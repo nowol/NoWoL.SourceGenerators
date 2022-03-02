@@ -161,6 +161,18 @@ namespace NoWoL.SourceGenerators
             return modifiers + " ";
         }
 
+        private static string GetModifier(ClassDeclarationSyntax target, SyntaxKind kind, bool addTrailingSpace = false)
+        {
+            var modifier = target.Modifiers.FirstOrDefault(m => m.IsKind(kind)).ValueText;
+
+            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifier))
+            {
+                return modifier;
+            }
+
+            return modifier + " ";
+        }
+
         private static AttributeData GetExceptionGeneratorAttribute(ISymbol targetType, INamedTypeSymbol excepGeneratorAttr)
         {
             return targetType.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Equals(excepGeneratorAttr, SymbolEqualityComparer.Default) ?? false);
@@ -197,9 +209,9 @@ namespace NoWoL.SourceGenerators
         private static string BuildClassDefinition(ClassDeclarationSyntax classDef)
         {
             var modifiers = GetClassAccessModifiers(classDef, addTrailingSpace: true);
-            var staticDef = IsStaticClass(classDef) ? "static " : String.Empty;
-            var partialDef = IsPartialClass(classDef) ? "partial " : String.Empty;
-            var abstractDef = IsAbstractClass(classDef) ? "abstract " : String.Empty;
+            var staticDef = GetModifier(classDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
+            var partialDef = GetModifier(classDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
+            var abstractDef = GetModifier(classDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
 
             return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {classDef.Identifier.Value}";
         }
