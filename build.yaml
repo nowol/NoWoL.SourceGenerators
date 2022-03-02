@@ -8,7 +8,7 @@ pool:
 
 variables:
 - group: "NugetAuth"
-- group: "SonarCloudNoWoLTestingUtilities"
+- group: "SonarCloudNowolSourceGenerators"
 - name: buildConfiguration
   value: 'Release'
 
