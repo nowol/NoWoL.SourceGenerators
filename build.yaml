@@ -1,0 +1,158 @@
+trigger:
+- main
+- features/*
+- bugs/*
+
+pool:
+  vmImage: windows-2022
+
+variables:
+- group: "NugetAuth"
+- group: "SonarCloudNoWoLTestingUtilities"
+- name: buildConfiguration
+  value: 'Release'
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: 
+    steps:
+      - task: UseDotNet@2
+        displayName: 'Install .Net 6'
+        inputs:
+          packageType: 'sdk'
+          version: '6.x'
+
+      - task: gitversion/setup@0
+        displayName: 'Install GitVersion'
+        inputs:
+          versionSpec: '5.x'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Install Report Generator'
+        inputs:
+          command: 'custom'
+          custom: 'tool'
+          arguments: 'install -g dotnet-reportgenerator-globaltool'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Install Sonar Scanner'
+        inputs:
+          command: 'custom'
+          custom: 'tool'
+          arguments: 'install -g dotnet-sonarscanner'
+
+      - task: gitversion/execute@0
+        displayName: 'Execute GitVersion'
+        inputs:
+          additionalArguments: '/updateprojectfiles'
+
+      - task: SonarCloudPrepare@1
+        displayName: 'Install Sonar Scanner'
+        env:
+            SONAR_TOKEN: $(SonarCloudProjectToken)
+        inputs:
+          SonarCloud: 'SonarCloud'
+          organization: 'nowol'
+          scannerMode: 'CLI'
+          configMode: 'manual'
+          cliProjectKey: '$(SonarCloudProjectKey)'
+          cliSources: '.'
+          extraProperties: |
+              sonar.cs.vstest.reportsPaths=artifacts\TestResults\*.trx
+              sonar.cs.vscoveragexml.reportsPaths=artifacts\TestResults\**\*.coveragexml
+              sonar.cs.opencover.reportsPaths=artifacts\TestResults\**\coverage.opencover.xml
+              sonar.verbose=true
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Execute Build In $(buildConfiguration) Mode'
+        inputs:
+          command: 'build'
+          arguments: '--configuration $(buildConfiguration)'
+
+      - task: CopyFiles@2
+        displayName: 'Copy Nuget Files To Artifacts Folder'
+        inputs:
+          sourceFolder: '$(Build.SourcesDirectory)'
+          contents: '**/$(buildConfiguration)/**/?(*.nupkg|*.snupkg)'
+          targetFolder: '$(Build.ArtifactStagingDirectory)/artifacts'
+          flattenFolders: true
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Nuget Files'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)/artifacts'
+          artifactName: Nuget
+
+      - task: PowerShell@2
+        displayName: 'Execute Tests'
+        inputs:
+          targetType: 'inline'
+          script: |
+            dotnet test NoWoL.SourceGenerators.sln --collect:"XPlat Code Coverage" --no-build --no-restore --configuration $(buildConfiguration) --logger "trx;LogFileName=TestResults.trx" --results-directory "artifacts\TestResults" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
+            $allTestsPassed = $?
+            
+            reportgenerator -reports:artifacts\TestResults\*\coverage.cobertura.xml -targetdir:"artifacts\coveragereport" -reporttypes:Html
+            
+            if (-not $allTestsPassed) {
+                throw "Some test have failed."
+            }
+      
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish Code Coverage Results'
+        condition: succeededOrFailed()
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/artifacts/TestResults/**/coverage.cobertura.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/artifacts/coveragereport'
+      
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: 'VSTest'
+          testResultsFiles: 'artifacts/TestResults/TestResults.trx'
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+
+      - task: SonarCloudAnalyze@1
+        displayName: 'Run Sonar Scanner'
+
+      - task: SonarCloudPublish@1
+        inputs:
+          pollingTimeoutSec: '300'
+
+      - task: BuildQualityChecks@8
+        displayName: 'Ensure Code Coverage'
+        inputs:
+          checkCoverage: true
+          coverageFailOption: 'fixed'
+          coverageType: 'branches'
+          coverageThreshold: '100'
+
+- stage: Publishing
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
+  displayName: 'Nuget - Publish Public Packages'
+  jobs:
+  - job: 
+    steps:
+      - task: DownloadBuildArtifacts@1
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'Nuget'
+          downloadPath: '$(System.ArtifactsDirectory)/artifacts/'
+
+      - task: DotNetCoreCLI@2
+        displayName: Publish nuget packages
+        enabled: true
+        inputs:
+          workingDirectory: '$(System.ArtifactsDirectory)'
+          command: custom
+          custom: nuget
+          arguments: >
+            push artifacts\Nuget\*.nupkg
+            -s $(NugetUrl)
+            -k $(NugetApiKey)

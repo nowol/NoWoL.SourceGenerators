@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ClassWithoutAttribute.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithoutPartialShouldFail.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithParametrizedMessageShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithParametrizedMessageShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithTransformedParametrizedMessageShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithAttributeWithTransformedParametrizedMessageShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\GeneratorShouldIgnoreAttributeWithSameName.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\NestedClassesShouldMustBePartial.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\NestedClassesShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\NestedClassesShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.cs" />
+	  <Compile Remove="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ValueToStringTransformer.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\AliasedAttributeShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldMustBePartial.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ClassModifiersShouldBePreserved.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\GeneratorShouldIgnoreAttributeWithSameName.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithTransformedParametrizedMessageShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithTransformedParametrizedMessageShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithParametrizedMessageShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithParametrizedMessageShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithoutPartialShouldFail.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Generated.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ClassWithoutAttribute.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\ValueToStringTransformer.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.0.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\NoWoL.SourceGenerators\NoWoL.SourceGenerators.csproj" />
+	</ItemGroup>
+
+</Project>
