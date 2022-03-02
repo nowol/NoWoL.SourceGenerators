@@ -133,16 +133,6 @@ namespace NoWoL.SourceGenerators
             return target.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
-        private static bool IsStaticClass(ClassDeclarationSyntax target)
-        {
-            return target.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
-        }
-
-        private static bool IsAbstractClass(ClassDeclarationSyntax target)
-        {
-            return target.Modifiers.Any(m => m.IsKind(SyntaxKind.AbstractKeyword));
-        }
-
         private static string GetClassAccessModifiers(ClassDeclarationSyntax target, bool addTrailingSpace = false)
         {
             var modifiersSyntax = target.Modifiers.Where(m => m.IsKind(SyntaxKind.PrivateKeyword)
