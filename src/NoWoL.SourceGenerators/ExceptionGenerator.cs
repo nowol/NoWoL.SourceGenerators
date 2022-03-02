@@ -165,7 +165,7 @@ namespace NoWoL.SourceGenerators
 
         private static AttributeData GetExceptionGeneratorAttribute(ISymbol targetType, INamedTypeSymbol excepGeneratorAttr)
         {
-            return targetType.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Equals(excepGeneratorAttr, SymbolEqualityComparer.Default) ?? false);
+            return targetType.GetAttributes().FirstOrDefault(x => x.AttributeClass!.Equals(excepGeneratorAttr, SymbolEqualityComparer.Default));
         }
 
         private void GenerateException(IndentedStringBuilder sb, ISymbol targetType, ClassDeclarationSyntax target, AttributeData exceptionGeneratorAttribute, string ns)
