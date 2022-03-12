@@ -203,5 +203,13 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task TestedNamespaceShouldSucceed()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
     }
 }

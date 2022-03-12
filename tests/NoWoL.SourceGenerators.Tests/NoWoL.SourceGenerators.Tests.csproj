@@ -37,6 +37,8 @@
 	  <Compile Remove="Content\TestFiles\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
 	  <Compile Remove="Content\TestFiles\NestedClassesShouldSucceed.Generated.TestClass_3f09774f3ea0ded540bc58382252aeca.cs" />
 	  <Compile Remove="Content\TestFiles\NestedClassesShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\TestedNamespaceShouldSucceed.Generated.TestClass_a383433eba2b14850b3edf28962b30d7.cs" />
+	  <Compile Remove="Content\TestFiles\TestedNamespaceShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.AnotherTestClass_b331070b72c92651e7adfb4752fa9bfd.cs" />
 	  <Compile Remove="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.TestClass_3b5abaddc0344111a05bc707222d4f00.cs" />
 	  <Compile Remove="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
@@ -60,6 +62,7 @@
 		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldMustBePartial.Initial.cs" />
 		<EmbeddedResource Include="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassNone_0122d5e492331a87bdb8d329c5eb322d.cs" />
 		<EmbeddedResource Include="Content\TestFiles\ClassModifiersShouldBePreserved.Initial.cs" />
+		<EmbeddedResource Include="Content\TestFiles\TestedNamespaceShouldSucceed.Generated.TestClass_a383433eba2b14850b3edf28962b30d7.cs" />
 		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldSucceed.Generated.TestClass_3f09774f3ea0ded540bc58382252aeca.cs" />
 		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
 		<EmbeddedResource Include="Content\TestFiles\NestedClassesShouldSucceed.Initial.cs" />
@@ -71,6 +74,7 @@
 		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithTransformedParametrizedMessageShouldSucceed.Initial.cs" />
 		<EmbeddedResource Include="Content\TestFiles\ExceptionClassWithAttributeWithParametrizedMessageShouldSucceed.Initial.cs" />
 		<EmbeddedResource Include="Content\TestFiles\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
+		<EmbeddedResource Include="Content\TestFiles\TestedNamespaceShouldSucceed.Initial.cs" />
 		<EmbeddedResource Include="Content\TestFiles\TwoExceptionsInDifferentScopeWithSameNameShouldBeGenerated.Generated.TestClass_622e170805df79b45c9e35700714460b.cs" />
 		<EmbeddedResource Include="Content\TestFiles\TwoExceptionsInDifferentScopeWithSameNameShouldBeGenerated.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 		<EmbeddedResource Include="Content\TestFiles\TwoExceptionsInDifferentScopeWithSameNameShouldBeGenerated.Initial.cs" />

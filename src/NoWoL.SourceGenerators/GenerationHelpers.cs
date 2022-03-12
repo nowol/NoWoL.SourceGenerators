@@ -11,24 +11,39 @@ namespace NoWoL.SourceGenerators
 {
     internal static class GenerationHelpers
     {
-        public static bool IsPartialClass(ClassDeclarationSyntax target)
+        public static bool IsPartialClass(ClassDeclarationSyntax syntax)
         {
-            return target.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+            return syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
-        public static string? GetNamespace(ClassDeclarationSyntax target)
+        public static string GetNamespace(ClassDeclarationSyntax syntax)
         {
-            if (target.AncestorsAndSelf().FirstOrDefault(x => x.IsKind(SyntaxKind.NamespaceDeclaration)) is NamespaceDeclarationSyntax ns)
+            // determine the namespace the class is declared in, if any
+            string nameSpace = string.Empty;
+            SyntaxNode? potentialNamespaceParent = syntax.Parent;
+            while (potentialNamespaceParent != null &&
+                   potentialNamespaceParent is not NamespaceDeclarationSyntax
+                   && potentialNamespaceParent is not FileScopedNamespaceDeclarationSyntax)
             {
-                return ns.Name.ToString();
+                potentialNamespaceParent = potentialNamespaceParent.Parent;
             }
 
-            if (target.AncestorsAndSelf().FirstOrDefault(x => x.IsKind(SyntaxKind.FileScopedNamespaceDeclaration)) is FileScopedNamespaceDeclarationSyntax scopedNs)
+            if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax namespaceParent)
             {
-                return scopedNs.Name.ToString();
+                nameSpace = namespaceParent.Name.ToString();
+                while (true)
+                {
+                    if (namespaceParent.Parent is not NamespaceDeclarationSyntax parent)
+                    {
+                        break;
+                    }
+
+                    namespaceParent = parent;
+                    nameSpace = $"{namespaceParent.Name}.{nameSpace}";
+                }
             }
 
-            return null;
+            return nameSpace;
         }
 
         private static readonly MD5CryptoServiceProvider Md5Algo = new ();
