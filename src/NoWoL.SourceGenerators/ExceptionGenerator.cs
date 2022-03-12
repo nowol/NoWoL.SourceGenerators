@@ -2,19 +2,250 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace NoWoL.SourceGenerators
 {
     [Generator]
-    public class ExceptionGenerator : ISourceGenerator
+    public class ExceptionGenerator : IIncrementalGenerator
     {
+        // This class was adapted from NetEscapades.EnumGenerators
+        // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
+
+        private const string ExceptionGeneratorAttributeFqn = "NoWoL.SourceGenerators.ExceptionGeneratorAttribute";
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
+        {
+            context.RegisterPostInitializationOutput(ctx => ctx.AddSource("ExceptionGeneratorAttributeFqn.g.cs",
+                                                                          SourceText.From(EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly, 
+                                                                                                                     EmbeddedResourceLoader.ExceptionGeneratorAttributeFileName)!,
+                                                                                          Encoding.UTF8)));
+
+            IncrementalValuesProvider<ClassDeclarationSyntax> classDeclarations = context.SyntaxProvider
+                                                                                         .CreateSyntaxProvider(predicate: static (s, _) => IsSyntaxTargetForGeneration(s),
+                                                                                                               transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
+                                                                                         .Where(static m => m is not null)!;
+
+            IncrementalValueProvider<(Compilation, ImmutableArray<ClassDeclarationSyntax>)> compilationAndClasses
+                = context.CompilationProvider.Combine(classDeclarations.Collect());
+
+            context.RegisterSourceOutput(compilationAndClasses,
+                                         static (spc, source) => Execute(source.Item1, source.Item2, spc));
+        }
+
+        private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
+        {
+            return node is ClassDeclarationSyntax cds
+                   && cds.AttributeLists.Count > 0
+                   && !String.Equals(cds.Identifier.ValueText, "ExceptionGeneratorAttribute", StringComparison.Ordinal);
+        }
+
+        private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+        {
+            // we know the node is a ClassDeclarationSyntax thanks to IsSyntaxTargetForGeneration
+            var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
+
+            // loop through all the attributes on the method
+            foreach (AttributeListSyntax attributeListSyntax in classDeclarationSyntax.AttributeLists)
+            {
+                foreach (var (attributeSyntax, attributeSymbol) in FilterAttributes(attributeListSyntax))
+                {
+                    INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
+                    string fullName = attributeContainingTypeSymbol.ToDisplayString();
+
+                    // Is the attribute the [ExceptionGenerator] attribute?
+                    if (fullName == ExceptionGeneratorAttributeFqn)
+                    {
+                        // return the class
+                        return classDeclarationSyntax;
+                    }
+                }
+            }
+
+            // we didn't find the attribute we were looking for
+            return null;
+
+            // moving the non testable code (the continue) to its own method to ignore it
+            [ExcludeFromCodeCoverage]
+            List<(AttributeSyntax, IMethodSymbol)> FilterAttributes(AttributeListSyntax attributeListSyntax)
+            {
+                var results = new List<(AttributeSyntax, IMethodSymbol)>();
+
+                foreach (var attributeSyntax in attributeListSyntax.Attributes)
+                {
+                    if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
+                    {
+                        // weird, we couldn't get the symbol, ignore it
+                        continue;
+                    }
+
+                    results.Add((attributeSyntax, attributeSymbol));
+                }
+
+                return results;
+            }
+        }
+
+        private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
+        {
+            if (!CanExecute(classes, compilation, out var classAttribute))
+            {
+                return;
+            }
+
+            IEnumerable<ClassDeclarationSyntax> distinctClasses = classes.Distinct();
+
+            List<ClassToGenerate> classesToGenerate = GetTypesToGenerate(compilation,
+                                                                         context,
+                                                                         distinctClasses,
+                                                                         classAttribute!,
+                                                                         context.CancellationToken);
+            if (classesToGenerate.Count > 0)
+            {
+                var sb = new IndentedStringBuilder();
+                var classBuilder = new ExceptionClassBuilder();
+                foreach (var classToGenerate in classesToGenerate)
+                {
+                    sb.Clear(true);
+                    var result = classBuilder.GenerateException(sb, classToGenerate);
+                    context.AddSource(result.FileName, SourceText.From(sb.ToString(), Encoding.UTF8));
+                }
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        private static bool CanExecute(ImmutableArray<ClassDeclarationSyntax> classes, Compilation compilation, out INamedTypeSymbol? classAttribute)
+        {
+            if (classes.IsDefaultOrEmpty)
+            {
+                // nothing to do yet
+                classAttribute = null;
+                return false;
+            }
+
+            classAttribute = compilation.GetTypeByMetadataName(ExceptionGeneratorAttributeFqn);
+            if (classAttribute == null)
+            {
+                // nothing to do if this type isn't available
+                return false;
+            }
+
+            return true;
+        }
+
+        private static List<ClassToGenerate> GetTypesToGenerate(Compilation compilation,
+                                                                SourceProductionContext context,
+                                                                IEnumerable<ClassDeclarationSyntax> classes,
+                                                                INamedTypeSymbol classAttribute,
+                                                                CancellationToken ct)
+        {
+            var classesToGenerate = new List<ClassToGenerate>();
+
+            foreach (var (classDeclarationSyntax, classSymbol) in FilterClasses())
+            {
+                // stop if we're asked to
+                ct.ThrowIfCancellationRequested();
+
+                var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
+
+                if (!ValidateTarget(context, classDeclarationSyntax, ns))
+                {
+                    continue;
+                }
+
+                // It's OK to use First() here since we have validated the presence of the attribute in a previous step
+                var exceptionAttribute = classSymbol.GetAttributes().First(x => classAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default));
+
+                classesToGenerate.Add(new ClassToGenerate(classDeclarationSyntax,
+                                                          classSymbol,
+                                                          exceptionAttribute,
+                                                          ns));
+            }
+
+            return classesToGenerate;
+
+            // moving the non testable code (the continue) to its own method to ignore it
+            [ExcludeFromCodeCoverage]
+            List<(ClassDeclarationSyntax, INamedTypeSymbol)> FilterClasses()
+            {
+                var results = new List<(ClassDeclarationSyntax, INamedTypeSymbol)>();
+
+                foreach (var classDeclarationSyntax in classes)
+                {
+                    SemanticModel semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
+                    var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+
+                    if (classSymbol == null)
+                    {
+                        // report diagnostic, something went wrong
+                        continue;
+                    }
+
+                    results.Add((classDeclarationSyntax, classSymbol));
+                }
+
+                return results;
+            }
+        }
+        
+        private static bool ValidateTarget(SourceProductionContext context, ClassDeclarationSyntax target, string? ns)
+        {
+            if (!GenerationHelpers.IsPartialClass(target))
+            {
+                context.ReportDiagnostic(Diagnostic.Create("EG01",
+                                                           "Exception generator",
+                                                           "The [ExceptionGenerator] must be applied to a partial class.",
+                                                           defaultSeverity: DiagnosticSeverity.Error,
+                                                           severity: DiagnosticSeverity.Error,
+                                                           isEnabledByDefault: true,
+                                                           warningLevel: 0,
+                                                           location: target.GetLocation()));
+
+                return false;
+            }
+
+            if (String.IsNullOrWhiteSpace(ns))
+            {
+                context.ReportDiagnostic(Diagnostic.Create("EG02",
+                                                           "Exception generator",
+                                                           "The [ExceptionGenerator] must be applied to a partial class contained in a namespace.",
+                                                           defaultSeverity: DiagnosticSeverity.Error,
+                                                           severity: DiagnosticSeverity.Error,
+                                                           isEnabledByDefault: true,
+                                                           warningLevel: 0,
+                                                           location: target.GetLocation()));
+
+                return false;
+            }
+
+            var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
+            if (parentClasses.Any(x => !GenerationHelpers.IsPartialClass(x)))
+            {
+                context.ReportDiagnostic(Diagnostic.Create("EG03",
+                                                           "Exception generator",
+                                                           "The [ExceptionGenerator] must be applied to a partial class nested in another partial class.",
+                                                           defaultSeverity: DiagnosticSeverity.Error,
+                                                           severity: DiagnosticSeverity.Error,
+                                                           isEnabledByDefault: true,
+                                                           warningLevel: 0,
+                                                           location: target.GetLocation()));
+
+                return false;
+            }
+
+            return true;
+        }
+
+        /*
+
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForPostInitialization(initializationContext =>
@@ -66,11 +297,12 @@ namespace NoWoL.SourceGenerators
                     sb.AppendLine("");
                 }
 
-                GenerateException(sb,
-                                  targetType,
-                                  target,
-                                  exceptionGeneratorAttribute,
-                                  ns);
+                var b = new ExceptionClassBuilder(targetType,
+                                                     target,
+                                                     exceptionGeneratorAttribute,
+                                                     ns);
+
+                b.GenerateException(sb);
             }
 
             if (sb.Length > 0)
@@ -133,193 +365,9 @@ namespace NoWoL.SourceGenerators
             return target.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
-        private static string GetClassAccessModifiers(ClassDeclarationSyntax target, bool addTrailingSpace = false)
-        {
-            var modifiersSyntax = target.Modifiers.Where(m => m.IsKind(SyntaxKind.PrivateKeyword)
-                                                                || m.IsKind(SyntaxKind.PublicKeyword)
-                                                                || m.IsKind(SyntaxKind.ProtectedKeyword)
-                                                                || m.IsKind(SyntaxKind.InternalKeyword));
-
-            var modifiers = String.Join(" ",
-                                        modifiersSyntax.Select(x => x.ValueText));
-
-            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifiers))
-            {
-                return modifiers;
-            }
-
-            return modifiers + " ";
-        }
-
-        private static string GetModifier(ClassDeclarationSyntax target, SyntaxKind kind, bool addTrailingSpace = false)
-        {
-            var modifier = target.Modifiers.FirstOrDefault(m => m.IsKind(kind)).ValueText;
-
-            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifier))
-            {
-                return modifier;
-            }
-
-            return modifier + " ";
-        }
-
         private static AttributeData GetExceptionGeneratorAttribute(ISymbol targetType, INamedTypeSymbol excepGeneratorAttr)
         {
             return targetType.GetAttributes().FirstOrDefault(x => x.AttributeClass!.Equals(excepGeneratorAttr, SymbolEqualityComparer.Default));
-        }
-
-        private void GenerateException(IndentedStringBuilder sb, ISymbol targetType, ClassDeclarationSyntax target, AttributeData exceptionGeneratorAttribute, string ns)
-        {
-            var className = targetType.Name;
-
-            sb.AppendLine($@"namespace {ns}
-{{");
-            var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Reverse();
-
-            foreach (var parentClass in parentClasses)
-            {
-                sb.IncreaseIndent();
-                sb.AppendLine(BuildClassDefinition(parentClass));
-                sb.AppendLine($@"{{");
-            }
-
-            AddExceptionBody(sb, className, exceptionGeneratorAttribute, target);
-
-            if (sb.Indent > 0)
-            {
-                sb.AppendLine("", skipIndent: true);
-                while (sb.Indent > 0)
-                {
-                    sb.DecreaseIndent();
-                    sb.AppendLine($@"}}");
-                }
-            }
-        }
-
-        private static string BuildClassDefinition(ClassDeclarationSyntax classDef)
-        {
-            var modifiers = GetClassAccessModifiers(classDef, addTrailingSpace: true);
-            var staticDef = GetModifier(classDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
-            var partialDef = GetModifier(classDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
-            var abstractDef = GetModifier(classDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
-
-            return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {classDef.Identifier.Value}";
-        }
-
-        private void AddExceptionBody(IndentedStringBuilder sb, string className, AttributeData exceptionGeneratorAttribute, ClassDeclarationSyntax target)
-        {
-            sb.AppendLines($@"    // This is generated code
-    [System.Serializable]
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    {BuildClassDefinition(target)} : System.Exception
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-    {{
-        /// <summary>
-        /// Creates an instance of the <see cref=""{className}""/> class.
-        /// </summary>
-        public {className}()
-        {{}}
-
-        /// <summary>
-        /// Creates an instance of the <see cref=""{className}""/> class.
-        /// </summary>
-        /// <param name=""message"">Message of the exception</param>
-        public {className}(string message)
-            : base(message)
-        {{}}
-
-        /// <summary>
-        /// Creates an instance of the <see cref=""{className}""/> class.
-        /// </summary>
-        /// <param name=""message"">Message of the exception</param>
-        /// <param name=""innerException"">Optional inner exception</param>
-        public {className}(string message, System.Exception innerException)
-            : base(message, innerException)
-        {{}}
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref=""{className}""/> class.
-        /// </summary>
-        /// <param name=""info"">Serialization info</param>
-        /// <param name=""context"">Serialization context</param>
-        protected {className}(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-            : base(info, context)
-        {{
-        }}", removeLastNewLines: true);
-
-            var exceptionHelper = GenerateExceptionHelper(className, exceptionGeneratorAttribute);
-            if (exceptionHelper != null)
-            {
-                sb.AppendLines(exceptionHelper, removeLastNewLines: true);
-            }
-
-            sb.AppendLines(@"
-    }
-}", removeLastNewLines: true);
-        }
-
-        private static string GetExceptionAttributeMessage(AttributeData exceptionGeneratorAttribute)
-        {
-            if (exceptionGeneratorAttribute.ConstructorArguments.Length != 1)
-            {
-                return null;
-            }
-
-            return exceptionGeneratorAttribute.ConstructorArguments[0].Value as string;
-        }
-
-        private string GenerateExceptionHelper(string className, AttributeData exceptionGeneratorAttribute)
-        {
-            var standardMessage = GetExceptionAttributeMessage(exceptionGeneratorAttribute);
-
-            if (standardMessage == null)
-            {
-                return null;
-            }
-
-            var parameters = new List<(string type, string name)>();
-            var template = Regex.Replace(standardMessage,
-                                         @"\{(?<Formatter><[^<>{}]+>)?\s*(?<DataType>[^ {}]+)\s+(?<ParamName>[^{}]+)\}",
-                                         new MatchEvaluator(ReplaceParameterMatch));
-            var methodParameters = parameters.Count == 0 ?
-                                       String.Empty :
-                                       String.Join(", ", parameters.Select(x => $"{x.type} {x.name}")) + ", ";
-
-            return $@"
-
-        /// <summary>
-        /// Helper method to create the exception
-        /// </summary>
-        /// <param name=""innerException"">Optional inner exception</param>
-        /// <returns>An instance of the <see cref=""{className}""/> exception</returns>
-#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        public static {className} Create({methodParameters}System.Exception innerException = null)
-#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        {{
-#pragma warning disable CA1062 // Validate arguments of public methods
-            return new {className}($""{template}"", innerException);
-#pragma warning restore CA1062 // Validate arguments of public methods
-        }}";
-
-            string ReplaceParameterMatch(Match match)
-            {
-                {
-                    var dataType = match.Groups["DataType"].Value;
-                    var name = match.Groups["ParamName"].Value;
-
-                    parameters.Add((dataType, name));
-
-                    if (match.Groups["Formatter"].Success)
-                    {
-                        var formatter = match.Groups["Formatter"].Value.Trim(new[] { '<', '>' });
-
-                        return "{" + formatter + "(" + name + ")" + "}";
-                    }
-
-                    return "{" + name + "}";
-                }
-            }
         }
 
         private static string GetNamespace(ClassDeclarationSyntax target)
@@ -350,6 +398,6 @@ namespace NoWoL.SourceGenerators
                     Targets.Add(cds);
                 }
             }
-        }
+        }*/
     }
 }

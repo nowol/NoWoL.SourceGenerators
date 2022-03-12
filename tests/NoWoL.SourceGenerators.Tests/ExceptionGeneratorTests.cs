@@ -1,13 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
-using VerifyCS = NoWoL.SourceGenerators.Tests.CSharpSourceGeneratorVerifier<NoWoL.SourceGenerators.ExceptionGenerator>;
+using VerifyCS = CSharpGeneratorVerifier<NoWoL.SourceGenerators.ExceptionGenerator>;
 
 namespace NoWoL.SourceGenerators.Tests
 {
+
+    // The generated files must appear in the correct order expected by the test runner. You may need to reorder the classes in your Initial file to match the generated output
+
     public class ExceptionGeneratorTests
     {
         private async Task WithWithEmbeddedFiles(List<DiagnosticResult>? expectedDiagnosticResults = null,
@@ -21,8 +23,16 @@ namespace NoWoL.SourceGenerators.Tests
             }
 
             var initialCode = EmbeddedResourceLoader.Get(typeof(ExceptionGeneratorTests).Assembly, $"NoWoL.SourceGenerators.Tests.Content.TestFiles.{callerMemberName}.Initial.cs");
-            var generatedCode = EmbeddedResourceLoader.Get(typeof(ExceptionGeneratorTests).Assembly, $"NoWoL.SourceGenerators.Tests.Content.TestFiles.{callerMemberName}.Generated.cs");
-            var attrCode = EmbeddedResourceLoader.Get(EmbeddedResourceLoader.ExceptionGeneratorAttributeFileName);
+
+            if (initialCode == null)
+            {
+                throw new ArgumentException($"Could not find an initial file for {callerMemberName}",
+                                            nameof(callerMemberName));
+            }
+
+            var generatedCodes = EmbeddedResourceLoader.GetFilesFromPartialName(typeof(ExceptionGeneratorTests).Assembly, "NoWoL.SourceGenerators.Tests.Content.TestFiles", $"{callerMemberName}.Generated.");
+            var attrCode = EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly, 
+                                                      EmbeddedResourceLoader.ExceptionGeneratorAttributeFileName)!;
 
             if (additionalSourceFiles != null)
             {
@@ -41,16 +51,19 @@ namespace NoWoL.SourceGenerators.Tests
                                Sources = { initialCode },
                                GeneratedSources =
                                {
-                                   (typeof(ExceptionGenerator), "ExceptionGeneratorAttribute.g.cs", SourceText.From(attrCode, Encoding.UTF8, SourceHashAlgorithm.Sha1))
+                                   (typeof(ExceptionGenerator), "ExceptionGeneratorAttributeFqn.g.cs", SourceText.From(attrCode, Encoding.UTF8, SourceHashAlgorithm.Sha1))
                                }
                            }
             };
 
-            if (generatedCode != null)
+            if (generatedCodes.Count > 0)
             {
-                test.TestState.GeneratedSources.Add((typeof(ExceptionGenerator), "ExceptionGenerator.g.cs", SourceText.From(generatedCode,
-                                                                                                                            Encoding.UTF8,
-                                                                                                                            SourceHashAlgorithm.Sha1)));
+                foreach (var generatedCode in generatedCodes.OrderBy(x => x.FileName))
+                {
+                    test.TestState.GeneratedSources.Add((typeof(ExceptionGenerator), $"{generatedCode.FileName}.g.cs", SourceText.From(generatedCode.Content!,
+                                                                                                                                       Encoding.UTF8,
+                                                                                                                                       SourceHashAlgorithm.Sha1)));
+                }
             }
 
             if (expectedDiagnosticResults != null)
@@ -142,7 +155,7 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public async Task GeneratorShouldIgnoreAttributeWithSameName()
+        public async Task GeneratorShouldIgnoreAttributeWithSameAttributeName()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
@@ -179,6 +192,14 @@ namespace NoWoL.SourceGenerators.Tests
         [Trait("Category",
                "Unit")]
         public async Task ClassModifiersShouldBePreserved()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task TwoExceptionsInDifferentScopeWithSameNameShouldBeGenerated()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }

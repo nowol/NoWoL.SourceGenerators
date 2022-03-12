@@ -40,7 +40,7 @@ namespace NoWoL.SourceGenerators
             return this;
         }
 
-        private IndentedStringBuilder Append(string text, bool skipIndent = false)
+        public IndentedStringBuilder Append(string text, bool skipIndent = false)
         {
             if (!skipIndent)
             {
@@ -162,6 +162,16 @@ namespace NoWoL.SourceGenerators
             }
 
             return this;
+        }
+
+        public void Clear(bool resetIndent)
+        {
+            _builder.Clear();
+
+            if (resetIndent)
+            {
+                Indent = 0;
+            }
         }
     }
 }
