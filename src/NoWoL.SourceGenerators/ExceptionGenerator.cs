@@ -116,7 +116,7 @@ namespace NoWoL.SourceGenerators
                 {
                     sb.Clear(true);
                     var result = classBuilder.GenerateException(sb, classToGenerate);
-                    context.AddSource(result.FileName, SourceText.From(sb.ToString(), Encoding.UTF8));
+                    context.AddSource(result.FileName!, SourceText.From(sb.ToString(), Encoding.UTF8));
                 }
             }
         }

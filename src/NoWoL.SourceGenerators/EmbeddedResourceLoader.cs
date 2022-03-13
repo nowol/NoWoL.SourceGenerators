@@ -55,7 +55,6 @@ namespace NoWoL.SourceGenerators
                           });
             }
 
-
             return files;
 
             string GetFileName(string resourceName)

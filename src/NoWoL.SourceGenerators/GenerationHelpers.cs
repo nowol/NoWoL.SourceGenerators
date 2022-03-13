@@ -69,5 +69,45 @@ namespace NoWoL.SourceGenerators
 
             return sb.ToString();
         }
+
+        public static string GetModifier(ClassDeclarationSyntax target, SyntaxKind kind, bool addTrailingSpace = false)
+        {
+            var modifier = target.Modifiers.FirstOrDefault(m => m.IsKind(kind)).ValueText;
+
+            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifier))
+            {
+                return modifier;
+            }
+
+            return modifier + " ";
+        }
+
+        public static string BuildClassDefinition(ClassDeclarationSyntax classDef)
+        {
+            var modifiers = GetClassAccessModifiers(classDef, addTrailingSpace: true);
+            var staticDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
+            var partialDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
+            var abstractDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
+
+            return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {classDef.Identifier.Value}";
+        }
+
+        public static string GetClassAccessModifiers(ClassDeclarationSyntax target, bool addTrailingSpace = false)
+        {
+            var modifiersSyntax = target.Modifiers.Where(m => m.IsKind(SyntaxKind.PrivateKeyword)
+                                                              || m.IsKind(SyntaxKind.PublicKeyword)
+                                                              || m.IsKind(SyntaxKind.ProtectedKeyword)
+                                                              || m.IsKind(SyntaxKind.InternalKeyword));
+
+            var modifiers = String.Join(" ",
+                                        modifiersSyntax.Select(x => x.ValueText));
+
+            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifiers))
+            {
+                return modifiers;
+            }
+
+            return modifiers + " ";
+        }
     }
 }

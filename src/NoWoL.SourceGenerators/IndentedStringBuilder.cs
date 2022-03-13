@@ -40,69 +40,21 @@ namespace NoWoL.SourceGenerators
             return this;
         }
 
-        public IndentedStringBuilder Append(string text, bool skipIndent = false)
+        public IndentedStringBuilder Add(string? text, 
+                                         bool addNewLine = false,
+                                         bool removeLastNewLines = false)
         {
-            if (!skipIndent)
+            if (string.IsNullOrEmpty(text))
             {
-                AppendIndent();
-            }
+                if (addNewLine)
+                {
+                    _builder.AppendLine(String.Empty);
+                }
 
-            if (String.IsNullOrWhiteSpace(text))
-            {
                 return this;
             }
 
-            _builder.Append(text);
-
-            return this;
-        }
-
-        private void AppendIndent()
-        {
-            for (var i = 0; i < Indent; i++)
-            {
-                _builder.Append("    ");
-            }
-        }
-
-        public IndentedStringBuilder AppendLine(string text, bool skipIndent = false)
-        {
-            Append(text, skipIndent: skipIndent);
-            _builder.Append(Environment.NewLine);
-
-            return this;
-        }
-
-        public IndentedStringBuilder AppendLine(ReadOnlySpan<char> value)
-        {
-            Append(value);
-
-            _builder.Append(Environment.NewLine);
-
-            return this;
-        }
-
-        private void Append(ReadOnlySpan<char> value)
-        {
-            if (!value.IsEmpty)
-            {
-                AppendIndent();
-
-                foreach (var c in value)
-                {
-                    _builder.Append(c);
-                }
-            }
-        }
-
-        public IndentedStringBuilder AppendLines(string text, bool removeLastNewLines = false)
-        {
-            if (text == null)
-            {
-                return AppendLine(String.Empty);
-            }
-
-            var textLength = text.Length;
+            var textLength = text!.Length;
 
             if (removeLastNewLines)
             {
@@ -128,21 +80,33 @@ namespace NoWoL.SourceGenerators
                 if (text[i] == '\r')
                 {
                     int length = i - start;
-                    if (i + 1 < textLength && text[i+1] == '\n')
+                    if (i + 1 < textLength && text[i + 1] == '\n')
                     {
                         i++;
                     }
 
-                    AppendLine(text.AsSpan(start,
-                                           length));
+                    Append(text.AsSpan(start,
+                                       length));
+
+                    if (addNewLine)
+                    {
+                        _builder.Append(Environment.NewLine);
+                    }
+
                     start = i + 1;
                 }
                 else if (text[i] == '\n')
                 {
                     int length = i - start;
 
-                    AppendLine(text.AsSpan(start,
-                                           length));
+                    Append(text.AsSpan(start,
+                                    length));
+
+                    if (addNewLine)
+                    {
+                        _builder.Append(Environment.NewLine);
+                    }
+
                     start = i + 1;
                 }
             }
@@ -156,12 +120,38 @@ namespace NoWoL.SourceGenerators
                 }
                 else
                 {
-                    AppendLine(text.AsSpan(start,
-                                           textLength - start));
+                    Append(text.AsSpan(start,
+                                       textLength - start));
+
+                    if (addNewLine)
+                    {
+                        _builder.Append(Environment.NewLine);
+                    }
                 }
             }
 
             return this;
+        }
+
+        private void AppendIndent()
+        {
+            for (var i = 0; i < Indent; i++)
+            {
+                _builder.Append("    ");
+            }
+        }
+
+        private void Append(ReadOnlySpan<char> value)
+        {
+            if (!value.IsEmpty)
+            {
+                AppendIndent();
+
+                foreach (var c in value)
+                {
+                    _builder.Append(c);
+                }
+            }
         }
 
         public void Clear(bool resetIndent)

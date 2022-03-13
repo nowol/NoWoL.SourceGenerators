@@ -1,6 +1,6 @@
 # NoWoL.SourceGenerators
 
-NoWoL.SourceGenerators will contain C# source generators used to improve a developer's life. So far it only include a way to generate the boilerplate for an exception.
+NoWoL.SourceGenerators will contain C# (.NET 6/VS2022) source generators used to improve a developer's life. So far it only include a way to generate the boilerplate for an exception.
 
 ## Installation
 
@@ -49,3 +49,11 @@ Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## References
+
+Useful information for creating source generators:
+
+* Presentation by Andrey Dyatlov: https://youtu.be/052xutD86uI
+* https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
+* https://andrewlock.net/exploring-dotnet-6-part-9-source-generator-updates-incremental-generators/

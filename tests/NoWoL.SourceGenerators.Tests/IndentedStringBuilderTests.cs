@@ -14,10 +14,19 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public void AddingTextDoesNotAddNewLine()
+        {
+            _sut.Add("abc").Add("def");
+            Assert.Equal("abcdef",
+                         _sut.ToString());
+        }
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public void AddingTextIncreaseTheLength()
         {
-            _sut.AppendLine("abc").AppendLine("def");
-            Assert.Equal($"abc{Environment.NewLine}def{Environment.NewLine}".Length,
+            _sut.Add("abc", addNewLine: true).Add("def");
+            Assert.Equal($"abc{Environment.NewLine}def".Length,
                          _sut.Length);
         }
 
@@ -26,7 +35,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendTwoLines()
         {
-            _sut.AppendLine("abc").AppendLine("def");
+            _sut.Add("abc", addNewLine: true).Add("def", addNewLine: true);
             Assert.Equal($"abc{Environment.NewLine}def{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -36,7 +45,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendTwoLinesWithIndentOfOne()
         {
-            _sut.IncreaseIndent().AppendLine("abc").AppendLine("def");
+            _sut.IncreaseIndent().Add("abc", addNewLine: true).Add("def", addNewLine: true);
             Assert.Equal($"    abc{Environment.NewLine}    def{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -46,7 +55,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendThreeLines()
         {
-            _sut.AppendLine("abc").AppendLine("def").AppendLine("ghi");
+            _sut.Add("abc", addNewLine: true).Add("def", addNewLine: true).Add("ghi", addNewLine: true);
             Assert.Equal($"abc{Environment.NewLine}def{Environment.NewLine}ghi{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -56,7 +65,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendThreeLinesWithIndentOfOne()
         {
-            _sut.IncreaseIndent().AppendLine("abc").AppendLine("def").AppendLine("ghi");
+            _sut.IncreaseIndent().Add("abc", addNewLine: true).Add("def", addNewLine: true).Add("ghi", addNewLine: true);
             Assert.Equal($"    abc{Environment.NewLine}    def{Environment.NewLine}    ghi{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -66,7 +75,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendLineWithMultipleIndent()
         {
-            _sut.IncreaseIndent().AppendLine("abc").IncreaseIndent().AppendLine("def").DecreaseIndent().AppendLine("aaa");
+            _sut.IncreaseIndent().Add("abc", addNewLine: true).IncreaseIndent().Add("def", addNewLine: true).DecreaseIndent().Add("aaa", addNewLine: true);
             Assert.Equal($"    abc{Environment.NewLine}        def{Environment.NewLine}    aaa{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -76,7 +85,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void IncreaseIndentFollowedByDecreaseIndentCancelEachOtherOut()
         {
-            _sut.IncreaseIndent().DecreaseIndent().AppendLine("abc").AppendLine("def");
+            _sut.IncreaseIndent().DecreaseIndent().Add("abc", addNewLine: true).Add("def", addNewLine: true);
             Assert.Equal($"abc{Environment.NewLine}def{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -86,7 +95,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void DecreaseIndentWithoutIncreaseIndentDoesNothing()
         {
-            _sut.DecreaseIndent().AppendLine("abc");
+            _sut.DecreaseIndent().Add("abc", addNewLine: true);
             Assert.Equal($"abc{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -96,7 +105,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendMultipleLinesAtOnce()
         {
-            _sut.AppendLines("abc\r\ndef\r\n");
+            _sut.Add("abc\r\ndef\r\n", addNewLine: true);
             Assert.Equal($"abc{Environment.NewLine}def{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -108,7 +117,7 @@ namespace NoWoL.SourceGenerators.Tests
         [InlineData("\r\n")]
         public void AppendLinesWithOnlyOneNewLine(string value)
         {
-            _sut.AppendLines(value);
+            _sut.Add(value, addNewLine: true);
             Assert.Equal($"{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -121,7 +130,7 @@ namespace NoWoL.SourceGenerators.Tests
         [InlineData("\n\r")]
         public void AppendLinesWithTwoNewLine(string value)
         {
-            _sut.AppendLines(value);
+            _sut.Add(value, addNewLine: true);
             Assert.Equal($"{Environment.NewLine}{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -134,7 +143,7 @@ namespace NoWoL.SourceGenerators.Tests
         [InlineData("\n\r")]
         public void AppendLinesWithOnlyNewLinesShouldNotIndent(string value)
         {
-            _sut.IncreaseIndent().IncreaseIndent().AppendLines(value);
+            _sut.IncreaseIndent().IncreaseIndent().Add(value, addNewLine: true);
             Assert.Equal($"{Environment.NewLine}{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -144,7 +153,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AddingMultipleLineTextWithoutIndent()
         {
-            _sut.AppendLines("hello\nthere\r  how  \r\nyoudoing");
+            _sut.Add("hello\nthere\r  how  \r\nyoudoing", addNewLine: true);
             Assert.Equal($"hello{Environment.NewLine}there{Environment.NewLine}  how  {Environment.NewLine}youdoing{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -154,7 +163,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AddingMultipleLineTextWithIndent()
         {
-            _sut.IncreaseIndent().AppendLines("hello\nthere\r  how  \r\nyoudoing");
+            _sut.IncreaseIndent().Add("hello\nthere\r  how  \r\nyoudoing", addNewLine: true);
             Assert.Equal($"    hello{Environment.NewLine}    there{Environment.NewLine}      how  {Environment.NewLine}    youdoing{Environment.NewLine}",
                          _sut.ToString());
         }
@@ -164,38 +173,32 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendLinesWithNullTextGivesNewLineOnlyWithoutIndent()
         {
-            _sut.AppendLines(null);
+            _sut.Add(null, addNewLine: true);
             Assert.Equal($"{Environment.NewLine}",
                          _sut.ToString());
         }
 
-        [Fact]
+        [Theory]
         [Trait("Category",
                "Unit")]
-        public void AppendLinesWithNullTextGivesNewLineOnlyWithIndent()
+        [InlineData((string?)null)]
+        [InlineData("")]
+        public void AppendLinesWithEmptyTextGivesNewLineOnlyWithIndent(string? text)
         {
-            _sut.IncreaseIndent().AppendLines(null);
-            Assert.Equal($"    {Environment.NewLine}",
-                         _sut.ToString());
-        }
-
-        [Fact]
-        [Trait("Category",
-               "Unit")]
-        public void AppendLinesWithEmptyTextGivesNewLineOnlyWithoutIndent()
-        {
-            _sut.AppendLines(null);
+            _sut.IncreaseIndent().Add(text, addNewLine: true);
             Assert.Equal($"{Environment.NewLine}",
                          _sut.ToString());
         }
 
-        [Fact]
+        [Theory]
         [Trait("Category",
                "Unit")]
-        public void AppendLinesWithEmptyTextGivesNewLineOnlyWithIndent()
+        [InlineData((string?)null)]
+        [InlineData("")]
+        public void AppendLinesWithEmptyTextGivesNewLineOnlyWithoutIndent(string? text)
         {
-            _sut.IncreaseIndent().AppendLines(null);
-            Assert.Equal($"    {Environment.NewLine}",
+            _sut.Add(text, addNewLine: true);
+            Assert.Equal($"{Environment.NewLine}",
                          _sut.ToString());
         }
 
@@ -204,7 +207,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendLinesShouldNotAddTheLastNewLine()
         {
-            _sut.IncreaseIndent().AppendLines("abc\ndef", removeLastNewLines: true);
+            _sut.IncreaseIndent().Add("abc\ndef", removeLastNewLines: true, addNewLine: true);
             Assert.Equal($"    abc{Environment.NewLine}    def",
                          _sut.ToString());
         }
@@ -214,8 +217,52 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void AppendLinesShouldRemoveTheLastNewLine()
         {
-            _sut.IncreaseIndent().AppendLines("abc\ndef\n", removeLastNewLines: true);
+            _sut.IncreaseIndent().Add("abc\ndef\n", removeLastNewLines: true, addNewLine: true);
             Assert.Equal($"    abc{Environment.NewLine}    def",
+                         _sut.ToString());
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void ClearShouldRemoveTheContentAndKeepIndent()
+        {
+            _sut.IncreaseIndent().Add("abc");
+            Assert.Equal("    abc",
+                         _sut.ToString());
+            
+            _sut.Clear(false);
+
+            Assert.Equal(1,
+                         _sut.Indent);
+
+            Assert.Equal(String.Empty,
+                         _sut.ToString());
+            _sut.Add("def");
+
+            Assert.Equal("    def",
+                         _sut.ToString());
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void ClearShouldRemoveTheContentAndResetIndent()
+        {
+            _sut.IncreaseIndent().Add("abc");
+            Assert.Equal("    abc",
+                         _sut.ToString());
+            
+            _sut.Clear(true);
+
+            Assert.Equal(0,
+                         _sut.Indent);
+
+            Assert.Equal(String.Empty,
+                         _sut.ToString());
+            _sut.Add("def");
+
+            Assert.Equal("def",
                          _sut.ToString());
         }
     }

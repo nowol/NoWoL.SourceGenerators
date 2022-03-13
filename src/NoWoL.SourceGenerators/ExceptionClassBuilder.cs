@@ -10,17 +10,12 @@ using CSharpExtensions = Microsoft.CodeAnalysis.CSharpExtensions;
 
 namespace NoWoL.SourceGenerators
 {
-    internal class ExceptionClassBuilderResult
-    {
-        public string FileName { get; set; }
-    }
-
     internal class ExceptionClassBuilder
     {
         internal ExceptionClassBuilderResult GenerateException(IndentedStringBuilder sb, ClassToGenerate classToGenerate)
         {
-            sb.AppendLine($@"namespace {classToGenerate.NameSpace}
-{{");
+            sb.Add($@"namespace {classToGenerate.NameSpace}
+{{", addNewLine: true);
             var parentClasses = classToGenerate.ClassDeclarationSyntax.Ancestors().Where(x => CSharpExtensions.IsKind((SyntaxNode?)x,
                                                                                                      SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Reverse();
             var filenameStringBuilder = new StringBuilder();
@@ -28,26 +23,27 @@ namespace NoWoL.SourceGenerators
 
             foreach (var parentClass in parentClasses)
             {
-                var buildClassDefinition = BuildClassDefinition(parentClass);
+                var buildClassDefinition = GenerationHelpers.BuildClassDefinition(parentClass);
                 filenameStringBuilder.Append(buildClassDefinition);
 
                 sb.IncreaseIndent();
-                sb.AppendLine(buildClassDefinition);
-                sb.AppendLine($@"{{");
+                sb.Add(buildClassDefinition, addNewLine: true);
+                sb.Add($@"{{", addNewLine: true);
             }
 
             AddExceptionBody(sb, classToGenerate);
 
             if (sb.Indent > 0)
             {
-                sb.AppendLine("", skipIndent: true);
+                sb.Add("", addNewLine: true);
                 while (sb.Indent > 1)
                 {
                     sb.DecreaseIndent();
-                    sb.AppendLine($@"}}");
+                    sb.Add($@"}}", addNewLine: true);
                 }
+
                 sb.DecreaseIndent();
-                sb.Append($@"}}");
+                sb.Add($@"}}");
             }
 
             return new ExceptionClassBuilderResult
@@ -63,25 +59,15 @@ namespace NoWoL.SourceGenerators
             return name;
         }
 
-        private static string BuildClassDefinition(ClassDeclarationSyntax classDef)
-        {
-            var modifiers = GetClassAccessModifiers(classDef, addTrailingSpace: true);
-            var staticDef = GetModifier(classDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
-            var partialDef = GetModifier(classDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
-            var abstractDef = GetModifier(classDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
-
-            return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {classDef.Identifier.Value}";
-        }
-
         private void AddExceptionBody(IndentedStringBuilder sb, ClassToGenerate classToGenerate)
         {
             var className = classToGenerate.ClassSymbol.Name;
 
-            sb.AppendLines($@"    // This is generated code
+            sb.Add($@"    // This is generated code
     [System.Serializable]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    {BuildClassDefinition(classToGenerate.ClassDeclarationSyntax)} : System.Exception
+    {GenerationHelpers.BuildClassDefinition(classToGenerate.ClassDeclarationSyntax)} : System.Exception
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {{
         /// <summary>
@@ -115,50 +101,20 @@ namespace NoWoL.SourceGenerators
         protected {className}(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
             : base(info, context)
         {{
-        }}", removeLastNewLines: true);
+        }}", removeLastNewLines: true, addNewLine: true);
 
             var exceptionHelper = GenerateExceptionHelper(classToGenerate);
             if (exceptionHelper != null)
             {
-                sb.AppendLines(exceptionHelper, removeLastNewLines: true);
+                sb.Add(exceptionHelper, removeLastNewLines: true, addNewLine: true);
             }
 
-            sb.AppendLines(@"
+            sb.Add(@"
     }
-}", removeLastNewLines: true);
+}", removeLastNewLines: true, addNewLine: true);
         }
 
-        private static string GetClassAccessModifiers(ClassDeclarationSyntax target, bool addTrailingSpace = false)
-        {
-            var modifiersSyntax = target.Modifiers.Where(m => m.IsKind(SyntaxKind.PrivateKeyword)
-                                                              || m.IsKind(SyntaxKind.PublicKeyword)
-                                                              || m.IsKind(SyntaxKind.ProtectedKeyword)
-                                                              || m.IsKind(SyntaxKind.InternalKeyword));
-
-            var modifiers = String.Join(" ",
-                                        modifiersSyntax.Select(x => x.ValueText));
-
-            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifiers))
-            {
-                return modifiers;
-            }
-
-            return modifiers + " ";
-        }
-
-        private static string GetModifier(ClassDeclarationSyntax target, SyntaxKind kind, bool addTrailingSpace = false)
-        {
-            var modifier = target.Modifiers.FirstOrDefault(m => m.IsKind(kind)).ValueText;
-
-            if (!addTrailingSpace || String.IsNullOrWhiteSpace(modifier))
-            {
-                return modifier;
-            }
-
-            return modifier + " ";
-        }
-
-        private string GenerateExceptionHelper(ClassToGenerate classToGenerate)
+        private string? GenerateExceptionHelper(ClassToGenerate classToGenerate)
         {
             var className = classToGenerate.ClassSymbol.Name;
 
