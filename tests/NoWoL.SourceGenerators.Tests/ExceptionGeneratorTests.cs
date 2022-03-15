@@ -3,7 +3,7 @@ using System.Text;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
-using VerifyCS = CSharpGeneratorVerifier<NoWoL.SourceGenerators.ExceptionGenerator>;
+using VerifyCS = Microsoft.CodeAnalysis.CSharp.Testing.CSharpGeneratorVerifier<NoWoL.SourceGenerators.ExceptionGenerator>;
 
 namespace NoWoL.SourceGenerators.Tests
 {
@@ -12,9 +12,9 @@ namespace NoWoL.SourceGenerators.Tests
 
     public class ExceptionGeneratorTests
     {
-        private async Task WithWithEmbeddedFiles(List<DiagnosticResult>? expectedDiagnosticResults = null,
-                                                 List<string>? additionalSourceFiles = null,
-                                                 [CallerMemberName] string callerMemberName = "")
+        private static async Task WithWithEmbeddedFiles(List<DiagnosticResult>? expectedDiagnosticResults = null,
+                                                        List<string>? additionalSourceFiles = null,
+                                                        [CallerMemberName] string callerMemberName = "")
         {
             if (string.IsNullOrWhiteSpace(callerMemberName))
             {

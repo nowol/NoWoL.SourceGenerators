@@ -57,7 +57,7 @@ namespace NoWoL.SourceGenerators
 
             return files;
 
-            string GetFileName(string resourceName)
+            static string GetFileName(string resourceName)
             {
                 var parts = resourceName.Split('.');
 

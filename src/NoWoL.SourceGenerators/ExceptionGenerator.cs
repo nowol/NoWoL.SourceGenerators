@@ -56,7 +56,7 @@ namespace NoWoL.SourceGenerators
             // loop through all the attributes on the method
             foreach (AttributeListSyntax attributeListSyntax in classDeclarationSyntax.AttributeLists)
             {
-                foreach (var (attributeSyntax, attributeSymbol) in FilterAttributes(attributeListSyntax))
+                foreach (var (_, attributeSymbol) in FilterAttributes(attributeListSyntax))
                 {
                     INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                     string fullName = attributeContainingTypeSymbol.ToDisplayString();
@@ -181,7 +181,7 @@ namespace NoWoL.SourceGenerators
                 foreach (var classDeclarationSyntax in classes)
                 {
                     SemanticModel semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-                    var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax);
+                    var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, ct);
 
                     if (classSymbol == null)
                     {

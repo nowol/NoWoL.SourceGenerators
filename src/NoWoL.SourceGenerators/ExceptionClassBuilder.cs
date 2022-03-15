@@ -52,7 +52,7 @@ namespace NoWoL.SourceGenerators
                    };
         }
 
-        private string GenerateFileName(StringBuilder filenameStringBuilder, ClassToGenerate classToGenerate)
+        private static string GenerateFileName(StringBuilder filenameStringBuilder, ClassToGenerate classToGenerate)
         {
             var name = $"{classToGenerate.ClassSymbol.Name}_{GenerationHelpers.Md5(filenameStringBuilder.ToString())}.g.cs";
 
@@ -169,7 +169,7 @@ namespace NoWoL.SourceGenerators
             }
         }
 
-        private string? GetExceptionAttributeMessage(ClassToGenerate classToGenerate)
+        private static string? GetExceptionAttributeMessage(ClassToGenerate classToGenerate)
         {
             if (classToGenerate.ExceptionAttribute.ConstructorArguments.Length != 1)
             {

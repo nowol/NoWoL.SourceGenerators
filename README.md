@@ -55,5 +55,7 @@ Please make sure to update tests as appropriate.
 Useful information for creating source generators:
 
 * Presentation by Andrey Dyatlov: https://youtu.be/052xutD86uI
+* List of existing source generators: https://github.com/amis92/csharp-source-generators
 * https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
 * https://andrewlock.net/exploring-dotnet-6-part-9-source-generator-updates-incremental-generators/
+* https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md
