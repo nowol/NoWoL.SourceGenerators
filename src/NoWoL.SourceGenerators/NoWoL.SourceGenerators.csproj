@@ -31,9 +31,11 @@
 
 	<ItemGroup>
 	  <Compile Remove="Content\ExceptionGeneratorAttribute.cs" />
+	  <Compile Remove="Content\ExperimentalAsyncRemoverAttribute.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Content\ExperimentalAsyncRemoverAttribute.cs" />
 	  <EmbeddedResource Include="Content\ExceptionGeneratorAttribute.cs" />
 	</ItemGroup>
 

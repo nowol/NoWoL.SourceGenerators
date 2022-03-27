@@ -1,77 +1,24 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis.Testing;
 using Xunit;
-using VerifyCS = Microsoft.CodeAnalysis.CSharp.Testing.CSharpGeneratorVerifier<NoWoL.SourceGenerators.ExceptionGenerator>;
 
 namespace NoWoL.SourceGenerators.Tests
 {
 
     // The generated files must appear in the correct order expected by the test runner. You may need to reorder the classes in your Initial file to match the generated output
 
-    public class ExceptionGeneratorTests
+    public class ExceptionGeneratorTests : BaseGeneratorTests<NoWoL.SourceGenerators.ExceptionGenerator>
     {
-        private static async Task WithWithEmbeddedFiles(List<DiagnosticResult>? expectedDiagnosticResults = null,
-                                                        List<string>? additionalSourceFiles = null,
-                                                        [CallerMemberName] string callerMemberName = "")
+        public ExceptionGeneratorTests()
+            : base("Exception")
         {
-            if (string.IsNullOrWhiteSpace(callerMemberName))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.",
-                                            nameof(callerMemberName));
-            }
+            
+        }
 
-            var initialCode = EmbeddedResourceLoader.Get(typeof(ExceptionGeneratorTests).Assembly, $"NoWoL.SourceGenerators.Tests.Content.TestFiles.{callerMemberName}.Initial.cs");
-
-            if (initialCode == null)
-            {
-                throw new ArgumentException($"Could not find an initial file for {callerMemberName}",
-                                            nameof(callerMemberName));
-            }
-
-            var generatedCodes = EmbeddedResourceLoader.GetFilesFromPartialName(typeof(ExceptionGeneratorTests).Assembly, "NoWoL.SourceGenerators.Tests.Content.TestFiles", $"{callerMemberName}.Generated.");
-            var attrCode = EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly, 
+        protected override (string attrFileName, string fileContent) GetAttributeFileContent()
+        {
+            var attrCode = EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly,
                                                       EmbeddedResourceLoader.ExceptionGeneratorAttributeFileName)!;
-
-            if (additionalSourceFiles != null)
-            {
-                foreach (string additionalFile in additionalSourceFiles)
-                {
-                    var content = EmbeddedResourceLoader.Get(typeof(ExceptionGeneratorTests).Assembly,
-                                                             additionalFile);
-                    initialCode += "\r\n" + content;
-                }
-            }
-
-            var test = new VerifyCS.Test
-            {
-                TestState =
-                           {
-                               Sources = { initialCode },
-                               GeneratedSources =
-                               {
-                                   (typeof(ExceptionGenerator), "ExceptionGeneratorAttributeFqn.g.cs", SourceText.From(attrCode, Encoding.UTF8, SourceHashAlgorithm.Sha1))
-                               }
-                           }
-            };
-
-            if (generatedCodes.Count > 0)
-            {
-                foreach (var generatedCode in generatedCodes.OrderBy(x => x.FileName))
-                {
-                    test.TestState.GeneratedSources.Add((typeof(ExceptionGenerator), $"{generatedCode.FileName}.g.cs", SourceText.From(generatedCode.Content!,
-                                                                                                                                       Encoding.UTF8,
-                                                                                                                                       SourceHashAlgorithm.Sha1)));
-                }
-            }
-
-            if (expectedDiagnosticResults != null)
-            {
-                test.TestState.ExpectedDiagnostics.AddRange(expectedDiagnosticResults);
-            }
-
-            await test.RunAsync();
+            return ("ExceptionGeneratorAttributeFqn.g.cs", attrCode);
         }
 
         [Fact]
@@ -130,7 +77,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public async Task ExceptionClassWithAttributeWithTransformedParametrizedMessageShouldSucceed()
         {
-            await WithWithEmbeddedFiles(additionalSourceFiles: new List<string> { "NoWoL.SourceGenerators.Tests.Content.TestFiles.ValueToStringTransformer.cs" }).ConfigureAwait(false);
+            await WithWithEmbeddedFiles(additionalSourceFiles: new List<string> { "NoWoL.SourceGenerators.Tests.Content.TestFiles.Exception.ValueToStringTransformer.cs" }).ConfigureAwait(false);
         }
 
         [Fact]
