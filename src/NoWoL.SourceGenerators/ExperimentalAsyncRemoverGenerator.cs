@@ -168,7 +168,7 @@ namespace NoWoL.SourceGenerators
                                                                           });
                 
 
-                var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)?.Identifier.ValueText;
+                var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)!.Identifier.ValueText;
                 var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
 
                 var partialName = className + "_" + syncMethodName;

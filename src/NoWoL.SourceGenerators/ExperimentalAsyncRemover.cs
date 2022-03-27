@@ -74,7 +74,7 @@ namespace NoWoL.SourceGenerators
             }
 
             if (potentiallyRewrittenNode is AwaitExpressionSyntax awaitSyntax
-                && awaitSyntax?.Expression is InvocationExpressionSyntax invocation)
+                && awaitSyntax.Expression is InvocationExpressionSyntax invocation)
             {
                 if (invocation.Expression is MemberAccessExpressionSyntax memberAccess
                     &&
@@ -291,7 +291,9 @@ namespace NoWoL.SourceGenerators
                 {
                     var maeSymbol = semanticModel.GetSymbolInfo(mae).Symbol;
 
-                    if (maeSymbol?.ContainingType?.ToString() == "System.Threading.Tasks.Task"
+                    if (maeSymbol != null
+                        && maeSymbol.ContainingType != null
+                        && maeSymbol.ContainingType.ToString() == "System.Threading.Tasks.Task"
                         && maeSymbol.Name == nameof(System.Threading.Tasks.Task.Delay))
                     {
                         var nn = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
@@ -307,7 +309,9 @@ namespace NoWoL.SourceGenerators
                     {
                         var invocationSymbol = semanticModel.GetSymbolInfo(invocation).Symbol;
 
-                        if (invocationSymbol?.ContainingType?.ToString() == "System.Threading.Tasks.Task"
+                        if (invocationSymbol != null
+                            && invocationSymbol.ContainingType != null
+                            && invocationSymbol.ContainingType.ToString() == "System.Threading.Tasks.Task"
                             && invocationSymbol.Name == nameof(System.Threading.Tasks.Task.Delay))
                         {
                             if (als.Arguments.Count == 2) // last param is cancel token and we need to remove it
@@ -320,7 +324,8 @@ namespace NoWoL.SourceGenerators
 
                 if (syntaxNode is IdentifierNameSyntax ins)
                 {
-                    if (ins.Identifier.ValueText?.EndsWith("Async") == true)
+                    if (ins.Identifier.ValueText != null
+                        && ins.Identifier.ValueText.EndsWith("Async") == true)
                     {
                         var result = RemoveAsyncFrom(analysis, ins.Identifier);
 
@@ -373,7 +378,8 @@ namespace NoWoL.SourceGenerators
                     {
                         if (semanticModel.GetSymbolInfo(ies).Symbol is IMethodSymbol ms)
                         {
-                            if ((ms.ReturnType as INamedTypeSymbol)?.TypeArguments.Length == 0
+                            if (ms.ReturnType is INamedTypeSymbol ints 
+                                && ints.TypeArguments.Length == 0
                                 && IsTaskOrValueTask(ms.ReturnType))
                             {
                                 analysis.NodeMapping.Add(syntaxNode, ies);
@@ -409,7 +415,9 @@ namespace NoWoL.SourceGenerators
                     
                         var symbol4 = semanticModel.GetSymbolInfo(parameterSyntax.Type!).Symbol;
 
-                        if (symbol4?.ContainingNamespace?.ToString() == "System"
+                        if (symbol4 != null
+                            && symbol4.ContainingNamespace != null 
+                            && symbol4.ContainingNamespace.ToString() == "System"
                             && symbol4.Name == "Func")
                         {
                             var argType = parameterSyntax.Type!.DescendantNodes(x => !x.IsKind(SyntaxKind.TypeArgumentList)).OfType<TypeArgumentListSyntax>().FirstOrDefault();
@@ -667,7 +675,9 @@ namespace NoWoL.SourceGenerators
 
         private bool IsTaskOrValueTask(ISymbol? symbol)
         {
-            return symbol?.ContainingNamespace?.ToString() == "System.Threading.Tasks"
+            return symbol != null
+                   && symbol.ContainingNamespace != null
+                   && symbol.ContainingNamespace.ToString() == "System.Threading.Tasks"
                    && (symbol.Name == nameof(System.Threading.Tasks.Task) || symbol.Name == nameof(System.Threading.Tasks.ValueTask));
         }
 
