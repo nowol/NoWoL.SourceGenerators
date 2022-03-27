@@ -99,7 +99,7 @@ namespace NoWoL.SourceGenerators
 
         private static void Execute(Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
         {
-            if (!CanExecute(methods, compilation, out var methodAttribute))
+            if (!CanExecute(methods, compilation))
             {
                 return;
             }
@@ -134,8 +134,6 @@ namespace NoWoL.SourceGenerators
                                                                {
                                                                    isb.IncreaseIndent();
 
-                                                                   //isb.Add(GenerationHelpers.BuildClassDefinition(cargo!.ClassDeclarationSyntax!,
-                                                                   //                                               GenerationHelpers.RemoveLastWord(cargo!.ClassDeclarationSyntax!.Identifier.ValueText, "Async")), addNewLine: true);
                                                                    isb.Add(GenerationHelpers.BuildClassDefinition(transformResult.ClassDeclaration!), addNewLine: true);
                                                                    isb.Add("{", addNewLine: true);
 
@@ -171,10 +169,7 @@ namespace NoWoL.SourceGenerators
                 
 
                 var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)?.Identifier.ValueText;
-                //var syncMethodName = methodDeclarationSyntax.Identifier.ValueText;
                 var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
-
-                ////newNode.
 
                 var partialName = className + "_" + syncMethodName;
 
@@ -186,104 +181,18 @@ namespace NoWoL.SourceGenerators
                 context.AddSource(fileName,
                                   SourceText.From(content,
                                                   Encoding.UTF8));
-
-                //if (!ValidateTarget(context, methodDeclarationSyntax))
-                //{
-                //    continue;
-                //}
-
-                //SemanticModel semanticModel = compilation.GetSemanticModel(methodDeclarationSyntax.SyntaxTree);
-                //var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclarationSyntax, context.CancellationToken);
-
-                //if (methodSymbol == null)
-                //{
-                //    // report diagnostic, something went wrong
-                //    continue;
-                //}
-
-                //var rewriter = new AsyncRemoverRewriter(compilation);
-
-                //var newNode = rewriter.Visit(methodDeclarationSyntax);
-
-                //var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)?.Identifier.ValueText;
-                //var syncMethodName = methodDeclarationSyntax.Identifier.ValueText;
-                ////var syncMethodName = RemoveLast(methodDeclarationSyntax.Identifier.ValueText, "Async");
-
-                ////newNode.
-
-                //var partialName = className + "_" + syncMethodName;
-
-                //var content = newNode.ToString();
-
-                //var fileName = ExceptionClassBuilder.GenerateFileName(partialName,
-                //                                                      content);
-
-                //context.AddSource(fileName, SourceText.From(content, Encoding.UTF8));
-
-                ////results.Add((classDeclarationSyntax, classSymbol));
             }
-            
-            //foreach (var (classDeclarationSyntax, classSymbol) in FilterClasses())
-            //{
-            //    // stop if we're asked to
-            //    ct.ThrowIfCancellationRequested();
-
-            //    var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
-
-            //    if (!ValidateTarget(context, classDeclarationSyntax, ns))
-            //    {
-            //        continue;
-            //    }
-
-            //    // It's OK to use First() here since we have validated the presence of the attribute in a previous step
-            //    var exceptionAttribute = classSymbol.GetAttributes().First(x => classAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default));
-
-            //    classesToGenerate.Add(new ClassToGenerate(classDeclarationSyntax,
-            //                                              classSymbol,
-            //                                              exceptionAttribute,
-            //                                              ns));
-            //}
-
-            //List<MethodToGenerate> methodsToGenerate = GetTypesToGenerate(compilation,
-            //                                                              context,
-            //                                                              distinctMethods,
-            //                                                              methodAttribute!,
-            //                                                              context.CancellationToken);
-            //if (methodsToGenerate.Count > 0)
-            //{
-            //var sb = new IndentedStringBuilder();
-            //var classBuilder = new ExceptionClassBuilder();
-            //foreach (var classToGenerate in classesToGenerate)
-            //{
-            //    sb.Clear(true);
-            //    var result = classBuilder.GenerateException(sb, classToGenerate);
-            //    context.AddSource(result.FileName!, SourceText.From(sb.ToString(), Encoding.UTF8));
-            //}
-            //}
-        }
-
-        private static string RemoveLast(string value, string needle)
-        {
-            if (value.EndsWith(needle, StringComparison.OrdinalIgnoreCase))
-            {
-                return value.Substring(0,
-                                       value.Length - needle.Length);
-            }
-
-            return value;
         }
 
         [ExcludeFromCodeCoverage]
-        private static bool CanExecute(ImmutableArray<MethodDeclarationSyntax> methods, Compilation compilation, out INamedTypeSymbol? methodAttribute)
+        private static bool CanExecute(ImmutableArray<MethodDeclarationSyntax> methods, Compilation compilation)
         {
             if (methods.IsDefaultOrEmpty)
             {
-                // nothing to do yet
-                methodAttribute = null;
                 return false;
             }
 
-            methodAttribute = compilation.GetTypeByMetadataName(ExperimentalAsyncRemoverAttributeFqn);
+            var methodAttribute = compilation.GetTypeByMetadataName(ExperimentalAsyncRemoverAttributeFqn);
             if (methodAttribute == null)
             {
                 // nothing to do if this type isn't available

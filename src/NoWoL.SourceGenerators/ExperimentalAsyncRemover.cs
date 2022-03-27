@@ -32,14 +32,20 @@ namespace NoWoL.SourceGenerators
 
             var unmodifiedNode = node;
 
-            var d = node.DescendantNodesAndSelf();//.Reverse();
+            var d = node.DescendantNodesAndSelf();
             
             node = node.ReplaceSyntax(d,
-                                      (SyntaxNode originalNode, SyntaxNode potentiallyRewrittenNode) => ComputeReplacementNode(context, analysis, originalNode, potentiallyRewrittenNode),
+                                      (originalNode, potentiallyRewrittenNode) => ComputeReplacementNode(context, analysis, originalNode, potentiallyRewrittenNode),
                                       Enumerable.Empty<SyntaxToken>(),
-                                      (token, syntaxToken) => token,
+                                      [ExcludeFromCodeCoverage]
+                                      (token, _) => token,
                                       Enumerable.Empty<SyntaxTrivia>(),
-                                      (trivia, syntaxTrivia) => trivia);
+                                      [ExcludeFromCodeCoverage]
+                                      (trivia, _) => trivia);
+
+            node = RemoveAttributes(node,
+                                    unmodifiedNode,
+                                    analysis);
 
             if (unmodifiedNode.HasLeadingTrivia)
             {
@@ -119,25 +125,6 @@ namespace NoWoL.SourceGenerators
                 return parenthesizedLambdaSyntax.WithAsyncKeyword(default).WithTriviaFrom(potentiallyRewrittenNode);
             }
 
-            // return
-            if (potentiallyRewrittenNode is ReturnStatementSyntax returnSyntax)
-            {
-                var invocation2 = returnSyntax.Expression as InvocationExpressionSyntax;
-
-                if (invocation2?.Expression is IdentifierNameSyntax ins)
-                {
-                    var newInvocation = invocation2.WithExpression(RemoveAsyncFrom(analysis,
-                                                                                   ins));
-
-                    if (analysis.ReturnStatementsThatMustBeRemoved.Contains(originalNode))
-                    {
-                        return SyntaxFactory.ExpressionStatement(newInvocation).WithTriviaFrom(potentiallyRewrittenNode);
-                    }
-
-                    return returnSyntax.WithExpression(newInvocation).WithTriviaFrom(potentiallyRewrittenNode);
-                }
-            }
-
             // local function
             if (potentiallyRewrittenNode is LocalFunctionStatementSyntax localFct)
             {
@@ -149,14 +136,10 @@ namespace NoWoL.SourceGenerators
                 }
 
                 var result = RemoveAsyncFrom(analysis,
-                                             localFct.Identifier);
+                                             localFct.Identifier,
+                                             forceRename: true);
 
-                if (result.Success)
-                {
-                    return localFct.WithIdentifier((SyntaxToken)result.ReplacementNode!).WithTriviaFrom(potentiallyRewrittenNode);
-                }
-
-                return localFct.WithTriviaFrom(potentiallyRewrittenNode);
+                return localFct.WithIdentifier((SyntaxToken)result.ReplacementNode!).WithTriviaFrom(potentiallyRewrittenNode);
             }
 
             // async stream - foreach
@@ -180,8 +163,6 @@ namespace NoWoL.SourceGenerators
                 }
 
                 ss = RenameMethod(ss);
-                ss = RemoveAttributes(ss,
-                                      analysis);
 
                 return ss;
             }
@@ -189,9 +170,9 @@ namespace NoWoL.SourceGenerators
             return potentiallyRewrittenNode;
         }
 
-        private static IdentifierNameSyntax RemoveAsyncFrom(AsyncRemoverAnalysis analysis, IdentifierNameSyntax ins)
+        private static IdentifierNameSyntax RemoveAsyncFrom(AsyncRemoverAnalysis analysis, IdentifierNameSyntax ins, bool forceRename = false)
         {
-            if (analysis.IdentifiersThatDoesNotNeedRenaming.Contains(ins.Identifier.ValueText))
+            if (!forceRename && analysis.IdentifiersThatDoesNotNeedRenaming.Contains(ins.Identifier.ValueText))
             {
                 return ins;
             }
@@ -200,9 +181,9 @@ namespace NoWoL.SourceGenerators
                                                                                                 "Async")));
         }
 
-        private static (bool Success, SyntaxToken? ReplacementNode) RemoveAsyncFrom(AsyncRemoverAnalysis analysis, SyntaxToken token)
+        private static (bool Success, SyntaxToken? ReplacementNode) RemoveAsyncFrom(AsyncRemoverAnalysis analysis, SyntaxToken token, bool forceRename = false)
         {
-            if (analysis.IdentifiersThatDoesNotNeedRenaming.Contains(token.ValueText))
+            if (!forceRename && analysis.IdentifiersThatDoesNotNeedRenaming.Contains(token.ValueText))
             {
                 return (false, null);
             }
@@ -229,7 +210,6 @@ namespace NoWoL.SourceGenerators
             public HashSet<string> IdentifiersThatDoesNotNeedRenaming { get; } = new();
             public Dictionary<SyntaxNode, SyntaxNode> NodeMapping { get; } = new();
             public bool ContainsDiagnosticErrors { get; set; }
-            public HashSet<SyntaxNode> ReturnStatementsThatMustBeRemoved { get; } = new();
             public string? ReturnType { get; set; }
             public string? NameSpace { get; set; }
             public ClassDeclarationSyntax? ClassDeclaration { get; set; }
@@ -248,15 +228,10 @@ namespace NoWoL.SourceGenerators
 
             public List<AttributeSyntax> GetAttributesToRemove()
             {
-                if (_attributesToRemove == null)
-                {
-                    LoadAttributesToRemove();
-                }
-                //GetAttributesToRemove(target, semanticModel)
                 return _attributesToRemove!;
             }
 
-            private void LoadAttributesToRemove()
+            public void LoadAttributesToRemove()
             {
                 _attributesToRemove = new();
 
@@ -275,7 +250,6 @@ namespace NoWoL.SourceGenerators
                     }
                 }
 
-                [ExcludeFromCodeCoverage]
                 List<(AttributeSyntax, IMethodSymbol)> FilterAttributes(AttributeListSyntax attributeListSyntax)
                 {
                     var results = new List<(AttributeSyntax, IMethodSymbol)>();
@@ -306,6 +280,8 @@ namespace NoWoL.SourceGenerators
                              analysis,
                              semanticModel,
                              node);
+
+            analysis.LoadAttributesToRemove();
 
             foreach (var syntaxNode in d)
             {
@@ -594,17 +570,11 @@ namespace NoWoL.SourceGenerators
 
                     if (result.ReturnsTask)
                     {
-                        if ((ies.Expression is IdentifierNameSyntax ins && ins.Identifier.ValueText.EndsWith("Async", StringComparison.Ordinal))
-                            ||
-                            ms.Name.EndsWith("Async", StringComparison.Ordinal)
-                            )
-                        {
-                            if (result.ReturnsVoid)
-                            {
-                                analysis.ReturnStatementsThatMustBeRemoved.Add(returnStatement);
-                            }
-                        }
-                        else
+                        if ((ies.Expression is not IdentifierNameSyntax ins
+                             || !ins.Identifier.ValueText.EndsWith("Async",
+                                                                   StringComparison.Ordinal))
+                            && !ms.Name.EndsWith("Async",
+                                                 StringComparison.Ordinal))
                         {
                             AddDiagnostic(context,
                                           analysis,
@@ -701,23 +671,28 @@ namespace NoWoL.SourceGenerators
                    && (symbol.Name == nameof(System.Threading.Tasks.Task) || symbol.Name == nameof(System.Threading.Tasks.ValueTask));
         }
 
-        private MethodDeclarationSyntax RemoveAttributes(MethodDeclarationSyntax target, AsyncRemoverAnalysis cargo)
+        private MethodDeclarationSyntax RemoveAttributes(MethodDeclarationSyntax target, 
+                                                         MethodDeclarationSyntax unmodifiedNode, 
+                                                         AsyncRemoverAnalysis analysis)
         {
-            var newAttributeList = new SyntaxList<AttributeListSyntax>();
+            var newAttributeList = new List<AttributeListSyntax>();
 
-            foreach (var attributeListSyntax in target.AttributeLists)
+            foreach (var attributeListSyntax in unmodifiedNode.AttributeLists)
             {
                 var attList = attributeListSyntax;
 
-                foreach (var attributeSyntax in cargo.GetAttributesToRemove())
+                foreach (var attributeSyntax in analysis.GetAttributesToRemove())
                 {
-                    attList = attList.WithAttributes(attributeListSyntax.Attributes.Remove(attributeSyntax));
+                    attList = attList.WithAttributes(attList.Attributes.Remove(attributeSyntax));
                 }
 
-                newAttributeList.Add(attList);
+                if (attList.Attributes.Count > 0)
+                {
+                    newAttributeList.Add(attList);
+                }
             }
 
-            return target.WithAttributeLists(newAttributeList);
+            return target.WithAttributeLists(new SyntaxList<AttributeListSyntax>(newAttributeList));
         }
 
         private (bool ReturnsTask, bool ReturnsVoid, string NewDataType) GetReturnsTypeDetails(ITypeSymbol returnTypeSymbol, AsyncRemoverAnalysis analysis)

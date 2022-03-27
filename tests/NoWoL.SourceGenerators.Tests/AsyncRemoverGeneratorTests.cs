@@ -261,11 +261,6 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public async Task ConvertTaskDelayToThreadSleep()
         {
-            // Task.Delay(123)
-            // Task.Delay(TimeSpan)
-            // Task.Delay(123, Cancel Token)
-            // Task.Delay(TimeSpan, Cancel Token)
-
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
 
@@ -273,6 +268,38 @@ namespace NoWoL.SourceGenerators.Tests
         [Trait("Category",
                "Unit")]
         public async Task EveryCaseAtOnce()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task AttributeWithoutMethod()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task MoreThanOneAttribute()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task MoreThanOneAttributeWithXmlDoc()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task AnotherAttributeWithSameName()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
