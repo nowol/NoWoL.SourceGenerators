@@ -47,7 +47,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Testing
 
         protected override async Task<Compilation> GetProjectCompilationAsync(Project project, IVerifier verifier, CancellationToken cancellationToken)
         {
-            var (finalProject, diagnostics) = await ApplySourceGeneratorAsync(GetSourceGenerators().ToImmutableArray(), project, verifier, cancellationToken).ConfigureAwait(false);
+            var (finalProject, _) = await ApplySourceGeneratorAsync(GetSourceGenerators().ToImmutableArray(), project, verifier, cancellationToken).ConfigureAwait(false);
             return (await finalProject.GetCompilationAsync(cancellationToken).ConfigureAwait(false))!;
         }
 
@@ -60,11 +60,10 @@ namespace Microsoft.CodeAnalysis.CSharp.Testing
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         protected async Task<ImmutableArray<Diagnostic>> VerifySourceGeneratorAsync(SolutionState testState, IVerifier verifier, CancellationToken cancellationToken)
         {
-            return await VerifySourceGeneratorAsync(Language, GetSourceGenerators().ToImmutableArray(), testState, ApplySourceGeneratorAsync, verifier.PushContext("Source generator application"), cancellationToken);
+            return await VerifySourceGeneratorAsync(GetSourceGenerators().ToImmutableArray(), testState, ApplySourceGeneratorAsync, verifier.PushContext("Source generator application"), cancellationToken);
         }
 
         private async Task<ImmutableArray<Diagnostic>> VerifySourceGeneratorAsync(
-            string language,
             ImmutableArray<IIncrementalGenerator> sourceGenerators,
             SolutionState testState,
             Func<ImmutableArray<IIncrementalGenerator>, Project, IVerifier, CancellationToken, Task<(Project project, ImmutableArray<Diagnostic> diagnostics)>> getFixedProject,

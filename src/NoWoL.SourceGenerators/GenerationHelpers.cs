@@ -11,8 +11,13 @@ namespace NoWoL.SourceGenerators
 {
     internal static class GenerationHelpers
     {
-        public static bool IsPartialClass(ClassDeclarationSyntax syntax)
+        public static bool IsPartialClass(ClassDeclarationSyntax? syntax)
         {
+            if (syntax == null)
+            {
+                return false;
+            }
+
             return syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
@@ -84,12 +89,29 @@ namespace NoWoL.SourceGenerators
 
         public static string BuildClassDefinition(ClassDeclarationSyntax classDef)
         {
+            return BuildClassDefinition(classDef,
+                                        classDef.Identifier.ValueText);
+        }
+
+        public static string BuildClassDefinition(ClassDeclarationSyntax classDef, string className)
+        {
             var modifiers = GetClassAccessModifiers(classDef, addTrailingSpace: true);
             var staticDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
             var partialDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
             var abstractDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
 
-            return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {classDef.Identifier.Value}";
+            return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {className}";
+        }
+
+        public static string RemoveLastWord(string value, string word)
+        {
+            if (value.EndsWith(word, StringComparison.OrdinalIgnoreCase))
+            {
+                return value.Substring(0,
+                                       value.Length - word.Length);
+            }
+
+            return value;
         }
 
         public static string GetClassAccessModifiers(ClassDeclarationSyntax target, bool addTrailingSpace = false)
@@ -108,6 +130,33 @@ namespace NoWoL.SourceGenerators
             }
 
             return modifiers + " ";
+        }
+
+        public static bool IdentifierEndsWithAsync(IdentifierNameSyntax ins)
+        {
+            return EndsWithAsync(ins.Identifier.ValueText);
+        }
+
+        public static bool EndsWithAsync(string valueText)
+        {
+            return valueText.EndsWith("Async");
+        }
+
+        public static string ConvertErrorCode(ErrorCode errorCode)
+        {
+            return errorCode switch
+                   {
+                       ErrorCode.AwaitedMethodMustEndWithAsync => "NWL0001",
+                       ErrorCode.ReturnedMethodMustEndWithAsync => "NWL0002",
+                       ErrorCode.AttributeMustBeAppliedToAClassEndingWithAsync => "NWL0003",
+                       ErrorCode.AttributeMustBeAppliedToPartialClass => "NWL0004",
+                       ErrorCode.AttributeMustBeAppliedInPartialClassHierarchy => "NWL0005",
+                       ErrorCode.MethodMustBeInNameSpace => "NWL0006",
+                       ErrorCode.MethodMustReturnTask => "NWL0007",
+                       _ => throw new ArgumentOutOfRangeException(nameof(errorCode),
+                                                                  errorCode,
+                                                                  null)
+                   };
         }
     }
 }

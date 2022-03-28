@@ -40,7 +40,7 @@ namespace NoWoL.SourceGenerators
             return this;
         }
 
-        public IndentedStringBuilder Add(string? text, 
+        public IndentedStringBuilder Add(string? text,
                                          bool addNewLine = false,
                                          bool removeLastNewLines = false)
         {
