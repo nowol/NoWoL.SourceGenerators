@@ -9,6 +9,7 @@ namespace NoWoL.SourceGenerators
     internal static class EmbeddedResourceLoader
     {
         public const string ExceptionGeneratorAttributeFileName = "NoWoL.SourceGenerators.Content.ExceptionGeneratorAttribute.cs";
+        public const string AsyncToSyncConverterAttributeFileName = "NoWoL.SourceGenerators.Content.AsyncToSyncConverterAttribute.cs";
 
         public static string? Get(Assembly assembly, string resourceName)
         {

@@ -14,7 +14,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public void GetShouldReturnEmbeddedContent()
         {
-            var resourceName = "NoWoL.SourceGenerators.Tests.Content.TestFiles.ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs";
+            var resourceName = "NoWoL.SourceGenerators.Tests.Content.TestFiles.Exception.ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs";
             var content = EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoaderTests).Assembly,
                                                      resourceName);
             Assert.NotNull(content);
@@ -49,7 +49,7 @@ namespace NoWoL.SourceGenerators.Tests
         public void GetFilesFromPartialNameShouldReturnTheirContentAndFileName()
         {
             var contents = EmbeddedResourceLoader.GetFilesFromPartialName(typeof(EmbeddedResourceLoaderTests).Assembly,
-                                                                         "NoWoL.SourceGenerators.Tests.Content.TestFiles",
+                                                                         "NoWoL.SourceGenerators.Tests.Content.TestFiles.Exception",
                                                                          "TwoExceptionsInDifferentScopeWithSameNameShouldBeGenerated.Generated");
             Assert.NotEmpty(contents);
             Assert.Equal(2,

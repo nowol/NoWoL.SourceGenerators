@@ -30,10 +30,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Content\AsyncToSyncConverterAttribute.cs" />
 	  <Compile Remove="Content\ExceptionGeneratorAttribute.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Content\AsyncToSyncConverterAttribute.cs" />
 	  <EmbeddedResource Include="Content\ExceptionGeneratorAttribute.cs" />
 	</ItemGroup>
 
