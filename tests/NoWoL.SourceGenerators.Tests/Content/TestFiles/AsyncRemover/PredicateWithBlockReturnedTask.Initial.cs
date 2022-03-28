@@ -7,7 +7,11 @@ namespace Test
         [NoWoL.SourceGenerators.AsyncToSyncConverter()]
 		public async Task MainMethodAsync()
         {
-            await TheMethodAsync(async () => await SimulateWork(3000).ConfigureAwait(false)).ConfigureAwait(false);
+            await TheMethodAsync(async () =>
+                                 {
+                                     await SimulateWorkAsync(3000);
+                                     await Task.Delay(3).ConfigureAwait(false);
+                                 }).ConfigureAwait(false);
         }
 
         public async Task TheMethodAsync(Func<Task> funky)
@@ -15,7 +19,7 @@ namespace Test
             await funky().ConfigureAwait(false);
         }
 
-        public async Task SimulateWork(int value)
+        public async Task SimulateWorkAsync(int value)
         {
             await Task.Delay(3000).ConfigureAwait(false);
         }

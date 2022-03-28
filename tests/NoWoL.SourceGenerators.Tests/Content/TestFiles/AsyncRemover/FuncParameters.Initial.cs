@@ -6,7 +6,7 @@ namespace Test
 {
     public partial class TestClass
     {
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         public async Task MainMethodAsync(int param, Func<int, string, string> param2Async, Func<int, string, Task> param3, Func<int, string, Task<TestClass>> param4, Func<string> param5, Func<Task> param6, System.Func<Task<TestClass>> param7)
         {
             param2Async(1, "a");

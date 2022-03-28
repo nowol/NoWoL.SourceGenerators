@@ -5,7 +5,7 @@ namespace Test
     public partial class TestClass
     {
         [AnotherAttribute()]
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         public Task MainMethodAsync()
         {
             return TheMethodAsync();

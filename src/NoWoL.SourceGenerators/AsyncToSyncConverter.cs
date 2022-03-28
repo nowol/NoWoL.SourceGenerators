@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace NoWoL.SourceGenerators
 {
-    internal class ExperimentalAsyncRemover
+    internal class AsyncToSyncConverter
     {
         private const string DiagnosticCategory = "Async/Await remover generator";
 
@@ -243,7 +243,7 @@ namespace NoWoL.SourceGenerators
                         string fullName = attributeContainingTypeSymbol.ToDisplayString();
 
                         // Is the attribute the [ExceptionGenerator] attribute?
-                        if (fullName == ExperimentalAsyncRemoverGenerator.ExperimentalAsyncRemoverAttributeFqn)
+                        if (fullName == AsyncToSyncConverterGenerator.AsyncToSyncConverterAttributeFqn)
                         {
                             _attributesToRemove.Add(attributeSyntax);
                         }
@@ -606,7 +606,7 @@ namespace NoWoL.SourceGenerators
                 AddDiagnostic(context,
                               analysis,
                               ErrorCode.AttributeMustBeAppliedToAClassEndingWithAsync,
-                              "The [ExperimentalAsyncRemover] must be applied to a method ending with Async.",
+                              "The [AsyncToSyncConverter] must be applied to a method ending with Async.",
                               target.GetLocation());
                 return false;
             }
@@ -618,7 +618,7 @@ namespace NoWoL.SourceGenerators
                 AddDiagnostic(context,
                               analysis,
                               ErrorCode.AttributeMustBeAppliedToPartialClass,
-                              "The [ExperimentalAsyncRemover] must be applied to a partial class.",
+                              "The [AsyncToSyncConverter] must be applied to a partial class.",
                               target.GetLocation());
 
                 return false;
@@ -630,7 +630,7 @@ namespace NoWoL.SourceGenerators
                 AddDiagnostic(context,
                               analysis,
                               ErrorCode.AttributeMustBeAppliedInPartialClassHierarchy,
-                              "The [ExperimentalAsyncRemover] must be applied to a partial class nested in another partial class.",
+                              "The [AsyncToSyncConverter] must be applied to a partial class nested in another partial class.",
                               target.GetLocation());
 
                 return false;
@@ -642,7 +642,7 @@ namespace NoWoL.SourceGenerators
                 AddDiagnostic(context,
                               analysis,
                               ErrorCode.MethodMustBeInNameSpace,
-                              "The [ExperimentalAsyncRemover] must be applied to a method in a partial class contained in a namespace.",
+                              "The [AsyncToSyncConverter] must be applied to a method in a partial class contained in a namespace.",
                               target.GetLocation());
 
                 return false;
@@ -663,7 +663,7 @@ namespace NoWoL.SourceGenerators
                     AddDiagnostic(context,
                                   analysis,
                                   ErrorCode.MethodMustReturnTask,
-                                  $"The [ExperimentalAsyncRemover] must be applied to a method return a task instead of type '{target.ReturnType.ToString()}'.",
+                                  $"The [AsyncToSyncConverter] must be applied to a method return a task instead of type '{target.ReturnType.ToString()}'.",
                                   target.ReturnType.GetLocation());
 
                     return false;

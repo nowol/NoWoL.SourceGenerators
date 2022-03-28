@@ -9,7 +9,7 @@ namespace Test
         /// </summary>
         /// <returns>The return</returns>
         [AnotherAttribute()]
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         public Task MainMethodAsync()
         {
             return TheMethodAsync();

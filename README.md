@@ -1,12 +1,15 @@
 # NoWoL.SourceGenerators
 
-NoWoL.SourceGenerators will contain C# (.NET 6/VS2022) source generators used to improve a developer's life. So far it only include a way to generate the boilerplate for an exception.
+NoWoL.SourceGenerators will contain C# (.NET 6/VS2022) source generators used to improve a developer's life. So far it includes:
+
+* a way to generate the boilerplate for an exception: `ExceptionGenerator`
+* an simple async to sync code generator: `AsyncToSyncConverterGenerator`
 
 ## Installation
 
 Use your favorite Nuget package manager to add the `NoWoL.SourceGenerators` package to your project.
 
-## Usage
+## ExceptionGenerator Usage
 
 Define a partial class decorated with the `[ExceptionGenerator]` attribute to generate the boilerplate code of the exception. The exception always inherits from `System.Exception`. While it would be possible to support inheriting from another exception type, it would be too problematic to programmatically call the correct constructor of the base class.
 
@@ -42,6 +45,81 @@ public void Main()
 }
 ```
 
+## AsyncToSyncConverterGenerator Usage
+
+This generator uses simple rules to convert async code to their sync version:
+
+* The name of the method must end with `Async`. The generator does not validate if a non-async version of the method exists.
+* The generated method will have the same access modifiers as the original method.
+* Awaitable local functions must end with `Async`. The generator does not validate if a non-async version of the location function exists.
+* Assumes that a `Func<>` returning a `Task` will be awaited. In this case the `Func<>` will be converted to an `Action<>` which will not be awaited.
+* ConfigureAwait / ConfigureAwaitWithCulture will be removed.
+* `Task.Delay` is converted to `Thread.Sleep`.
+* Type conversion:
+  * `Task` is converted to `void`
+  * `Task<T>` is converted to `T`
+  * `ValueTask` is converted to `void`
+  * `ValueTask<T>` is converted to `T`
+  * `Func<Task>` is converted to `Action`
+  * `Func<int, Task>` is converted to `Action<int>`
+  * `Func<int, Task<double>>` is converted to `Func<int, double>`
+* Async streams will be converted to sync by dropping their `await` keyword and removing `Async` from the name of their method.
+* Attributes and XML documentation will be copied to the new method.
+
+Not yet supported:
+
+* Creating a `Task` variable and returning it.
+
+To use it you need to define an async method decorated with the `[AsyncToSyncConverter]` attribute to generate a sync version of the method. The method must be inside a partial class otherwise it is not possible to add new code to the class.
+
+For example, the following code
+
+```cs
+public partial class TestClass
+{
+    [AsyncToSyncConverter]
+    public async Task MainMethodAsync(CancellationToken ct)
+    {
+        await TheMethodAsync();
+        
+        await TheMethodAsync().ConfigureAwait(false);
+
+        await Task.Delay(TimeSpan.FromSeconds(30), ct);
+    }
+
+    public async Task TheMethodAsync()
+    {
+        // omitted
+    }
+
+    public void TheMethod()
+    {
+        // omitted
+    }
+}
+```
+
+will be converted to
+
+```cs
+public partial class TestClass
+{
+    public void MainMethod(CancellationToken ct)
+    {
+        TheMethod();
+        
+        TheMethod();
+
+        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(30));
+    }
+}
+```
+
+## Bug Reports
+
+Please include the smallest code possible to reproduce the issue.
+
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -59,3 +137,4 @@ Useful information for creating source generators:
 * https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
 * https://andrewlock.net/exploring-dotnet-6-part-9-source-generator-updates-incremental-generators/
 * https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md
+* Great collection of analyzers to help figure out how syntax trees work: https://github.com/JosefPihrt/Roslynator

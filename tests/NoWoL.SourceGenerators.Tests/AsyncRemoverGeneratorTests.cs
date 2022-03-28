@@ -6,7 +6,7 @@ namespace NoWoL.SourceGenerators.Tests
 
     // The generated files must appear in the correct order expected by the test runner. You may need to reorder the classes in your Initial file to match the generated output
 
-    public class AsyncRemoverGeneratorTests : BaseGeneratorTests<NoWoL.SourceGenerators.ExperimentalAsyncRemoverGenerator>
+    public class AsyncRemoverGeneratorTests : BaseGeneratorTests<NoWoL.SourceGenerators.AsyncToSyncConverterGenerator>
     {
         public AsyncRemoverGeneratorTests()
             : base("AsyncRemover")
@@ -17,8 +17,8 @@ namespace NoWoL.SourceGenerators.Tests
         protected override (string attrFileName, string fileContent) GetAttributeFileContent()
         {
             var attrCode = EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly,
-                                                      EmbeddedResourceLoader.ExperimentalAsyncRemoverAttributeFileName)!;
-            return ("ExperimentalAsyncRemoverAttributeFqn.g.cs", attrCode);
+                                                      EmbeddedResourceLoader.AsyncToSyncConverterAttributeFileName)!;
+            return ("AsyncToSyncConverterAttributeFqn.g.cs", attrCode);
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("NWL0004").WithMessage("The [ExperimentalAsyncRemover] must be applied to a partial class.").WithSpan(7, 9, 11, 10)
+                                                                       DiagnosticResult.CompilerError("NWL0004").WithMessage("The [AsyncToSyncConverter] must be applied to a partial class.").WithSpan(7, 9, 11, 10)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -39,7 +39,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("NWL0005").WithMessage("The [ExperimentalAsyncRemover] must be applied to a partial class nested in another partial class.").WithSpan(9, 13, 13, 14)
+                                                                       DiagnosticResult.CompilerError("NWL0005").WithMessage("The [AsyncToSyncConverter] must be applied to a partial class nested in another partial class.").WithSpan(9, 13, 13, 14)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -50,7 +50,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("NWL0003").WithMessage("The [ExperimentalAsyncRemover] must be applied to a method ending with Async.").WithSpan(7, 9, 11, 10)
+                                                                       DiagnosticResult.CompilerError("NWL0003").WithMessage("The [AsyncToSyncConverter] must be applied to a method ending with Async.").WithSpan(7, 9, 11, 10)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -61,7 +61,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("NWL0006").WithMessage("The [ExperimentalAsyncRemover] must be applied to a method in a partial class contained in a namespace.").WithSpan(5, 5, 9, 6)
+                                                                       DiagnosticResult.CompilerError("NWL0006").WithMessage("The [AsyncToSyncConverter] must be applied to a method in a partial class contained in a namespace.").WithSpan(5, 5, 9, 6)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -72,7 +72,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("NWL0007").WithMessage("The [ExperimentalAsyncRemover] must be applied to a method return a task instead of type 'void'.").WithSpan(8, 16, 8, 20)
+                                                                       DiagnosticResult.CompilerError("NWL0007").WithMessage("The [AsyncToSyncConverter] must be applied to a method return a task instead of type 'void'.").WithSpan(8, 16, 8, 20)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -193,6 +193,14 @@ namespace NoWoL.SourceGenerators.Tests
         [Trait("Category",
                "Unit")]
         public async Task PredicateWithReturnedTask()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task PredicateWithBlockReturnedTask()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }

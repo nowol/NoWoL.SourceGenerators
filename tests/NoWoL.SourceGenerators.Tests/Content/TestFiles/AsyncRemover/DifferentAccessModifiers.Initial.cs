@@ -4,37 +4,37 @@ namespace Test
 {
     public partial class TestClass
     {
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         internal async Task InternalMainMethodAsync()
         {
             await TheMethodAsync();
         }
 
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         private async Task PrivateMainMethodAsync()
         {
             await TheMethodAsync();
         }
 
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         private static async Task PrivateStaticMainMethodAsync()
         {
             await TheMethodAsync();
         }
 
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         protected async Task ProtectedMainMethodAsync()
         {
             await TheMethodAsync();
         }
 
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         public async Task PublicMainMethodAsync()
         {
             await TheMethodAsync();
         }
 
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         public virtual async Task PublicVirtualMainMethodAsync()
         {
             await TheMethodAsync();

@@ -11,7 +11,7 @@ namespace Test
     public partial class TestClass
     {
         [Test.AnotherAttr1Attribute()]
-        [NoWoL.AnotherNamespace.ExperimentalAsyncRemover()]
+        [NoWoL.AnotherNamespace.AsyncToSyncConverter()]
         public async Task MainMethodAsync()
         {
             await TheMethodAsync().ConfigureAwaitWithCulture(false);

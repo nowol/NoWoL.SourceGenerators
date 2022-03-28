@@ -45,6 +45,8 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MustReturnATask.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\PredicateWithAwait.Generated.TestClass_MainMethod_5e046b3b061c65c0193133d182733ff0.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\PredicateWithAwait.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\PredicateWithBlockReturnedTask.Generated.TestClass_MainMethod_bd182f6aa6ae381d2f413f66db62ceaf.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\PredicateWithBlockReturnedTask.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\PredicateWithReturnedTask.Generated.TestClass_MainMethod_5e046b3b061c65c0193133d182733ff0.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\PredicateWithReturnedTask.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\RemoveReturnStatement.Generated.TestClass_MainMethod_5b3cea29a3c0470f09336f6943d1589a.cs" />
@@ -68,7 +70,6 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwait.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Generated.TestClass_MainMethod_5b3cea29a3c0470f09336f6943d1589a.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AsyncRemover\zzz.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassInternal_d2b3daa975bdb1a40870e041ade49f89.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassNone_0122d5e492331a87bdb8d329c5eb322d.cs" />
@@ -171,6 +172,8 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\LocalAsyncMethod.Generated.TestClass_MainMethod_4ac3c612bcd35c915cc517e7b90188a0.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\LocalAsyncMethod.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MoreThanOneAttribute.Generated.TestClass_MainMethod_bb8e9a683817bf68ac7bf5173b57ead3.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\PredicateWithBlockReturnedTask.Generated.TestClass_MainMethod_bd182f6aa6ae381d2f413f66db62ceaf.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\PredicateWithBlockReturnedTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\PredicateWithReturnedTask.Generated.TestClass_MainMethod_5e046b3b061c65c0193133d182733ff0.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\PredicateWithReturnedTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\PredicateWithAwait.Generated.TestClass_MainMethod_5e046b3b061c65c0193133d182733ff0.cs" />
@@ -199,7 +202,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsTaskDirectly.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Generated.TestClass_MainMethod_c515d9baa9250efcd35bdc3b4bdaab21.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\zzz.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_79ecac2efa047534c79cbfe0e6418cc4.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />

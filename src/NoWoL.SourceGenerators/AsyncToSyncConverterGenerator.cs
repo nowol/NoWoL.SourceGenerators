@@ -18,18 +18,18 @@ using Microsoft.CodeAnalysis.Text;
 namespace NoWoL.SourceGenerators
 {
     [Generator]
-    public class ExperimentalAsyncRemoverGenerator : IIncrementalGenerator
+    public class AsyncToSyncConverterGenerator : IIncrementalGenerator
     {
         // This class was adapted from NetEscapades.EnumGenerators
         // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
 
-        internal const string ExperimentalAsyncRemoverAttributeFqn = "NoWoL.SourceGenerators.ExperimentalAsyncRemoverAttribute";
+        internal const string AsyncToSyncConverterAttributeFqn = "NoWoL.SourceGenerators.AsyncToSyncConverterAttribute";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            context.RegisterPostInitializationOutput(ctx => ctx.AddSource("ExperimentalAsyncRemoverAttributeFqn.g.cs",
+            context.RegisterPostInitializationOutput(ctx => ctx.AddSource("AsyncToSyncConverterAttributeFqn.g.cs",
                                                                           SourceText.From(EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly, 
-                                                                                                                     EmbeddedResourceLoader.ExperimentalAsyncRemoverAttributeFileName)!,
+                                                                                                                     EmbeddedResourceLoader.AsyncToSyncConverterAttributeFileName)!,
                                                                                           Encoding.UTF8)));
 
             IncrementalValuesProvider<MethodDeclarationSyntax> methodDeclarations = context.SyntaxProvider
@@ -48,7 +48,7 @@ namespace NoWoL.SourceGenerators
         {
             return node is MethodDeclarationSyntax mds
                    && mds.AttributeLists.Count > 0
-                   && !String.Equals(mds.Identifier.ValueText, "ExperimentalAsyncRemoverAttribute", StringComparison.Ordinal);
+                   && !String.Equals(mds.Identifier.ValueText, "AsyncToSyncConverterAttribute", StringComparison.Ordinal);
         }
 
         private static MethodDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
@@ -65,7 +65,7 @@ namespace NoWoL.SourceGenerators
                     string fullName = attributeContainingTypeSymbol.ToDisplayString();
 
                     // Is the attribute the [ExceptionGenerator] attribute?
-                    if (fullName == ExperimentalAsyncRemoverAttributeFqn)
+                    if (fullName == AsyncToSyncConverterAttributeFqn)
                     {
                         // return the method
                         return methodDeclarationSyntax;
@@ -112,7 +112,7 @@ namespace NoWoL.SourceGenerators
 
                 var node = methodDeclarationSyntax;
 
-                var remover = new ExperimentalAsyncRemover();
+                var remover = new AsyncToSyncConverter();
 
                 var transformResult = remover.Transform(context,
                                                         compilation,
@@ -192,7 +192,7 @@ namespace NoWoL.SourceGenerators
                 return false;
             }
 
-            var methodAttribute = compilation.GetTypeByMetadataName(ExperimentalAsyncRemoverAttributeFqn);
+            var methodAttribute = compilation.GetTypeByMetadataName(AsyncToSyncConverterAttributeFqn);
             if (methodAttribute == null)
             {
                 // nothing to do if this type isn't available

@@ -15,7 +15,7 @@ namespace Test
             /// <param name="param3">The 3rd param</param>
             /// <param name="token">The cancel token</param>
             /// <returns>The return</returns>
-            [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+            [NoWoL.SourceGenerators.AsyncToSyncConverter()]
             public async Task<string> MainMethodAsync(int param, Func<int, string, string> param2Async, Func<int, string, Task> param3, System.Threading.CancellationToken token)
             {
                 string str = await param2Async(1, "").ConfigureAwait(true);

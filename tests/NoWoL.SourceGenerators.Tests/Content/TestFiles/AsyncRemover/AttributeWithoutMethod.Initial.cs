@@ -4,6 +4,6 @@ namespace Test
 {
     public partial class TestClass
     {
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
     }
 }

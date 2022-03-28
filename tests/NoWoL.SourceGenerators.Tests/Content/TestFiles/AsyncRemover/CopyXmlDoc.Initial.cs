@@ -11,7 +11,7 @@ namespace Test
         /// <param name="param">The param</param>
         /// <param name="param2">The 2nd param</param>
         /// <returns>The return</returns>
-        [NoWoL.SourceGenerators.ExperimentalAsyncRemover()]
+        [NoWoL.SourceGenerators.AsyncToSyncConverter()]
         public async Task MainMethodAsync(int param, Func<int, string, Task<string>> param2)
         {
             await TheMethodAsync().ConfigureAwait(false);
