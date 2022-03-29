@@ -9,7 +9,7 @@ namespace Test
         /// </summary>
         /// <returns>The return</returns>
         [AnotherAttribute()]
-        [System.CodeDom.Compiler.AsyncToSyncConverterGenerator("ExceptionGenerator", "1.0.0.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("ExceptionGenerator", "1.0.0.0")]
         public void MainMethod()
         {
             TheMethod();
