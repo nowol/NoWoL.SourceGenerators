@@ -3,6 +3,7 @@
     // This is generated code
     [System.Serializable]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("ExceptionGenerator", "1.0.0.0")]
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     internal partial class TestClassInternal : System.Exception
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

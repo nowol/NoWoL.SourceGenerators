@@ -4,7 +4,8 @@ namespace Test
 {
     public partial class TestClass
     {
-        private static void PrivateStaticMainMethod()
+        [System.CodeDom.Compiler.AsyncToSyncConverterGenerator("ExceptionGenerator", "1.0.0.0")]
+        protected void ProtectedMainMethod()
         {
             TheMethod();
         }
