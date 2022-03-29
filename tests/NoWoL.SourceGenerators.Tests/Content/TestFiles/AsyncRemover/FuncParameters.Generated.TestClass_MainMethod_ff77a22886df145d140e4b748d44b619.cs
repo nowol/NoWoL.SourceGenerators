@@ -6,6 +6,7 @@ namespace Test
 {
     public partial class TestClass
     {
+        [System.CodeDom.Compiler.AsyncToSyncConverterGenerator("ExceptionGenerator", "1.0.0.0")]
         public void MainMethod(int param, Func<int, string, string> param2Async, System.Action<int, string> param3, System.Func<int, string, Test.TestClass> param4, Func<string> param5, System.Action param6, System.Func<Test.TestClass> param7)
         {
             param2Async(1, "a");

@@ -138,3 +138,5 @@ Useful information for creating source generators:
 * https://andrewlock.net/exploring-dotnet-6-part-9-source-generator-updates-incremental-generators/
 * https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md
 * Great collection of analyzers to help figure out how syntax trees work: https://github.com/JosefPihrt/Roslynator
+* Tool to see a syntax tree: https://sharplab.io
+* Tool to generate Roslyn API calls: https://roslynquoter.azurewebsites.net/

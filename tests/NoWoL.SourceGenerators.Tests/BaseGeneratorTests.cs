@@ -70,7 +70,8 @@ namespace NoWoL.SourceGenerators.Tests
             {
                 foreach (var generatedCode in generatedCodes.OrderBy(x => x.FileName))
                 {
-                    test.TestState.GeneratedSources.Add((typeof(T), $"{generatedCode.FileName}.g.cs", SourceText.From(generatedCode.Content!,
+                    test.TestState.GeneratedSources.Add((typeof(T), $"{generatedCode.FileName}.g.cs", SourceText.From(generatedCode.Content!.Replace(@""", ""1.0.0.0"")]",
+                                                                                                                                                     $@""", ""{typeof(AsyncToSyncConverterGenerator).Assembly.GetName().Version}"")]"),
                                                                                                                       Encoding.UTF8,
                                                                                                                       SourceHashAlgorithm.Sha1)));
                 }

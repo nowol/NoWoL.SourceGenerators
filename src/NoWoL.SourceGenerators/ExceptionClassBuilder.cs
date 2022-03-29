@@ -15,6 +15,7 @@ namespace NoWoL.SourceGenerators
         internal static ExceptionClassBuilderResult GenerateClass(IndentedStringBuilder sb, 
                                                                   string nameSpace, 
                                                                   ClassDeclarationSyntax classDeclaration,
+                                                                  string fileNamePrefix,
                                                                   Action<IndentedStringBuilder> addBody,
                                                                   Action<IndentedStringBuilder>? preAction = null)
         {
@@ -56,13 +57,13 @@ namespace NoWoL.SourceGenerators
 
             return new ExceptionClassBuilderResult
                    {
-                       FileName = GenerateFileName(filenameStringBuilder, classDeclaration)
+                       FileName = GenerateFileName(filenameStringBuilder, fileNamePrefix)
                    };
         }
 
-        private static string GenerateFileName(StringBuilder filenameStringBuilder, ClassDeclarationSyntax classDeclaration)
+        private static string GenerateFileName(StringBuilder filenameStringBuilder, string fileNamePrefix)
         {
-            var name = $"{classDeclaration.Identifier.ValueText}_{GenerationHelpers.Md5(filenameStringBuilder.ToString())}.g.cs";
+            var name = $"{fileNamePrefix}_{GenerationHelpers.Md5(filenameStringBuilder.ToString())}.g.cs";
 
             return name;
         }
@@ -79,46 +80,13 @@ namespace NoWoL.SourceGenerators
     {
         internal ExceptionClassBuilderResult GenerateException(IndentedStringBuilder sb, ClassToGenerate classToGenerate)
         {
+            var fileNamePrefix = classToGenerate.ClassDeclarationSyntax.Identifier.ValueText;
+
             return GenericClassBuilder.GenerateClass(sb,
                                                      classToGenerate.NameSpace!,
                                                      classToGenerate.ClassDeclarationSyntax,
+                                                     fileNamePrefix,
                                                      (isb) => AddExceptionBody(isb, classToGenerate));
-//            sb.Add($@"namespace {classToGenerate.NameSpace}
-//{{", addNewLine: true);
-//            var parentClasses = classToGenerate.ClassDeclarationSyntax.Ancestors().Where(x => CSharpExtensions.IsKind((SyntaxNode?)x,
-//                                                                                                     SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Reverse();
-//            var filenameStringBuilder = new StringBuilder();
-//            filenameStringBuilder.Append(classToGenerate.NameSpace).Append(classToGenerate.ClassSymbol.Name);
-
-//            foreach (var parentClass in parentClasses)
-//            {
-//                var buildClassDefinition = GenerationHelpers.BuildClassDefinition(parentClass);
-//                filenameStringBuilder.Append(buildClassDefinition);
-
-//                sb.IncreaseIndent();
-//                sb.Add(buildClassDefinition, addNewLine: true);
-//                sb.Add($@"{{", addNewLine: true);
-//            }
-
-//            AddExceptionBody(sb, classToGenerate);
-
-//            if (sb.Indent > 0)
-//            {
-//                sb.Add("", addNewLine: true);
-//                while (sb.Indent > 1)
-//                {
-//                    sb.DecreaseIndent();
-//                    sb.Add($@"}}", addNewLine: true);
-//                }
-
-//                sb.DecreaseIndent();
-//                sb.Add($@"}}");
-//            }
-
-//            return new ExceptionClassBuilderResult
-//                   {
-//                       FileName = GenerateFileName(filenameStringBuilder, classToGenerate)
-//                   };
         }
 
         private void AddExceptionBody(IndentedStringBuilder sb, ClassToGenerate classToGenerate)
@@ -128,6 +96,7 @@ namespace NoWoL.SourceGenerators
             sb.Add($@"    // This is generated code
     [System.Serializable]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    {CodeGenAttribute}
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     {GenerationHelpers.BuildClassDefinition(classToGenerate.ClassDeclarationSyntax)} : System.Exception
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
@@ -173,6 +142,13 @@ namespace NoWoL.SourceGenerators
 
             sb.Add(@"
     }", addNewLine: true);
+        }
+
+        private static readonly string CodeGenAttribute = GetCodeGenAttribute();
+
+        private static string GetCodeGenAttribute()
+        {
+            return $@"[System.CodeDom.Compiler.GeneratedCodeAttribute(""{nameof(ExceptionGenerator)}"", ""{typeof(ExceptionGenerator).Assembly.GetName().Version}"")]";
         }
 
         private string? GenerateExceptionHelper(ClassToGenerate classToGenerate)

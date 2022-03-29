@@ -127,9 +127,15 @@ namespace NoWoL.SourceGenerators
 
                 var sb = new IndentedStringBuilder();
 
+                var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)!.Identifier.ValueText;
+                var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
+
+                var fileNamePrefix = className + "_" + syncMethodName;
+
                 var result = GenericClassBuilder.GenerateClass(sb,
                                                                transformResult.NameSpace!,
                                                                transformResult.ClassDeclaration!,
+                                                               fileNamePrefix,
                                                                (isb) =>
                                                                {
                                                                    isb.IncreaseIndent();
@@ -166,19 +172,10 @@ namespace NoWoL.SourceGenerators
                                                                                           addNewLine: true);
                                                                               }
                                                                           });
-                
-
-                var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)!.Identifier.ValueText;
-                var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
-
-                var partialName = className + "_" + syncMethodName;
 
                 var content = sb.ToString();
 
-                var fileName = GenericClassBuilder.GenerateFileName(partialName,
-                                                                    content);
-
-                context.AddSource(fileName,
+                context.AddSource(result.FileName!,
                                   SourceText.From(content,
                                                   Encoding.UTF8));
             }

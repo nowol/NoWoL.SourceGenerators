@@ -47,12 +47,49 @@ namespace NoWoL.SourceGenerators
                                     unmodifiedNode,
                                     analysis);
 
+            node = AddCodeGenAttribute(node);
+
             if (unmodifiedNode.HasLeadingTrivia)
             {
                 node = node.WithLeadingTrivia(unmodifiedNode.GetLeadingTrivia());
             }
 
             return (true, node, analysis.NameSpace, analysis.ClassDeclaration);
+        }
+
+        private MethodDeclarationSyntax AddCodeGenAttribute(MethodDeclarationSyntax node)
+        {
+            return node.AddAttributeLists(CodeGenAttributeList);
+        }
+
+        private static readonly AttributeListSyntax CodeGenAttributeList = GetCodeGenAttribute();
+
+        private static AttributeListSyntax GetCodeGenAttribute()
+        {
+            var attSyntax = SyntaxFactory.Attribute(
+                                                   SyntaxFactory.QualifiedName(
+                                                                               SyntaxFactory.QualifiedName(
+                                                                                                           SyntaxFactory.QualifiedName(
+                                                                                                                                       SyntaxFactory.IdentifierName("System"),
+                                                                                                                                       SyntaxFactory.IdentifierName("CodeDom")),
+                                                                                                           SyntaxFactory.IdentifierName("Compiler")),
+                                                                               SyntaxFactory.IdentifierName(nameof(AsyncToSyncConverterGenerator))))
+                                        .WithArgumentList(
+                                                          SyntaxFactory.AttributeArgumentList(
+                                                                                              SyntaxFactory.SeparatedList<AttributeArgumentSyntax>(
+                                                                                                                                                   new SyntaxNodeOrToken[]{
+                                                                                                                                                        SyntaxFactory.AttributeArgument(
+                                                                                                                                                         SyntaxFactory.LiteralExpression(
+                                                                                                                                                          SyntaxKind.StringLiteralExpression,
+                                                                                                                                                          SyntaxFactory.Literal("ExceptionGenerator"))),
+                                                                                                                                                        SyntaxFactory.Token(SyntaxKind.CommaToken),
+                                                                                                                                                        SyntaxFactory.AttributeArgument(
+                                                                                                                                                         SyntaxFactory.LiteralExpression(
+                                                                                                                                                          SyntaxKind.StringLiteralExpression,
+                                                                                                                                                          SyntaxFactory.Literal(typeof(AsyncToSyncConverterGenerator).Assembly.GetName().Version.ToString())))})));
+            var als = SyntaxFactory.AttributeList().AddAttributes(attSyntax);
+
+            return als;
         }
 
         private SyntaxNode ComputeReplacementNode(SourceProductionContext context, AsyncRemoverAnalysis analysis, SyntaxNode originalNode, SyntaxNode potentiallyRewrittenNode)
