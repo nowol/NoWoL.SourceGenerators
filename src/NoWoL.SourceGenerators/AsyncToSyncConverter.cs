@@ -73,7 +73,7 @@ namespace NoWoL.SourceGenerators
                                                                                                                                        SyntaxFactory.IdentifierName("System"),
                                                                                                                                        SyntaxFactory.IdentifierName("CodeDom")),
                                                                                                            SyntaxFactory.IdentifierName("Compiler")),
-                                                                               SyntaxFactory.IdentifierName(nameof(AsyncToSyncConverterGenerator))))
+                                                                               SyntaxFactory.IdentifierName("GeneratedCodeAttribute")))
                                         .WithArgumentList(
                                                           SyntaxFactory.AttributeArgumentList(
                                                                                               SyntaxFactory.SeparatedList<AttributeArgumentSyntax>(
