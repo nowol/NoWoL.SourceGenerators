@@ -1,3 +1,4 @@
+
 # NoWoL.SourceGenerators
 
 NoWoL.SourceGenerators will contain C# (.NET 6/VS2022) source generators used to improve a developer's life. So far it includes:
@@ -7,7 +8,21 @@ NoWoL.SourceGenerators will contain C# (.NET 6/VS2022) source generators used to
 
 ## Installation
 
-Use your favorite Nuget package manager to add the `NoWoL.SourceGenerators` package to your project.
+Use your favorite Nuget package manager to add the `NoWoL.SourceGenerators` package to your project. Once installed you need to edit the reference to the package in the csproj file to add these attributes:
+
+* PrivateAssets="all"
+  * This attribute means that projects referencing this one won't get a reference to the package
+* ExcludeAssets="runtime"
+  * This attribute means that the package's DLL is not copied to your build output 
+
+  You should end up with something similar to this:
+
+```xml
+<ItemGroup>
+    <PackageReference Include="NoWoL.SourceGenerators" Version="0.1.16"
+                      PrivateAssets="all" ExcludeAssets="runtime" />
+</ItemGroup>
+```
 
 ## ExceptionGenerator Usage
 
