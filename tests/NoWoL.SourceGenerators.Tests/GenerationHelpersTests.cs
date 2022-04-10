@@ -8,9 +8,9 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void ConvertErrorCodeShouldThrowForInvalidValue()
+        public void ConvertErrorCodeShouldThrowForInvalidValue_AsyncToSync()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => SourceGenerators.GenerationHelpers.ConvertErrorCode((ErrorCode)66666));
+            Assert.Throws<ArgumentOutOfRangeException>(() => SourceGenerators.GenerationHelpers.ConvertErrorCode((AsyncToSyncErrorCode)66666));
         }
 
         [Fact]
@@ -19,6 +19,32 @@ namespace NoWoL.SourceGenerators.Tests
         public void IsPartialClassReturnsFalseIfSyntaxIsNull()
         {
             Assert.False(SourceGenerators.GenerationHelpers.IsPartialClass(null));
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void ConvertErrorCodeShouldThrowForInvalidValue_ExceptionGenerator()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => SourceGenerators.GenerationHelpers.ConvertErrorCode((ExceptionGeneratorErrorCode)66666));
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void IsOperationCanceledExceptionReturnsTrueForCanceledException()
+        {
+            var result = SourceGenerators.GenerationHelpers.IsOperationCanceledException(new OperationCanceledException());
+            Assert.True(result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void IsOperationCanceledExceptionReturnsFalseIfExceptionIsNotCanceledException()
+        {
+            var result = SourceGenerators.GenerationHelpers.IsOperationCanceledException(new InvalidCastException());
+            Assert.False(result);
         }
     }
 }

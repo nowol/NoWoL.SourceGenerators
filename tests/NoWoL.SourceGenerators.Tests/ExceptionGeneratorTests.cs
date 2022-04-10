@@ -54,7 +54,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
             {
-                DiagnosticResult.CompilerError("EG01").WithMessage("The [ExceptionGenerator] must be applied to a partial class.").WithSpan(3, 5, 4, 31)
+                DiagnosticResult.CompilerError("NWL1003").WithMessage("The [ExceptionGenerator] must be applied to a partial class.").WithSpan(3, 5, 4, 31)
             }).ConfigureAwait(false);
         }
 
@@ -97,7 +97,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("EG02").WithMessage("The [ExceptionGenerator] must be applied to a partial class contained in a namespace.").WithSpan(1, 1, 2, 41)
+                                                                       DiagnosticResult.CompilerError("NWL1002").WithMessage("The [ExceptionGenerator] must be applied to a partial class contained in a namespace.").WithSpan(1, 1, 2, 41)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -132,7 +132,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("EG03").WithMessage("The [ExceptionGenerator] must be applied to a partial class nested in another partial class.")
+                                                                       DiagnosticResult.CompilerError("NWL1001").WithMessage("The [ExceptionGenerator] must be applied to a partial class nested in another partial class.")
                                                                                        .WithSpan(7, 13, 10, 14)
                                                                    }).ConfigureAwait(false);
         }
@@ -159,6 +159,17 @@ namespace NoWoL.SourceGenerators.Tests
         public async Task TestedNamespaceShouldSucceed()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task ExceptionCannotBeDuplicated()
+        {
+            await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
+                                                                   {
+                                                                       DiagnosticResult.CompilerError("NWL1000").WithMessage("An exception occurred while generating exception: The hintName 'TestClass_ff77a22886df145d140e4b748d44b619.g.cs' of the added source file must be unique within a generator. (Parameter 'hintName')")
+                                                                   }).ConfigureAwait(false);
         }
     }
 }

@@ -34,6 +34,8 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\FuncParameters.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\LocalAsyncMethod.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\LocalAsyncMethod.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodMustBeInPartialClass.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodMustBeInPartialClassNested.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodMustEndWithAsync.Initial.cs" />
@@ -100,6 +102,8 @@
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassWithoutAttribute.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
@@ -160,6 +164,8 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\DifferentAccessModifiers.Generated.TestClass_PrivateMainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\DifferentAccessModifiers.Generated.TestClass_PublicMainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncStreamsMethodMustEndWithAsync.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MoreThanOneAttributeWithXmlDoc.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MoreThanOneAttributeWithXmlDoc.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MustReturnATask.Initial.cs" />
@@ -212,6 +218,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassWithoutAttribute.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
@@ -226,6 +233,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\GeneratorShouldIgnoreAttributeWithSameAttributeName.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_3f09774f3ea0ded540bc58382252aeca.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Initial.cs" />

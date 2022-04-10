@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NoWoL.SourceGenerators
 {
-    internal enum ErrorCode
+    internal enum AsyncToSyncErrorCode
     {
         AwaitedMethodMustEndWithAsync,
         ReturnedMethodMustEndWithAsync,
@@ -13,5 +13,6 @@ namespace NoWoL.SourceGenerators
         AttributeMustBeAppliedInPartialClassHierarchy,
         MethodMustBeInNameSpace,
         MethodMustReturnTask,
+        UnexpectedException
     }
 }
