@@ -12,7 +12,7 @@ namespace NoWoL.SourceGenerators
 {
     internal class AsyncToSyncConverter
     {
-        private const string DiagnosticCategory = "Async/Await remover generator";
+        internal const string DiagnosticCategory = "Async/Await remover generator";
 
         public (bool Success, MethodDeclarationSyntax Node, string? NameSpace, ClassDeclarationSyntax? ClassDeclaration) Transform(SourceProductionContext context, Compilation compilation, MethodDeclarationSyntax node)
         {
@@ -549,7 +549,7 @@ namespace NoWoL.SourceGenerators
                         {
                             AddDiagnostic(context,
                                           analysis,
-                                          ErrorCode.AwaitedMethodMustEndWithAsync,
+                                          AsyncToSyncErrorCode.AwaitedMethodMustEndWithAsync,
                                           $"The awaited method '{ins.Identifier.ValueText}' must end with 'Async'.",
                                           ies.GetLocation());
 
@@ -594,7 +594,7 @@ namespace NoWoL.SourceGenerators
                 {
                     AddDiagnostic(context,
                                   analysis,
-                                  ErrorCode.AwaitedMethodMustEndWithAsync,
+                                  AsyncToSyncErrorCode.AwaitedMethodMustEndWithAsync,
                                   $"The awaited method '{methodName}' must end with 'Async'.",
                                   awaitStatement.GetLocation());
                 }
@@ -623,7 +623,7 @@ namespace NoWoL.SourceGenerators
                         {
                             AddDiagnostic(context,
                                           analysis,
-                                          ErrorCode.ReturnedMethodMustEndWithAsync,
+                                          AsyncToSyncErrorCode.ReturnedMethodMustEndWithAsync,
                                           $"The returned method '{ms.Name}' must end with 'Async'.",
                                           returnStatement.GetLocation());
 
@@ -642,7 +642,7 @@ namespace NoWoL.SourceGenerators
             {
                 AddDiagnostic(context,
                               analysis,
-                              ErrorCode.AttributeMustBeAppliedToAClassEndingWithAsync,
+                              AsyncToSyncErrorCode.AttributeMustBeAppliedToAClassEndingWithAsync,
                               "The [AsyncToSyncConverter] must be applied to a method ending with Async.",
                               target.GetLocation());
                 return false;
@@ -654,7 +654,7 @@ namespace NoWoL.SourceGenerators
             {
                 AddDiagnostic(context,
                               analysis,
-                              ErrorCode.AttributeMustBeAppliedToPartialClass,
+                              AsyncToSyncErrorCode.AttributeMustBeAppliedToPartialClass,
                               "The [AsyncToSyncConverter] must be applied to a partial class.",
                               target.GetLocation());
 
@@ -666,7 +666,7 @@ namespace NoWoL.SourceGenerators
             {
                 AddDiagnostic(context,
                               analysis,
-                              ErrorCode.AttributeMustBeAppliedInPartialClassHierarchy,
+                              AsyncToSyncErrorCode.AttributeMustBeAppliedInPartialClassHierarchy,
                               "The [AsyncToSyncConverter] must be applied to a partial class nested in another partial class.",
                               target.GetLocation());
 
@@ -678,7 +678,7 @@ namespace NoWoL.SourceGenerators
             {
                 AddDiagnostic(context,
                               analysis,
-                              ErrorCode.MethodMustBeInNameSpace,
+                              AsyncToSyncErrorCode.MethodMustBeInNameSpace,
                               "The [AsyncToSyncConverter] must be applied to a method in a partial class contained in a namespace.",
                               target.GetLocation());
 
@@ -699,7 +699,7 @@ namespace NoWoL.SourceGenerators
                 {
                     AddDiagnostic(context,
                                   analysis,
-                                  ErrorCode.MethodMustReturnTask,
+                                  AsyncToSyncErrorCode.MethodMustReturnTask,
                                   $"The [AsyncToSyncConverter] must be applied to a method return a task instead of type '{target.ReturnType.ToString()}'.",
                                   target.ReturnType.GetLocation());
 
@@ -782,7 +782,7 @@ namespace NoWoL.SourceGenerators
                                                                                                  "Async")));
         }
 
-        private void AddDiagnostic(SourceProductionContext context, AsyncRemoverAnalysis analysis, ErrorCode errorCode, string message, Location location)
+        private void AddDiagnostic(SourceProductionContext context, AsyncRemoverAnalysis analysis, AsyncToSyncErrorCode errorCode, string message, Location location)
         {
             analysis.ContainsDiagnosticErrors = true;
             context.ReportDiagnostic(Diagnostic.Create(GenerationHelpers.ConvertErrorCode(errorCode),

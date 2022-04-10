@@ -67,13 +67,6 @@ namespace NoWoL.SourceGenerators
 
             return name;
         }
-
-        public static string GenerateFileName(string fileName, string content)
-        {
-            var name = $"{fileName}_{GenerationHelpers.Md5(content)}.g.cs";
-
-            return name;
-        }
     }
 
     internal class ExceptionClassBuilder

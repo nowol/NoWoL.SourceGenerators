@@ -311,5 +311,16 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task MethodCannotBeDuplicated()
+        {
+            await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
+                                                                   {
+                                                                       DiagnosticResult.CompilerError("NWL0008").WithMessage("An exception occurred while converting async code to sync: The hintName 'TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.g.cs' of the added source file must be unique within a generator. (Parameter 'hintName')")
+                                                                   }).ConfigureAwait(false);
+        }
     }
 }

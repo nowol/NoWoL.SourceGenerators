@@ -142,21 +142,41 @@ namespace NoWoL.SourceGenerators
             return valueText.EndsWith("Async");
         }
 
-        public static string ConvertErrorCode(ErrorCode errorCode)
+        public static string ConvertErrorCode(AsyncToSyncErrorCode errorCode)
         {
             return errorCode switch
                    {
-                       ErrorCode.AwaitedMethodMustEndWithAsync => "NWL0001",
-                       ErrorCode.ReturnedMethodMustEndWithAsync => "NWL0002",
-                       ErrorCode.AttributeMustBeAppliedToAClassEndingWithAsync => "NWL0003",
-                       ErrorCode.AttributeMustBeAppliedToPartialClass => "NWL0004",
-                       ErrorCode.AttributeMustBeAppliedInPartialClassHierarchy => "NWL0005",
-                       ErrorCode.MethodMustBeInNameSpace => "NWL0006",
-                       ErrorCode.MethodMustReturnTask => "NWL0007",
+                       AsyncToSyncErrorCode.AwaitedMethodMustEndWithAsync => "NWL0001",
+                       AsyncToSyncErrorCode.ReturnedMethodMustEndWithAsync => "NWL0002",
+                       AsyncToSyncErrorCode.AttributeMustBeAppliedToAClassEndingWithAsync => "NWL0003",
+                       AsyncToSyncErrorCode.AttributeMustBeAppliedToPartialClass => "NWL0004",
+                       AsyncToSyncErrorCode.AttributeMustBeAppliedInPartialClassHierarchy => "NWL0005",
+                       AsyncToSyncErrorCode.MethodMustBeInNameSpace => "NWL0006",
+                       AsyncToSyncErrorCode.MethodMustReturnTask => "NWL0007",
+                       AsyncToSyncErrorCode.UnexpectedException => "NWL0008",
                        _ => throw new ArgumentOutOfRangeException(nameof(errorCode),
                                                                   errorCode,
                                                                   null)
                    };
+        }
+
+        public static string ConvertErrorCode(ExceptionGeneratorErrorCode errorCode)
+        {
+            return errorCode switch
+                   {
+                       ExceptionGeneratorErrorCode.UnexpectedException => "NWL1000",
+                       ExceptionGeneratorErrorCode.MustBeInParentPartialClass => "NWL1001",
+                       ExceptionGeneratorErrorCode.MethodClassMustBeInNamespace => "NWL1002",
+                       ExceptionGeneratorErrorCode.MethodMustBePartial => "NWL1003",
+                       _ => throw new ArgumentOutOfRangeException(nameof(errorCode),
+                                                                  errorCode,
+                                                                  null)
+                   };
+        }
+
+        public static bool IsOperationCanceledException(Exception ex)
+        {
+            return ex is OperationCanceledException;
         }
     }
 }

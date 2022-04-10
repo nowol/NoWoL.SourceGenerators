@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
@@ -11,7 +12,7 @@ namespace NoWoL.SourceGenerators.Tests
     {
         private readonly string _folder;
 
-        public BaseGeneratorTests(string folder)
+        protected BaseGeneratorTests(string folder)
         {
             if (string.IsNullOrWhiteSpace(folder))
             {
