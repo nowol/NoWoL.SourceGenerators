@@ -17,6 +17,8 @@
 		<Nullable>enable</Nullable>
 
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+		<PackageIcon>logo.png</PackageIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -55,6 +57,10 @@
 	<!--https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#use-functionality-from-nuget-packages-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="..\..\docs\logo.png">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
 		<None Include="..\..\README.md">
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
