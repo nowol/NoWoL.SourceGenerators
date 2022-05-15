@@ -25,11 +25,6 @@ namespace NoWoL.SourceGenerators
                 return (false, node, null, null);
             }
 
-            if (compilation.GetDiagnostics().Any(x => x.Severity == DiagnosticSeverity.Error))
-            {
-
-            }
-
             var unmodifiedNode = node;
 
             var d = node.DescendantNodesAndSelf();
@@ -521,7 +516,6 @@ namespace NoWoL.SourceGenerators
                 {
                     AnalyzeAwaitedMethodsMustEndWithAsync(context,
                                                           analysis,
-                                                          semanticModel,
                                                           awaitStatement);
                 }
 
@@ -529,7 +523,6 @@ namespace NoWoL.SourceGenerators
                 {
                     AnalyzeAsyncForEachMustEndWithAsync(context,
                                                         analysis,
-                                                        semanticModel,
                                                         forEachStatement);
                 }
             }
@@ -537,7 +530,7 @@ namespace NoWoL.SourceGenerators
             return analysis;
         }
 
-        private bool AnalyzeAsyncForEachMustEndWithAsync(SourceProductionContext context, AsyncRemoverAnalysis analysis, SemanticModel semanticModel, ForEachStatementSyntax forEachStatement)
+        private bool AnalyzeAsyncForEachMustEndWithAsync(SourceProductionContext context, AsyncRemoverAnalysis analysis, ForEachStatementSyntax forEachStatement)
         {
             if (forEachStatement.AwaitKeyword.IsKind(SyntaxKind.AwaitKeyword))
             {
@@ -562,7 +555,7 @@ namespace NoWoL.SourceGenerators
             return true;
         }
 
-        private bool AnalyzeAwaitedMethodsMustEndWithAsync(SourceProductionContext context, AsyncRemoverAnalysis analysis, SemanticModel semanticModel, AwaitExpressionSyntax awaitStatement)
+        private bool AnalyzeAwaitedMethodsMustEndWithAsync(SourceProductionContext context, AsyncRemoverAnalysis analysis, AwaitExpressionSyntax awaitStatement)
         {
             if (awaitStatement.Expression is InvocationExpressionSyntax invocation)
             {

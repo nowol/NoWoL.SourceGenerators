@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Text;
 
 namespace NoWoL.SourceGenerators
@@ -99,98 +93,85 @@ namespace NoWoL.SourceGenerators
 
         private static void Execute(Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
         {
-            try
+            if (!CanExecute(methods, compilation))
             {
-                if (!CanExecute(methods, compilation))
+                return;
+            }
+
+            IEnumerable<MethodDeclarationSyntax> distinctMethods = methods.Distinct();
+
+            foreach (var methodDeclarationSyntax in distinctMethods)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                var node = methodDeclarationSyntax;
+
+                var remover = new AsyncToSyncConverter();
+
+                var transformResult = remover.Transform(context,
+                                                        compilation,
+                                                        node);
+
+                if (!transformResult.Success)
                 {
-                    return;
+                    continue;
                 }
 
-                IEnumerable<MethodDeclarationSyntax> distinctMethods = methods.Distinct();
+                node = transformResult.Node.NormalizeWhitespace();
 
-                foreach (var methodDeclarationSyntax in distinctMethods)
-                {
-                    context.CancellationToken.ThrowIfCancellationRequested();
+                var sb = new IndentedStringBuilder();
 
-                    var node = methodDeclarationSyntax;
+                var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)!.Identifier.ValueText;
+                var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
 
-                    var remover = new AsyncToSyncConverter();
+                var fileNamePrefix = className + "_" + syncMethodName;
 
-                    var transformResult = remover.Transform(context,
-                                                            compilation,
-                                                            node);
+                var result = GenericClassBuilder.GenerateClass(sb,
+                                                               transformResult.NameSpace!,
+                                                               transformResult.ClassDeclaration!,
+                                                               fileNamePrefix,
+                                                               (isb) =>
+                                                               {
+                                                                   isb.IncreaseIndent();
 
-                    if (!transformResult.Success)
-                    {
-                        continue;
-                    }
+                                                                   isb.Add(GenerationHelpers.BuildClassDefinition(transformResult.ClassDeclaration!), addNewLine: true);
+                                                                   isb.Add("{", addNewLine: true);
 
-                    node = transformResult.Node.NormalizeWhitespace();
+                                                                   isb.IncreaseIndent();
+                                                                   isb.Add(node.ToFullString(),
+                                                                           addNewLine: true);
+                                                                   isb.DecreaseIndent();
 
-                    var sb = new IndentedStringBuilder();
+                                                                   isb.Add("}", addNewLine: true);
+                                                                   isb.DecreaseIndent();
+                                                               },
+                                                               preAction: isb =>
+                                                                          {
+                                                                              var cuSyntaxes = methodDeclarationSyntax.Ancestors().Where(x => x.IsKind(SyntaxKind.CompilationUnit));
+                                                                              var hasUsings = false;
 
-                    var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)!.Identifier.ValueText;
-                    var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
-
-                    var fileNamePrefix = className + "_" + syncMethodName;
-
-                    var result = GenericClassBuilder.GenerateClass(sb,
-                                                                   transformResult.NameSpace!,
-                                                                   transformResult.ClassDeclaration!,
-                                                                   fileNamePrefix,
-                                                                   (isb) =>
-                                                                   {
-                                                                       isb.IncreaseIndent();
-
-                                                                       isb.Add(GenerationHelpers.BuildClassDefinition(transformResult.ClassDeclaration!), addNewLine: true);
-                                                                       isb.Add("{", addNewLine: true);
-
-                                                                       isb.IncreaseIndent();
-                                                                       isb.Add(node.ToFullString(),
-                                                                               addNewLine: true);
-                                                                       isb.DecreaseIndent();
-
-                                                                       isb.Add("}", addNewLine: true);
-                                                                       isb.DecreaseIndent();
-                                                                   },
-                                                                   preAction: isb =>
+                                                                              foreach (var cuSyntax in cuSyntaxes!.Cast<CompilationUnitSyntax>())
                                                                               {
-                                                                                  var cuSyntaxes = methodDeclarationSyntax.Ancestors().Where(x => x.IsKind(SyntaxKind.CompilationUnit));
-                                                                                  var hasUsings = false;
-
-                                                                                  foreach (var cuSyntax in cuSyntaxes!.Cast<CompilationUnitSyntax>())
+                                                                                  foreach (var usingDirectiveSyntax in cuSyntax.Usings)
                                                                                   {
-                                                                                      foreach (var usingDirectiveSyntax in cuSyntax.Usings)
-                                                                                      {
-                                                                                          hasUsings = true;
-                                                                                          isb.Add(usingDirectiveSyntax.ToString(),
-                                                                                                  addNewLine: true);
-                                                                                      }
-                                                                                  }
-
-                                                                                  if (hasUsings)
-                                                                                  {
-                                                                                      isb.Add(String.Empty,
+                                                                                      hasUsings = true;
+                                                                                      isb.Add(usingDirectiveSyntax.ToString(),
                                                                                               addNewLine: true);
                                                                                   }
-                                                                              });
+                                                                              }
 
-                    var content = sb.ToString();
+                                                                              if (hasUsings)
+                                                                              {
+                                                                                  isb.Add(String.Empty,
+                                                                                          addNewLine: true);
+                                                                              }
+                                                                          });
 
-                    context.AddSource(result.FileName!,
-                                      SourceText.From(content,
-                                                      Encoding.UTF8));
-                }
-            }
-            catch (Exception ex) when (!GenerationHelpers.IsOperationCanceledException(ex))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(GenerationHelpers.ConvertErrorCode(AsyncToSyncErrorCode.UnexpectedException),
-                                                           AsyncToSyncConverter.DiagnosticCategory,
-                                                           "An exception occurred while converting async code to sync: " + ex.Message,
-                                                           defaultSeverity: DiagnosticSeverity.Error,
-                                                           severity: DiagnosticSeverity.Error,
-                                                           isEnabledByDefault: true,
-                                                           warningLevel: 0));
+                var content = sb.ToString();
+
+                context.AddSource(result.FileName!,
+                                  SourceText.From(content,
+                                                  Encoding.UTF8));
             }
         }
 

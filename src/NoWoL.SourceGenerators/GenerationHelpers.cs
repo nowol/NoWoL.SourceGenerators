@@ -153,7 +153,6 @@ namespace NoWoL.SourceGenerators
                        AsyncToSyncErrorCode.AttributeMustBeAppliedInPartialClassHierarchy => "NWL0005",
                        AsyncToSyncErrorCode.MethodMustBeInNameSpace => "NWL0006",
                        AsyncToSyncErrorCode.MethodMustReturnTask => "NWL0007",
-                       AsyncToSyncErrorCode.UnexpectedException => "NWL0008",
                        _ => throw new ArgumentOutOfRangeException(nameof(errorCode),
                                                                   errorCode,
                                                                   null)
@@ -164,7 +163,6 @@ namespace NoWoL.SourceGenerators
         {
             return errorCode switch
                    {
-                       ExceptionGeneratorErrorCode.UnexpectedException => "NWL1000",
                        ExceptionGeneratorErrorCode.MustBeInParentPartialClass => "NWL1001",
                        ExceptionGeneratorErrorCode.MethodClassMustBeInNamespace => "NWL1002",
                        ExceptionGeneratorErrorCode.MethodMustBePartial => "NWL1003",

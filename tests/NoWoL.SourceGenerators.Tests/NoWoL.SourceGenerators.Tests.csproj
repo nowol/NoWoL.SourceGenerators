@@ -34,7 +34,6 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\FuncParameters.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\LocalAsyncMethod.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\LocalAsyncMethod.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodMustBeInPartialClass.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\MethodMustBeInPartialClassNested.Initial.cs" />
@@ -94,6 +93,11 @@
 	  <Compile Remove="Content\TestFiles\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\AttributeNotOnAClass.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeWithSameName.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForClassNotUsingAttribute.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForPartialClass.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\RaisesDiagnostic.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />
@@ -102,7 +106,6 @@
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassWithoutAttribute.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
@@ -164,7 +167,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\DifferentAccessModifiers.Generated.TestClass_PrivateMainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\DifferentAccessModifiers.Generated.TestClass_PublicMainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncStreamsMethodMustEndWithAsync.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MethodCannotBeDuplicated.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MoreThanOneAttributeWithXmlDoc.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\MoreThanOneAttributeWithXmlDoc.Initial.cs" />
@@ -210,6 +212,11 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeWithSameName.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\AttributeNotOnAClass.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\RaisesDiagnostic.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForPartialClass.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForClassNotUsingAttribute.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />
@@ -218,7 +225,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassWithoutAttribute.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithAttributeWithoutMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
@@ -254,6 +260,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit" Version="1.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.0.1" />

@@ -13,6 +13,5 @@ namespace NoWoL.SourceGenerators
         AttributeMustBeAppliedInPartialClassHierarchy,
         MethodMustBeInNameSpace,
         MethodMustReturnTask,
-        UnexpectedException
     }
 }
