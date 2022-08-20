@@ -35,7 +35,7 @@ namespace NoWoL.SourceGenerators
         private static DiagnosticDescriptor GetMustBeInParentPartialClassDescriptor()
         {
             return new DiagnosticDescriptor(GenerationHelpers.ConvertErrorCode(ExceptionGeneratorErrorCode.MustBeInParentPartialClass),
-                                            "Class must be in namespace",
+                                            "Parent classes must be partial",
                                             "The parent classes of class '{0}' must also be partial",
                                             ExceptionGeneratorCategory,
                                             DiagnosticSeverity.Error,
