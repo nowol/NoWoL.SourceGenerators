@@ -96,42 +96,28 @@ namespace NoWoL.SourceGenerators
 
         private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
         {
-            try
+            if (!CanExecute(classes, compilation, out var classAttribute))
             {
-                if (!CanExecute(classes, compilation, out var classAttribute))
-                {
-                    return;
-                }
-
-                IEnumerable<ClassDeclarationSyntax> distinctClasses = classes.Distinct();
-
-                List<ClassToGenerate> classesToGenerate = GetTypesToGenerate(compilation,
-                                                                             context,
-                                                                             distinctClasses,
-                                                                             classAttribute!,
-                                                                             context.CancellationToken);
-                if (classesToGenerate.Count > 0)
-                {
-                    var sb = new IndentedStringBuilder();
-                    var classBuilder = new ExceptionClassBuilder();
-                    foreach (var classToGenerate in classesToGenerate)
-                    {
-                        sb.Clear(true);
-                        var result = classBuilder.GenerateException(sb, classToGenerate);
-                        context.AddSource(result.FileName!, SourceText.From(sb.ToString(), Encoding.UTF8));
-                    }
-                }
+                return;
             }
-            catch (Exception ex) when (!GenerationHelpers.IsOperationCanceledException(ex))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(GenerationHelpers.ConvertErrorCode(ExceptionGeneratorErrorCode.UnexpectedException),
-                                                                                              "Exception generator",
-                                                                                              "An exception occurred while generating exception: " + ex.Message,
-                                                                                              defaultSeverity: DiagnosticSeverity.Error,
-                                                                                              severity: DiagnosticSeverity.Error,
-                                                                                              isEnabledByDefault: true,
-                                                                                              warningLevel: 0));
 
+            IEnumerable<ClassDeclarationSyntax> distinctClasses = classes.Distinct();
+
+            List<ClassToGenerate> classesToGenerate = GetTypesToGenerate(compilation,
+                                                                         context,
+                                                                         distinctClasses,
+                                                                         classAttribute!,
+                                                                         context.CancellationToken);
+            if (classesToGenerate.Count > 0)
+            {
+                var sb = new IndentedStringBuilder();
+                var classBuilder = new ExceptionClassBuilder();
+                foreach (var classToGenerate in classesToGenerate)
+                {
+                    sb.Clear(true);
+                    var result = classBuilder.GenerateException(sb, classToGenerate);
+                    context.AddSource(result.FileName!, SourceText.From(sb.ToString(), Encoding.UTF8));
+                }
             }
         }
 
@@ -170,8 +156,12 @@ namespace NoWoL.SourceGenerators
 
                 var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
 
-                if (!ValidateTarget(context, classDeclarationSyntax, ns))
+                if (!TryValidateTarget(classDeclarationSyntax, ns, out var diagnosticToReport))
                 {
+                    var error = Diagnostic.Create(diagnosticToReport!,
+                                                  classDeclarationSyntax.Identifier.GetLocation(),
+                                                  classSymbol.Name);
+                    context.ReportDiagnostic(error);
                     continue;
                 }
 
@@ -209,33 +199,19 @@ namespace NoWoL.SourceGenerators
                 return results;
             }
         }
-        
-        private static bool ValidateTarget(SourceProductionContext context, ClassDeclarationSyntax target, string? ns)
+
+        internal static bool TryValidateTarget(ClassDeclarationSyntax target, string? ns, out DiagnosticDescriptor? diagnosticToReport)
         {
             if (!GenerationHelpers.IsPartialClass(target))
             {
-                context.ReportDiagnostic(Diagnostic.Create(GenerationHelpers.ConvertErrorCode(ExceptionGeneratorErrorCode.MethodMustBePartial),
-                                                           "Exception generator",
-                                                           "The [ExceptionGenerator] must be applied to a partial class.",
-                                                           defaultSeverity: DiagnosticSeverity.Error,
-                                                           severity: DiagnosticSeverity.Error,
-                                                           isEnabledByDefault: true,
-                                                           warningLevel: 0,
-                                                           location: target.GetLocation()));
+                diagnosticToReport = ExceptionGeneratorDescriptors.MethodMustBePartial;
 
                 return false;
             }
 
             if (String.IsNullOrWhiteSpace(ns))
             {
-                context.ReportDiagnostic(Diagnostic.Create(GenerationHelpers.ConvertErrorCode(ExceptionGeneratorErrorCode.MethodClassMustBeInNamespace),
-                                                           "Exception generator",
-                                                           "The [ExceptionGenerator] must be applied to a partial class contained in a namespace.",
-                                                           defaultSeverity: DiagnosticSeverity.Error,
-                                                           severity: DiagnosticSeverity.Error,
-                                                           isEnabledByDefault: true,
-                                                           warningLevel: 0,
-                                                           location: target.GetLocation()));
+                diagnosticToReport = ExceptionGeneratorDescriptors.MethodClassMustBeInNamespace;
 
                 return false;
             }
@@ -243,17 +219,12 @@ namespace NoWoL.SourceGenerators
             var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
             if (parentClasses.Any(x => !GenerationHelpers.IsPartialClass(x)))
             {
-                context.ReportDiagnostic(Diagnostic.Create(GenerationHelpers.ConvertErrorCode(ExceptionGeneratorErrorCode.MustBeInParentPartialClass),
-                                                           "Exception generator",
-                                                           "The [ExceptionGenerator] must be applied to a partial class nested in another partial class.",
-                                                           defaultSeverity: DiagnosticSeverity.Error,
-                                                           severity: DiagnosticSeverity.Error,
-                                                           isEnabledByDefault: true,
-                                                           warningLevel: 0,
-                                                           location: target.GetLocation()));
+                diagnosticToReport = ExceptionGeneratorDescriptors.MustBeInParentPartialClass;
 
                 return false;
             }
+
+            diagnosticToReport = null;
 
             return true;
         }

@@ -58,17 +58,9 @@ namespace NoWoL.SourceGenerators
 
             if (removeLastNewLines)
             {
-                for (var i = textLength - 1; i >= 0; i--)
+                for (var i = textLength - 1; CCC(i, text) ; i--)
                 {
-                    if (text[i] == '\r'
-                        || text[i] == '\n')
-                    {
-                        textLength--;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    textLength--;
                 }
             }
 
@@ -131,6 +123,31 @@ namespace NoWoL.SourceGenerators
             }
 
             return this;
+        }
+
+        private bool CCC(int i, string text)
+        {
+            if (i >= 0)
+            {
+                return IsNewLineCharacter(text[i]);
+            }
+
+            return false;
+        }
+
+        private static bool IsNewLineCharacter(char c)
+        {
+            if (c == '\r')
+            {
+                return true;
+            }
+
+            if (c == '\n')
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void AppendIndent()

@@ -25,6 +25,7 @@ namespace NoWoL.SourceGenerators.Tests
 
         protected async Task WithWithEmbeddedFiles(List<DiagnosticResult>? expectedDiagnosticResults = null,
                                                    List<string>? additionalSourceFiles = null,
+                                                   bool addGeneratedAttributeDefinitionFile = true,
                                                    [CallerMemberName] string callerMemberName = "")
         {
             if (string.IsNullOrWhiteSpace(callerMemberName))
@@ -52,20 +53,22 @@ namespace NoWoL.SourceGenerators.Tests
                     initialCode += "\r\n" + content;
                 }
             }
-
-            var (attrFileName, attrCode) = GetAttributeFileContent();
-
+            
             var test = new Microsoft.CodeAnalysis.CSharp.Testing.CSharpGeneratorVerifier<T>.Test
                        {
                            TestState =
                            {
-                               Sources = { initialCode },
-                               GeneratedSources =
-                               {
-                                   (typeof(T), attrFileName, SourceText.From(attrCode, Encoding.UTF8, SourceHashAlgorithm.Sha1))
-                               }
+                               Sources = { initialCode }
                            }
                        };
+
+            if (addGeneratedAttributeDefinitionFile)
+            {
+                var (attrFileName, attrCode) = GetAttributeFileContent();
+                test.TestState.GeneratedSources.Add((typeof(T), attrFileName, SourceText.From(attrCode,
+                                                                                              Encoding.UTF8,
+                                                                                              SourceHashAlgorithm.Sha1)));
+            }
 
             if (generatedCodes.Count > 0)
             {

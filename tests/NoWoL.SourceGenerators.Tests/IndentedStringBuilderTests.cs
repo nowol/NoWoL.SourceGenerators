@@ -215,6 +215,26 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public void AppendLinesShouldRemoveTheMacNewLinesAtTheEnd()
+        {
+            _sut.IncreaseIndent().Add("abc\rdef\r", removeLastNewLines: true, addNewLine: true);
+            Assert.Equal($"    abc{Environment.NewLine}    def",
+                         _sut.ToString());
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void AddingAnEmptyString()
+        {
+            _sut.IncreaseIndent().Add("\r", removeLastNewLines: true, addNewLine: true);
+            Assert.Equal($"",
+                         _sut.ToString());
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public void AppendLinesShouldRemoveTheLastNewLine()
         {
             _sut.IncreaseIndent().Add("abc\ndef\n", removeLastNewLines: true, addNewLine: true);

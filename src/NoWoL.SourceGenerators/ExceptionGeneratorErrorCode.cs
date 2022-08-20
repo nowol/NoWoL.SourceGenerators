@@ -6,7 +6,6 @@ namespace NoWoL.SourceGenerators
 {
     internal enum ExceptionGeneratorErrorCode
     {
-        UnexpectedException,
         MustBeInParentPartialClass,
         MethodClassMustBeInNamespace,
         MethodMustBePartial
