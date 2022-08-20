@@ -27,15 +27,12 @@ namespace NoWoL.SourceGenerators
 
         private static void AnalyzeNamedType(SymbolAnalysisContext context)
         {
-            if (context.Symbol is not INamedTypeSymbol { TypeKind: TypeKind.Class } type)
-            {
-                return;
-            }
-
             if (!IsValid(context.Symbol))
             {
                 return;
             }
+
+            var type = (context.Symbol as INamedTypeSymbol)!;
 
             foreach (var classDeclarationSyntax in FilterClassSyntax(type.DeclaringSyntaxReferences))
             {
@@ -57,22 +54,12 @@ namespace NoWoL.SourceGenerators
 
         private static bool IsValid(ISymbol type)
         {
-            return type.GetAttributes()
-                       .Any(a => a.AttributeClass?.Name == "ExceptionGeneratorAttribute"
-                                 && a.AttributeClass.ContainingNamespace is
-                                 {
-                                     Name: "SourceGenerators",
-                                     IsGlobalNamespace: false
-                                 }
-                                 && a.AttributeClass.ContainingNamespace.ContainingNamespace is
-                                 {
-                                     Name: "NoWoL",
-                                     IsGlobalNamespace: false
-                                 }
-                                 && a.AttributeClass.ContainingNamespace.ContainingNamespace.ContainingNamespace is
-                                 {
-                                     IsGlobalNamespace: true
-                                 });
+            return GenerationHelpers.IsClass(type)
+                   && type.GetAttributes()
+                          .Any(a => a.AttributeClass!.Name == "ExceptionGeneratorAttribute"
+                                    && a.AttributeClass!.ContainingNamespace.Name == "SourceGenerators"
+                                    && a.AttributeClass!.ContainingNamespace.ContainingNamespace.Name == "NoWoL"
+                                    && a.AttributeClass!.ContainingNamespace.ContainingNamespace.ContainingNamespace.IsGlobalNamespace);
         }
     }
 }

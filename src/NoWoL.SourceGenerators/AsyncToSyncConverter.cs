@@ -204,9 +204,12 @@ namespace NoWoL.SourceGenerators
 
         private static IdentifierNameSyntax RemoveAsyncFrom(AsyncRemoverAnalysis analysis, IdentifierNameSyntax ins, bool forceRename = false)
         {
-            if (!forceRename && analysis.IdentifiersThatDoesNotNeedRenaming.Contains(ins.Identifier.ValueText))
+            if (!forceRename)
             {
-                return ins;
+                if (analysis.IdentifiersThatDoesNotNeedRenaming.Contains(ins.Identifier.ValueText))
+                {
+                    return ins;
+                }
             }
 
             return ins.WithIdentifier(SyntaxFactory.Identifier(GenerationHelpers.RemoveLastWord(ins.Identifier!.ValueText!,
@@ -356,8 +359,7 @@ namespace NoWoL.SourceGenerators
 
                 if (syntaxNode is IdentifierNameSyntax ins)
                 {
-                    if (ins.Identifier.ValueText != null
-                        && ins.Identifier.ValueText.EndsWith("Async") == true)
+                    if (GenerationHelpers.IdentifierEndsWithAsync(ins))
                     {
                         var result = RemoveAsyncFrom(analysis, ins.Identifier);
 
@@ -394,10 +396,13 @@ namespace NoWoL.SourceGenerators
                             {
                                 var argType = syntaxNode.ChildNodes().OfType<TypeArgumentListSyntax>().FirstOrDefault();
 
-                                if (argType != null
-                                    && argType.Arguments.Count > 0)
+                                if (argType != null)
                                 {
-                                    analysis.NodeMapping.Add(syntaxNode, argType.Arguments.First());
+                                    if (argType.Arguments.Count > 0)
+                                    {
+                                        analysis.NodeMapping.Add(syntaxNode,
+                                                                 argType.Arguments.First());
+                                    }
                                 }
                             }
                         }
@@ -454,48 +459,48 @@ namespace NoWoL.SourceGenerators
                         {
                             var argType = parameterSyntax.Type!.DescendantNodes(x => !x.IsKind(SyntaxKind.TypeArgumentList)).OfType<TypeArgumentListSyntax>().FirstOrDefault();
 
-                            if (argType != null
-                                && argType.Arguments.Count > 0)
+                            if (argType != null)
                             {
-                                var lastArg = argType.Arguments.Last();
-                                var lastArgSymbol = semanticModel.GetSymbolInfo(lastArg).Symbol;
-
-                                if (IsTaskOrValueTask(lastArgSymbol)
-                                    && lastArgSymbol is INamedTypeSymbol nts)
+                                if (argType.Arguments.Count > 0)
                                 {
-                                    var newParam = parameterSyntax;
+                                    var lastArg = argType.Arguments.Last();
+                                    var lastArgSymbol = semanticModel.GetSymbolInfo(lastArg).Symbol;
 
-                                    if (nts.TypeArguments.Length == 0)
+                                    if (IsTaskOrValueTask(lastArgSymbol)
+                                        && lastArgSymbol is INamedTypeSymbol nts)
                                     {
-                                        if (argType.Arguments.Count == 1)
+                                        var newParam = parameterSyntax;
+
+                                        if (nts.TypeArguments.Length == 0)
                                         {
-                                            newParam = newParam.WithType(SyntaxFactory.ParseTypeName("System.Action"));
+                                            if (argType.Arguments.Count == 1)
+                                            {
+                                                newParam = newParam.WithType(SyntaxFactory.ParseTypeName("System.Action"));
+                                            }
+                                            else
+                                            {
+                                                var newArgs = argType.Arguments.RemoveAt(argType.Arguments.Count - 1);
+                                                var actParam = SyntaxFactory.GenericName(SyntaxFactory.Identifier("System.Action"),
+                                                                                         SyntaxFactory.TypeArgumentList(newArgs));
+
+                                                newParam = newParam.WithType(actParam);
+                                            }
                                         }
                                         else
                                         {
                                             var newArgs = argType.Arguments.RemoveAt(argType.Arguments.Count - 1);
-                                            var actParam = SyntaxFactory.GenericName(SyntaxFactory.Identifier("System.Action"),
+                                            newArgs = newArgs.Add(SyntaxFactory.ParseTypeName(nts.TypeArguments[0].ToString()));
+                                            var actParam = SyntaxFactory.GenericName(SyntaxFactory.Identifier("System.Func"),
                                                                                      SyntaxFactory.TypeArgumentList(newArgs));
 
                                             newParam = newParam.WithType(actParam);
                                         }
+
+                                        wasModified = true;
+                                        parameterWasConverted = true;
+
+                                        newParameters = newParameters.Add(newParam);
                                     }
-                                    else
-                                    {
-                                        var newArgs = argType.Arguments.RemoveAt(argType.Arguments.Count - 1);
-                                        newArgs = newArgs.Add(
-                                                              SyntaxFactory.ParseTypeName(nts.TypeArguments[0].ToString())
-                                                              );
-                                        var actParam = SyntaxFactory.GenericName(SyntaxFactory.Identifier("System.Func"),
-                                                                                 SyntaxFactory.TypeArgumentList(newArgs));
-
-                                        newParam = newParam.WithType(actParam);
-                                    }
-
-                                    wasModified = true;
-                                    parameterWasConverted = true;
-
-                                    newParameters = newParameters.Add(newParam);
                                 }
                             }
                         }
@@ -737,7 +742,7 @@ namespace NoWoL.SourceGenerators
 
         private (bool ReturnsTask, bool ReturnsVoid, string NewDataType) GetReturnsTypeDetails(ITypeSymbol returnTypeSymbol, AsyncRemoverAnalysis analysis)
         {
-            var nonGenericTaskClass = analysis.GetTypeByMetadataName("System.Threading.Tasks.Task");
+            var nonGenericTaskClass = analysis.GetTypeByMetadataName("System.Threading.Tasks.Task"); // todo typeof(Task).Fullname!
             if (returnTypeSymbol.Equals(nonGenericTaskClass, SymbolEqualityComparer.Default) == true)
             {
                 return (true, true, "void");

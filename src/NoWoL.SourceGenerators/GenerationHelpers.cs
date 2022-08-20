@@ -176,5 +176,15 @@ namespace NoWoL.SourceGenerators
         {
             return ex is OperationCanceledException;
         }
+
+        public static bool IsClass(ISymbol? symbol)
+        {
+            if (symbol != null && symbol is INamedTypeSymbol type)
+            {
+                return type.TypeKind == TypeKind.Class;
+            }
+
+            return false;
+        }
     }
 }

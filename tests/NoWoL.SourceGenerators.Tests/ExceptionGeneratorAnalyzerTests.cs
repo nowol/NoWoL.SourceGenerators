@@ -53,6 +53,22 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public async Task DifferentAttributeWithSameNameAndSimilarNamespace()
+        {
+            await Run().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task DifferentAttributeIsIgnored()
+        {
+            await Run().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public async Task RaisesDiagnostic()
         {
             // only testing one diagnostic here because the validation code is shared between the analyzer and the generator
@@ -62,6 +78,20 @@ namespace NoWoL.SourceGenerators.Tests
                                                      DiagnosticResult.CompilerError("NWL1003")
                                                                      .WithMessage("The class 'TestClass' must be partial to use [ExceptionGenerator]")
                                                                      .WithSpan("/0/Test1.cs", 4, 18, 4, 27)
+                                                                     .WithArguments("TestClass")
+                                                 }).ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task ExceptionClassWithoutNamespaceShouldFail()
+        {
+            await Run(expectedDiagnosticResults: new List<DiagnosticResult>
+                                                 {
+                                                     DiagnosticResult.CompilerError("NWL1002")
+                                                                     .WithMessage("The class 'TestClassScoped' must be contained in a namespace")
+                                                                     .WithSpan("/0/Test1.cs", 2, 22, 2, 37)
                                                                      .WithArguments("TestClass")
                                                  }).ConfigureAwait(false);
         }

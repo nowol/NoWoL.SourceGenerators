@@ -94,12 +94,16 @@
 	  <Compile Remove="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\AttributeNotOnAClass.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeIsIgnored.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeWithSameName.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeWithSameNameAndSimilarNamespace.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForClassNotUsingAttribute.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForPartialClass.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ExceptionGeneratorAnalyzer\RaisesDiagnostic.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\AnotherAttributeShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassInternal_d2b3daa975bdb1a40870e041ade49f89.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassNone_0122d5e492331a87bdb8d329c5eb322d.cs" />
@@ -212,8 +216,11 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeIsIgnored.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeWithSameNameAndSimilarNamespace.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\DifferentAttributeWithSameName.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\AttributeNotOnAClass.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\RaisesDiagnostic.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForPartialClass.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\ExceptionGeneratorAnalyzer\NoDiagnosticsForClassNotUsingAttribute.Initial.cs" />
@@ -255,7 +262,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="coverlet.collector" Version="3.1.0">
+		<PackageReference Include="coverlet.collector" Version="3.1.2">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -264,10 +271,11 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.0.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+		<PackageReference Include="Moq" Version="4.18.2" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-		<PackageReference Include="xunit" Version="2.4.1" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
