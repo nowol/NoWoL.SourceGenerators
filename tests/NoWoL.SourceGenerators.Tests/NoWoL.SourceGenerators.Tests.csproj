@@ -116,6 +116,8 @@
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\GeneratorShouldIgnoreAttributeWithSameAttributeName.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_3f09774f3ea0ded540bc58382252aeca.cs" />
@@ -208,6 +210,8 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />

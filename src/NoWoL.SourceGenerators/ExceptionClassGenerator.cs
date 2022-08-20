@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace NoWoL.SourceGenerators
 {
     [Generator]
-    public class ExceptionGenerator : IIncrementalGenerator
+    public class ExceptionClassGenerator : IIncrementalGenerator
     {
         // This class was adapted from NetEscapades.EnumGenerators
         // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
@@ -166,11 +166,11 @@ namespace NoWoL.SourceGenerators
                 }
 
                 // It's OK to use First() here since we have validated the presence of the attribute in a previous step
-                var exceptionAttribute = classSymbol.GetAttributes().First(x => classAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default));
+                var exceptionAttributes = classSymbol.GetAttributes().Where(x => classAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default)).ToList();
 
                 classesToGenerate.Add(new ClassToGenerate(classDeclarationSyntax,
                                                           classSymbol,
-                                                          exceptionAttribute,
+                                                          exceptionAttributes,
                                                           ns));
             }
 

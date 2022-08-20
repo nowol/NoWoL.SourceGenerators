@@ -1,14 +1,14 @@
 ﻿
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
-using VerifyCS = Microsoft.CodeAnalysis.CSharp.Testing.CSharpGeneratorVerifier<NoWoL.SourceGenerators.ExceptionGenerator>;
+using VerifyCS = Microsoft.CodeAnalysis.CSharp.Testing.CSharpGeneratorVerifier<NoWoL.SourceGenerators.ExceptionClassGenerator>;
 
 namespace NoWoL.SourceGenerators.Tests
 {
 
     // The generated files must appear in the correct order expected by the test runner. You may need to reorder the classes in your Initial file to match the generated output
 
-    public class ExceptionGeneratorTests : BaseGeneratorTests<NoWoL.SourceGenerators.ExceptionGenerator>
+    public class ExceptionGeneratorTests : BaseGeneratorTests<NoWoL.SourceGenerators.ExceptionClassGenerator>
     {
         public ExceptionGeneratorTests()
             : base("Exception")
@@ -178,8 +178,16 @@ namespace NoWoL.SourceGenerators.Tests
                                         expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
                                                                        DiagnosticResult.CompilerWarning("CS8785")
-                                                                                       .WithMessage("Generator 'ExceptionGenerator' failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type 'ArgumentException' with message 'The hintName 'TestClass_ff77a22886df145d140e4b748d44b619.g.cs' of the added source file must be unique within a generator. (Parameter 'hintName')'")
+                                                                                       .WithMessage("Generator 'ExceptionClassGenerator' failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type 'ArgumentException' with message 'The hintName 'TestClass_ff77a22886df145d140e4b748d44b619.g.cs' of the added source file must be unique within a generator. (Parameter 'hintName')'")
                                                                    }).ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task MultipleCreationMessages()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
     }
 }
