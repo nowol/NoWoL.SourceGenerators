@@ -127,11 +127,7 @@ namespace NoWoL.SourceGenerators
         {{
         }}", removeLastNewLines: true, addNewLine: true);
 
-            var exceptionHelper = GenerateExceptionHelper(classToGenerate);
-            if (exceptionHelper != null)
-            {
-                sb.Add(exceptionHelper, removeLastNewLines: true, addNewLine: true);
-            }
+            AddExceptionHelpers(sb, classToGenerate);
 
             sb.Add(@"
     }", addNewLine: true);
@@ -141,29 +137,40 @@ namespace NoWoL.SourceGenerators
 
         private static string GetCodeGenAttribute()
         {
-            return $@"[System.CodeDom.Compiler.GeneratedCodeAttribute(""{nameof(ExceptionGenerator)}"", ""{typeof(ExceptionGenerator).Assembly.GetName().Version}"")]";
+            return $@"[System.CodeDom.Compiler.GeneratedCodeAttribute(""{nameof(ExceptionClassGenerator)}"", ""{typeof(ExceptionClassGenerator).Assembly.GetName().Version}"")]";
         }
 
-        private string? GenerateExceptionHelper(ClassToGenerate classToGenerate)
+        private void AddExceptionHelpers(IndentedStringBuilder sb, ClassToGenerate classToGenerate)
         {
             var className = classToGenerate.ClassSymbol.Name;
 
-            var standardMessage = GetExceptionAttributeMessage(classToGenerate);
+            var standardMessages = GetExceptionAttributeMessages(classToGenerate);
 
-            if (standardMessage == null)
+            if (standardMessages.Count == 0)
             {
-                return null;
+                return;
             }
 
             var parameters = new List<(string type, string name)>();
-            var template = Regex.Replace(standardMessage,
-                                         @"\{(?<Formatter><[^<>{}]+>)?\s*(?<DataType>[^ {}]+)\s+(?<ParamName>[^{}]+)\}",
-                                         new MatchEvaluator(ReplaceParameterMatch));
-            var methodParameters = parameters.Count == 0 ?
-                                       String.Empty :
-                                       String.Join(", ", parameters.Select(x => $"{x.type} {x.name}")) + ", ";
+            foreach (var standardMessage in standardMessages)
+            {
+                parameters.Clear();
 
-            return $@"
+                var template = Regex.Replace(standardMessage,
+                                             @"\{(?<Formatter><[^<>{}]+>)?\s*(?<DataType>[^ {}]+)\s+(?<ParamName>[^{}]+)\}",
+                                             new MatchEvaluator(ReplaceParameterMatch));
+                var methodParameters = parameters.Count == 0 ?
+                                           String.Empty :
+                                           String.Join(", ", parameters.Select(x => $"{x.type} {x.name}")) + ", ";
+
+                sb.Add(Create(template, methodParameters),
+                       removeLastNewLines: true,
+                       addNewLine: true);
+            }
+
+            string Create(string template, string methodParameters)
+            {
+                return $@"
 
         /// <summary>
         /// Helper method to create the exception
@@ -178,6 +185,7 @@ namespace NoWoL.SourceGenerators
             return new {className}($""{template}"", innerException);
 #pragma warning restore CA1062 // Validate arguments of public methods
         }}";
+            }
 
             string ReplaceParameterMatch(Match match)
             {
@@ -199,14 +207,24 @@ namespace NoWoL.SourceGenerators
             }
         }
 
-        private static string? GetExceptionAttributeMessage(ClassToGenerate classToGenerate)
+        private static List<string> GetExceptionAttributeMessages(ClassToGenerate classToGenerate)
         {
-            if (classToGenerate.ExceptionAttribute.ConstructorArguments.Length != 1)
+            var messages = new List<string>();
+
+            foreach (var exceptionAttribute in classToGenerate.ExceptionAttributes)
             {
-                return null;
+                if (exceptionAttribute.ConstructorArguments.Length == 1)
+                {
+                    var msg = exceptionAttribute.ConstructorArguments[0].Value as string;
+
+                    if (!String.IsNullOrWhiteSpace(msg))
+                    {
+                        messages.Add(msg!);
+                    }
+                }
             }
 
-            return classToGenerate.ExceptionAttribute.ConstructorArguments[0].Value as string;
+            return messages;
         }
     }
 }

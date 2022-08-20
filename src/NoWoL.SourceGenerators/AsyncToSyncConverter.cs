@@ -76,7 +76,7 @@ namespace NoWoL.SourceGenerators
                                                                                                                                                         SyntaxFactory.AttributeArgument(
                                                                                                                                                          SyntaxFactory.LiteralExpression(
                                                                                                                                                           SyntaxKind.StringLiteralExpression,
-                                                                                                                                                          SyntaxFactory.Literal("ExceptionGenerator"))),
+                                                                                                                                                          SyntaxFactory.Literal("AsyncToSyncConverterGenerator"))),
                                                                                                                                                         SyntaxFactory.Token(SyntaxKind.CommaToken),
                                                                                                                                                         SyntaxFactory.AttributeArgument(
                                                                                                                                                          SyntaxFactory.LiteralExpression(

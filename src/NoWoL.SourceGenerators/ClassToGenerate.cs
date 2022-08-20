@@ -8,14 +8,14 @@ namespace NoWoL.SourceGenerators
     {
         public readonly ClassDeclarationSyntax ClassDeclarationSyntax;
         public readonly INamedTypeSymbol ClassSymbol;
-        public readonly AttributeData ExceptionAttribute;
+        public readonly List<AttributeData> ExceptionAttributes;
         public readonly string? NameSpace;
 
-        public ClassToGenerate(ClassDeclarationSyntax classDeclarationSyntax, INamedTypeSymbol classSymbol, AttributeData exceptionAttribute, string? nameSpace)
+        public ClassToGenerate(ClassDeclarationSyntax classDeclarationSyntax, INamedTypeSymbol classSymbol, List<AttributeData> exceptionAttributes, string? nameSpace)
         {
             ClassDeclarationSyntax = classDeclarationSyntax;
             ClassSymbol = classSymbol;
-            ExceptionAttribute = exceptionAttribute;
+            ExceptionAttributes = exceptionAttributes;
             NameSpace = nameSpace;
         }
     }

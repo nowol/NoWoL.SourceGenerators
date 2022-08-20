@@ -15,7 +15,7 @@ namespace Test
             /// <param name = "param3">The 3rd param</param>
             /// <param name = "token">The cancel token</param>
             /// <returns>The return</returns>
-            [System.CodeDom.Compiler.GeneratedCodeAttribute("ExceptionGenerator", "1.0.0.0")]
+            [System.CodeDom.Compiler.GeneratedCodeAttribute("AsyncToSyncConverterGenerator", "1.0.0.0")]
             public string MainMethod(int param, Func<int, string, string> param2Async, System.Action<int, string> param3, System.Threading.CancellationToken token)
             {
                 string str = param2Async(1, "");
