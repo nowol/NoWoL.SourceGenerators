@@ -3,7 +3,7 @@
     /// <summary>
     /// Use this attribute to generate the boiler plate for an exception
     /// </summary>
-    [System.AttributeUsage(System.AttributeTargets.Class, Inherited = false)]
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("NoWoL.SourceGenerators", null)]
     public class ExceptionGeneratorAttribute : System.Attribute
     {
