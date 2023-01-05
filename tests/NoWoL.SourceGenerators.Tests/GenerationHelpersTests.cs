@@ -21,9 +21,9 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void IsPartialClassReturnsFalseIfSyntaxIsNull()
+        public void IsPartialTypeReturnsFalseIfSyntaxIsNull()
         {
-            Assert.False(SourceGenerators.GenerationHelpers.IsPartialClass(null));
+            Assert.False(SourceGenerators.GenerationHelpers.IsPartialType(null));
         }
 
         [Theory]
@@ -118,29 +118,49 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void IsPartialClassReturnsFalseWithNull()
+        public void IsPartialTypeReturnsFalseWithNull()
         {
-            var result = SourceGenerators.GenerationHelpers.IsPartialClass(null);
+            var result = SourceGenerators.GenerationHelpers.IsPartialType(null);
             Assert.False(result);
         }
 
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void IsPartialClassReturnsFalseWithNonPartialClass()
+        public void IsPartialTypeReturnsFalseWithNonPartialClass()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
-            var result = SourceGenerators.GenerationHelpers.IsPartialClass(clsNode);
+            var result = SourceGenerators.GenerationHelpers.IsPartialType(clsNode);
             Assert.False(result);
         }
 
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void IsPartialClassReturnsTrueWithPartialClass()
+        public void IsPartialTypeReturnsTrueWithPartialClass()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
-            var result = SourceGenerators.GenerationHelpers.IsPartialClass(clsNode);
+            var result = SourceGenerators.GenerationHelpers.IsPartialType(clsNode);
+            Assert.True(result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void IsPartialTypeReturnsFalseWithNonPartialInterface()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterface").AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
+            var result = SourceGenerators.GenerationHelpers.IsPartialType(interfaceNode);
+            Assert.False(result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void IsPartialTypeReturnsTrueWithPartialInterface()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterface").AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
+            var result = SourceGenerators.GenerationHelpers.IsPartialType(interfaceNode);
             Assert.True(result);
         }
 
@@ -156,21 +176,41 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void BuildClassDefinitionReturnsClassDefinitionWithBuiltInName()
+        public void BuildTypeDefinitionReturnsClassDefinitionWithBuiltInName()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
-            var result = SourceGenerators.GenerationHelpers.BuildClassDefinition(clsNode);
+            var result = SourceGenerators.GenerationHelpers.BuildTypeDefinition(clsNode);
             Assert.Equal("partial class ClassName", result);
         }
 
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void BuildClassDefinitionReturnsClassDefinitionWithCustomName()
+        public void BuildTypeDefinitionReturnsClassDefinitionWithCustomName()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
-            var result = SourceGenerators.GenerationHelpers.BuildClassDefinition(clsNode, "AnotherName");
+            var result = SourceGenerators.GenerationHelpers.BuildTypeDefinition(clsNode, "AnotherName");
             Assert.Equal("partial class AnotherName", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void BuildTypeDefinitionReturnsInterfaceDefinitionWithBuiltInName()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterfaceName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
+            var result = SourceGenerators.GenerationHelpers.BuildTypeDefinition(interfaceNode);
+            Assert.Equal("partial interface IInterfaceName", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void BuildTypeDefinitionReturnsInterfaceDefinitionWithCustomName()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterfaceName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
+            var result = SourceGenerators.GenerationHelpers.BuildTypeDefinition(interfaceNode, "AnotherName");
+            Assert.Equal("partial interface AnotherName", result);
         }
 
         [Fact]
@@ -197,7 +237,7 @@ namespace NoWoL.SourceGenerators.Tests
         public void GetClassAccessModifiersWithTrailingSpace()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
-            var result = SourceGenerators.GenerationHelpers.GetClassAccessModifiers(clsNode, true);
+            var result = SourceGenerators.GenerationHelpers.GetTypeAccessModifiers(clsNode, true);
             Assert.Equal("public ", result);
         }
 
@@ -207,7 +247,7 @@ namespace NoWoL.SourceGenerators.Tests
         public void GetClassAccessModifiersWithoutModifiersReturnEmpty()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName");
-            var result = SourceGenerators.GenerationHelpers.GetClassAccessModifiers(clsNode, true);
+            var result = SourceGenerators.GenerationHelpers.GetTypeAccessModifiers(clsNode, true);
             Assert.Equal("", result);
         }
 
@@ -217,7 +257,37 @@ namespace NoWoL.SourceGenerators.Tests
         public void GetClassAccessModifiersWithoutTrailingSpace()
         {
             var clsNode = SyntaxFactory.ClassDeclaration("ClassName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
-            var result = SourceGenerators.GenerationHelpers.GetClassAccessModifiers(clsNode, false);
+            var result = SourceGenerators.GenerationHelpers.GetTypeAccessModifiers(clsNode, false);
+            Assert.Equal("public", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetInterfaceAccessModifiersWithTrailingSpace()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterfaceName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
+            var result = SourceGenerators.GenerationHelpers.GetTypeAccessModifiers(interfaceNode, true);
+            Assert.Equal("public ", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetInterfaceAccessModifiersWithoutModifiersReturnEmpty()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterfaceName");
+            var result = SourceGenerators.GenerationHelpers.GetTypeAccessModifiers(interfaceNode, true);
+            Assert.Equal("", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetInterfaceAccessModifiersWithoutTrailingSpace()
+        {
+            var interfaceNode = SyntaxFactory.InterfaceDeclaration("IInterfaceName").AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
+            var result = SourceGenerators.GenerationHelpers.GetTypeAccessModifiers(interfaceNode, false);
             Assert.Equal("public", result);
         }
 

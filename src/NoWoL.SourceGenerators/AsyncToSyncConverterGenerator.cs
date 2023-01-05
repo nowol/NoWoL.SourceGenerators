@@ -111,20 +111,20 @@ namespace NoWoL.SourceGenerators
 
             var sb = new IndentedStringBuilder();
 
-            var className = (methodDeclarationSyntax.FirstAncestorOrSelf<SyntaxNode>(x => x.IsKind(SyntaxKind.ClassDeclaration)) as ClassDeclarationSyntax)!.Identifier.ValueText;
+            var className = methodDeclarationSyntax.FirstAncestorOrSelf<TypeDeclarationSyntax>(x => x.IsKind(SyntaxKind.ClassDeclaration) || x.IsKind(SyntaxKind.InterfaceDeclaration))!.Identifier.ValueText;
             var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
 
             var fileNamePrefix = className + "_" + syncMethodName;
 
             var result = GenericClassBuilder.GenerateClass(sb,
                                                            transformResult.NameSpace!,
-                                                           transformResult.ClassDeclaration!,
+                                                           transformResult.TypeDeclaration!,
                                                            fileNamePrefix,
                                                            (isb) =>
                                                            {
                                                                isb.IncreaseIndent();
 
-                                                               isb.Add(GenerationHelpers.BuildClassDefinition(transformResult.ClassDeclaration!), addNewLine: true);
+                                                               isb.Add(GenerationHelpers.BuildTypeDefinition(transformResult.TypeDeclaration!), addNewLine: true);
                                                                isb.Add("{", addNewLine: true);
 
                                                                isb.IncreaseIndent();

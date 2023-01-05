@@ -14,7 +14,7 @@ namespace NoWoL.SourceGenerators
     {
         internal const string DiagnosticCategory = "Async/Await remover generator";
 
-        public (bool Success, MethodDeclarationSyntax Node, string? NameSpace, ClassDeclarationSyntax? ClassDeclaration) Transform(SourceProductionContext context, Compilation compilation, MethodDeclarationSyntax node)
+        public (bool Success, MethodDeclarationSyntax Node, string? NameSpace, TypeDeclarationSyntax? TypeDeclaration) Transform(SourceProductionContext context, Compilation compilation, MethodDeclarationSyntax node)
         {
             var semanticModel = compilation.GetSemanticModel(node.SyntaxTree);
 
@@ -49,7 +49,7 @@ namespace NoWoL.SourceGenerators
                 node = node.WithLeadingTrivia(unmodifiedNode.GetLeadingTrivia());
             }
 
-            return (true, node, analysis.NameSpace, analysis.ClassDeclaration);
+            return (true, node, analysis.NameSpace, analysis.TypeDeclaration);
         }
 
         private MethodDeclarationSyntax AddCodeGenAttribute(MethodDeclarationSyntax node)
@@ -247,7 +247,7 @@ namespace NoWoL.SourceGenerators
             public bool ContainsDiagnosticErrors { get; set; }
             public string? ReturnType { get; set; }
             public string? NameSpace { get; set; }
-            public ClassDeclarationSyntax? ClassDeclaration { get; set; }
+            public TypeDeclarationSyntax? TypeDeclaration { get; set; }
 
             public INamedTypeSymbol? GetTypeByMetadataName(string fullyQualifiedMetadataName)
             {
@@ -646,9 +646,9 @@ namespace NoWoL.SourceGenerators
                 return false;
             }
 
-            analysis.ClassDeclaration = target.FirstAncestorOrSelf<ClassDeclarationSyntax>();
+            analysis.TypeDeclaration = target.FirstAncestorOrSelf<TypeDeclarationSyntax>(x => x.IsKind(SyntaxKind.ClassDeclaration) || x.IsKind(SyntaxKind.InterfaceDeclaration));
 
-            if (!GenerationHelpers.IsPartialClass(analysis.ClassDeclaration))
+            if (!GenerationHelpers.IsPartialType(analysis.TypeDeclaration))
             {
                 AddDiagnostic(context,
                               analysis,
@@ -660,7 +660,7 @@ namespace NoWoL.SourceGenerators
             }
 
             var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
-            if (parentClasses.Any(x => !GenerationHelpers.IsPartialClass(x)))
+            if (parentClasses.Any(x => !GenerationHelpers.IsPartialType(x)))
             {
                 AddDiagnostic(context,
                               analysis,
@@ -671,7 +671,7 @@ namespace NoWoL.SourceGenerators
                 return false;
             }
 
-            analysis.NameSpace = GenerationHelpers.GetNamespace(analysis.ClassDeclaration!);
+            analysis.NameSpace = GenerationHelpers.GetNamespace(analysis.TypeDeclaration!);
             if (String.IsNullOrWhiteSpace(analysis.NameSpace))
             {
                 AddDiagnostic(context,

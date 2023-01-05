@@ -14,7 +14,7 @@ namespace NoWoL.SourceGenerators
     {
         internal static ExceptionClassBuilderResult GenerateClass(IndentedStringBuilder sb, 
                                                                   string nameSpace, 
-                                                                  ClassDeclarationSyntax classDeclaration,
+                                                                  TypeDeclarationSyntax typeDeclaration,
                                                                   string fileNamePrefix,
                                                                   Action<IndentedStringBuilder> addBody,
                                                                   Action<IndentedStringBuilder>? preAction = null)
@@ -23,14 +23,14 @@ namespace NoWoL.SourceGenerators
 
             sb.Add($@"namespace {nameSpace}
 {{", addNewLine: true);
-            var parentClasses = classDeclaration.Ancestors().Where(x => CSharpExtensions.IsKind((SyntaxNode?)x,
+            var parentClasses = typeDeclaration.Ancestors().Where(x => CSharpExtensions.IsKind((SyntaxNode?)x,
                                                                                                 SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Reverse();
             var filenameStringBuilder = new StringBuilder();
-            filenameStringBuilder.Append(nameSpace).Append(classDeclaration.Identifier.ValueText);
+            filenameStringBuilder.Append(nameSpace).Append(typeDeclaration.Identifier.ValueText);
 
             foreach (var parentClass in parentClasses)
             {
-                var buildClassDefinition = GenerationHelpers.BuildClassDefinition(parentClass);
+                var buildClassDefinition = GenerationHelpers.BuildTypeDefinition(parentClass);
                 filenameStringBuilder.Append(buildClassDefinition);
 
                 sb.IncreaseIndent();
@@ -91,7 +91,7 @@ namespace NoWoL.SourceGenerators
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     {CodeGenAttribute}
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    {GenerationHelpers.BuildClassDefinition(classToGenerate.ClassDeclarationSyntax)} : System.Exception
+    {GenerationHelpers.BuildTypeDefinition(classToGenerate.ClassDeclarationSyntax)} : System.Exception
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {{
         /// <summary>

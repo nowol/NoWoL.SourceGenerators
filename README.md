@@ -130,6 +130,27 @@ public partial class TestClass
 }
 ```
 
+It is also possible to use this generator to generate the sync methods of an interface.
+
+For example, the following code
+
+```cs
+public partial interface IMyInterface
+{
+    [AsyncToSyncConverter]
+    Task<int> MainMethodAsync(int someValue);
+}
+```
+
+will be converted to
+
+```cs
+public partial interface IMyInterface
+{
+    int MainMethod(int someValue);
+}
+```
+
 ## Bug Reports
 
 Please include the smallest code possible to reproduce the issue.
@@ -155,3 +176,4 @@ Useful information for creating source generators:
 * Great collection of analyzers to help figure out how syntax trees work: https://github.com/JosefPihrt/Roslynator
 * Tool to see a syntax tree: https://sharplab.io
 * Tool to generate Roslyn API calls: https://roslynquoter.azurewebsites.net/
+

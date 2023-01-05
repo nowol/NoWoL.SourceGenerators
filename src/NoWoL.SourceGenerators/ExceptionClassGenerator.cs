@@ -149,7 +149,7 @@ namespace NoWoL.SourceGenerators
 
         internal static bool TryValidateTarget(ClassDeclarationSyntax target, string? ns, out DiagnosticDescriptor? diagnosticToReport)
         {
-            if (!GenerationHelpers.IsPartialClass(target))
+            if (!GenerationHelpers.IsPartialType(target))
             {
                 diagnosticToReport = ExceptionGeneratorDescriptors.MethodMustBePartial;
 
@@ -164,7 +164,7 @@ namespace NoWoL.SourceGenerators
             }
 
             var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
-            if (parentClasses.Any(x => !GenerationHelpers.IsPartialClass(x)))
+            if (parentClasses.Any(x => !GenerationHelpers.IsPartialType(x)))
             {
                 diagnosticToReport = ExceptionGeneratorDescriptors.MustBeInParentPartialClass;
 
