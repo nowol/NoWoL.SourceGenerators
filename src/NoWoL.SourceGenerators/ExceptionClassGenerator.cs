@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,7 +13,7 @@ namespace NoWoL.SourceGenerators
     [Generator]
     public class ExceptionClassGenerator : IIncrementalGenerator
     {
-        // This class was adapted from NetEscapades.EnumGenerators
+        // This class was inspired from NetEscapades.EnumGenerators
         // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
 
         private const string ExceptionGeneratorAttributeFqn = "NoWoL.SourceGenerators.ExceptionGeneratorAttribute";
@@ -35,10 +30,10 @@ namespace NoWoL.SourceGenerators
                                                                                                                transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
                                                                                          .Where(static m => m is not null)!;
 
-            IncrementalValuesProvider<(ClassDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses2
+            IncrementalValuesProvider<(ClassDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses
                 = classDeclarations.Combine(context.CompilationProvider);
 
-            context.RegisterSourceOutput(compilationAndClasses2,
+            context.RegisterSourceOutput(compilationAndClasses,
                                          static (spc, source) => Execute(source.Compilation, source.ClassDef, spc));
         }
 
@@ -97,6 +92,8 @@ namespace NoWoL.SourceGenerators
 
         private static void Execute(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, SourceProductionContext context)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             var executionValidationResult = CanExecute(compilation,
                                                        classDeclarationSyntax,
                                                        context);
