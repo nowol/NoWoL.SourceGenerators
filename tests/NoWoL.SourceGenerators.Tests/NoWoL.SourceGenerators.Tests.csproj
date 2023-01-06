@@ -71,6 +71,10 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwait.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Generated.ITestInterface_MainMethod_65650ea3493880c7af62d03af2c85929.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Generated.ITestInterface_MainMethod_6c79eb6cee7b6c23fd70ff35fe391162.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassInternal_d2b3daa975bdb1a40870e041ade49f89.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassNone_0122d5e492331a87bdb8d329c5eb322d.cs" />
@@ -149,6 +153,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Generated.ITestInterface_MainMethod_6c79eb6cee7b6c23fd70ff35fe391162.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Generated.ITestInterface_MainMethod_65650ea3493880c7af62d03af2c85929.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\FuncParameters.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\FuncParameters.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\EveryCaseAtOnce.Generated.InnerTestClass_MainMethod_2fcbcd8ec33f06ae813d420cb6a6a49e.cs" />

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,7 +13,7 @@ namespace NoWoL.SourceGenerators
     [Generator]
     public class ExceptionClassGenerator : IIncrementalGenerator
     {
-        // This class was adapted from NetEscapades.EnumGenerators
+        // This class was inspired from NetEscapades.EnumGenerators
         // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
 
         private const string ExceptionGeneratorAttributeFqn = "NoWoL.SourceGenerators.ExceptionGeneratorAttribute";
@@ -34,11 +30,11 @@ namespace NoWoL.SourceGenerators
                                                                                                                transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
                                                                                          .Where(static m => m is not null)!;
 
-            IncrementalValueProvider<(Compilation, ImmutableArray<ClassDeclarationSyntax>)> compilationAndClasses
-                = context.CompilationProvider.Combine(classDeclarations.Collect());
+            IncrementalValuesProvider<(ClassDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses
+                = classDeclarations.Combine(context.CompilationProvider);
 
             context.RegisterSourceOutput(compilationAndClasses,
-                                         static (spc, source) => Execute(source.Item1, source.Item2, spc));
+                                         static (spc, source) => Execute(source.Compilation, source.ClassDef, spc));
         }
 
         private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
@@ -94,115 +90,66 @@ namespace NoWoL.SourceGenerators
             }
         }
 
-        private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
+        private static void Execute(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, SourceProductionContext context)
         {
-            if (!CanExecute(classes, compilation, out var classAttribute))
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var executionValidationResult = CanExecute(compilation,
+                                                       classDeclarationSyntax,
+                                                       context);
+
+            if (!executionValidationResult.IsSuccess())
             {
                 return;
             }
 
-            IEnumerable<ClassDeclarationSyntax> distinctClasses = classes.Distinct();
+            var exceptionAttribute = executionValidationResult.ExceptionAttribute!;
+            var classSymbol = executionValidationResult.ClassSymbol!;
+            var ns = executionValidationResult.Ns!;
 
-            List<ClassToGenerate> classesToGenerate = GetTypesToGenerate(compilation,
-                                                                         context,
-                                                                         distinctClasses,
-                                                                         classAttribute!,
-                                                                         context.CancellationToken);
-            if (classesToGenerate.Count > 0)
-            {
-                var sb = new IndentedStringBuilder();
-                var classBuilder = new ExceptionClassBuilder();
-                foreach (var classToGenerate in classesToGenerate)
-                {
-                    sb.Clear(true);
-                    var result = classBuilder.GenerateException(sb, classToGenerate);
-                    context.AddSource(result.FileName!, SourceText.From(sb.ToString(), Encoding.UTF8));
-                }
-            }
+            var exceptionAttributes = classSymbol.GetAttributes().Where(x => exceptionAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default)).ToList();
+
+            var classToGenerate = new ClassToGenerate(classDeclarationSyntax,
+                                                      classSymbol,
+                                                      exceptionAttributes,
+                                                      ns);
+
+            var sb = new IndentedStringBuilder();
+            var classBuilder = new ExceptionClassBuilder();
+            var result = classBuilder.GenerateException(sb, classToGenerate);
+            context.AddSource(result.FileName!,
+                              SourceText.From(sb.ToString(),
+                                              Encoding.UTF8));
         }
 
-        [ExcludeFromCodeCoverage]
-        private static bool CanExecute(ImmutableArray<ClassDeclarationSyntax> classes, Compilation compilation, out INamedTypeSymbol? classAttribute)
+        private static CanExecuteValidationResult CanExecute(Compilation compilation,
+                                                             ClassDeclarationSyntax classDeclarationSyntax,
+                                                             SourceProductionContext context)
         {
-            if (classes.IsDefaultOrEmpty)
+            var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
+
+            if (!TryValidateTarget(classDeclarationSyntax, ns, out var diagnosticToReport))
             {
-                // nothing to do yet
-                classAttribute = null;
-                return false;
+                var error = Diagnostic.Create(diagnosticToReport!,
+                                              classDeclarationSyntax.Identifier.GetLocation(),
+                                              classDeclarationSyntax.Identifier.Text);
+                context.ReportDiagnostic(error);
+
+                return new CanExecuteValidationResult(null, null, ns);
             }
 
-            classAttribute = compilation.GetTypeByMetadataName(ExceptionGeneratorAttributeFqn);
-            if (classAttribute == null)
-            {
-                // nothing to do if this type isn't available
-                return false;
-            }
+            var exceptionAttribute = compilation.GetTypeByMetadataName(ExceptionGeneratorAttributeFqn);
 
-            return true;
-        }
+            SemanticModel semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
+            var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax,
+                                                              context.CancellationToken);
 
-        private static List<ClassToGenerate> GetTypesToGenerate(Compilation compilation,
-                                                                SourceProductionContext context,
-                                                                IEnumerable<ClassDeclarationSyntax> classes,
-                                                                INamedTypeSymbol classAttribute,
-                                                                CancellationToken ct)
-        {
-            var classesToGenerate = new List<ClassToGenerate>();
-
-            foreach (var (classDeclarationSyntax, classSymbol) in FilterClasses())
-            {
-                // stop if we're asked to
-                ct.ThrowIfCancellationRequested();
-
-                var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
-
-                if (!TryValidateTarget(classDeclarationSyntax, ns, out var diagnosticToReport))
-                {
-                    var error = Diagnostic.Create(diagnosticToReport!,
-                                                  classDeclarationSyntax.Identifier.GetLocation(),
-                                                  classSymbol.Name);
-                    context.ReportDiagnostic(error);
-                    continue;
-                }
-
-                // It's OK to use First() here since we have validated the presence of the attribute in a previous step
-                var exceptionAttributes = classSymbol.GetAttributes().Where(x => classAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default)).ToList();
-
-                classesToGenerate.Add(new ClassToGenerate(classDeclarationSyntax,
-                                                          classSymbol,
-                                                          exceptionAttributes,
-                                                          ns));
-            }
-
-            return classesToGenerate;
-
-            // moving the non testable code (the continue) to its own method to ignore it
-            [ExcludeFromCodeCoverage]
-            List<(ClassDeclarationSyntax, INamedTypeSymbol)> FilterClasses()
-            {
-                var results = new List<(ClassDeclarationSyntax, INamedTypeSymbol)>();
-
-                foreach (var classDeclarationSyntax in classes)
-                {
-                    SemanticModel semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-                    var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, ct);
-
-                    if (classSymbol == null)
-                    {
-                        // report diagnostic, something went wrong
-                        continue;
-                    }
-
-                    results.Add((classDeclarationSyntax, classSymbol));
-                }
-
-                return results;
-            }
+            return new CanExecuteValidationResult(exceptionAttribute, classSymbol, ns);
         }
 
         internal static bool TryValidateTarget(ClassDeclarationSyntax target, string? ns, out DiagnosticDescriptor? diagnosticToReport)
         {
-            if (!GenerationHelpers.IsPartialClass(target))
+            if (!GenerationHelpers.IsPartialType(target))
             {
                 diagnosticToReport = ExceptionGeneratorDescriptors.MethodMustBePartial;
 
@@ -217,7 +164,7 @@ namespace NoWoL.SourceGenerators
             }
 
             var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
-            if (parentClasses.Any(x => !GenerationHelpers.IsPartialClass(x)))
+            if (parentClasses.Any(x => !GenerationHelpers.IsPartialType(x)))
             {
                 diagnosticToReport = ExceptionGeneratorDescriptors.MustBeInParentPartialClass;
 
@@ -227,6 +174,29 @@ namespace NoWoL.SourceGenerators
             diagnosticToReport = null;
 
             return true;
+        }
+
+        private readonly struct CanExecuteValidationResult
+        {
+            public INamedTypeSymbol? ExceptionAttribute { get; }
+
+            public INamedTypeSymbol? ClassSymbol { get; }
+
+            public string? Ns { get; }
+
+            public CanExecuteValidationResult(INamedTypeSymbol? exceptionAttribute, INamedTypeSymbol? classSymbol, string? ns)
+            {
+                ExceptionAttribute = exceptionAttribute;
+                ClassSymbol = classSymbol;
+                Ns = ns;
+            }
+
+            public bool IsSuccess()
+            {
+                return ExceptionAttribute != null
+                       && ClassSymbol != null
+                       && Ns != null;
+            }
         }
     }
 }

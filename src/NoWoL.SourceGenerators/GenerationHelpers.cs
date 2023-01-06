@@ -11,7 +11,7 @@ namespace NoWoL.SourceGenerators
 {
     internal static class GenerationHelpers
     {
-        public static bool IsPartialClass(ClassDeclarationSyntax? syntax)
+        public static bool IsPartialType(TypeDeclarationSyntax? syntax)
         {
             if (syntax == null)
             {
@@ -21,9 +21,9 @@ namespace NoWoL.SourceGenerators
             return syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
         }
 
-        public static string GetNamespace(ClassDeclarationSyntax syntax)
+        public static string GetNamespace(TypeDeclarationSyntax syntax)
         {
-            // determine the namespace the class is declared in, if any
+            // determine the namespace the class/interface is declared in, if any
             string nameSpace = string.Empty;
             SyntaxNode? potentialNamespaceParent = syntax.Parent;
             while (potentialNamespaceParent != null &&
@@ -75,7 +75,7 @@ namespace NoWoL.SourceGenerators
             return sb.ToString();
         }
 
-        public static string GetModifier(ClassDeclarationSyntax target, SyntaxKind kind, bool addTrailingSpace = false)
+        public static string GetModifier(TypeDeclarationSyntax target, SyntaxKind kind, bool addTrailingSpace = false)
         {
             var modifier = target.Modifiers.FirstOrDefault(m => m.IsKind(kind)).ValueText;
 
@@ -87,20 +87,21 @@ namespace NoWoL.SourceGenerators
             return modifier + " ";
         }
 
-        public static string BuildClassDefinition(ClassDeclarationSyntax classDef)
+        public static string BuildTypeDefinition(TypeDeclarationSyntax typeDef)
         {
-            return BuildClassDefinition(classDef,
-                                        classDef.Identifier.ValueText);
+            return BuildTypeDefinition(typeDef,
+                                        typeDef.Identifier.ValueText);
         }
 
-        public static string BuildClassDefinition(ClassDeclarationSyntax classDef, string className)
+        public static string BuildTypeDefinition(TypeDeclarationSyntax typeDef, string className)
         {
-            var modifiers = GetClassAccessModifiers(classDef, addTrailingSpace: true);
-            var staticDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
-            var partialDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
-            var abstractDef = GenerationHelpers.GetModifier(classDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
-
-            return $"{modifiers}{staticDef}{abstractDef}{partialDef}class {className}";
+            var modifiers = GetTypeAccessModifiers(typeDef, addTrailingSpace: true);
+            var staticDef = GenerationHelpers.GetModifier(typeDef, SyntaxKind.StaticKeyword, addTrailingSpace: true);
+            var partialDef = GenerationHelpers.GetModifier(typeDef, SyntaxKind.PartialKeyword, addTrailingSpace: true);
+            var abstractDef = GenerationHelpers.GetModifier(typeDef, SyntaxKind.AbstractKeyword, addTrailingSpace: true);
+            var type = typeDef.IsKind(SyntaxKind.InterfaceDeclaration) ? "interface" : "class";
+            
+            return $"{modifiers}{staticDef}{abstractDef}{partialDef}{type} {className}";
         }
 
         public static string RemoveLastWord(string value, string word)
@@ -114,7 +115,7 @@ namespace NoWoL.SourceGenerators
             return value;
         }
 
-        public static string GetClassAccessModifiers(ClassDeclarationSyntax target, bool addTrailingSpace = false)
+        public static string GetTypeAccessModifiers(TypeDeclarationSyntax target, bool addTrailingSpace = false)
         {
             var modifiersSyntax = target.Modifiers.Where(m => m.IsKind(SyntaxKind.PrivateKeyword)
                                                               || m.IsKind(SyntaxKind.PublicKeyword)
