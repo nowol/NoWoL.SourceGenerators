@@ -20,6 +20,12 @@ namespace Test
             {
                 string str = await param2Async(1, "").ConfigureAwait(true);
 
+                for (int i = 0; i < 24; i++)
+                {
+                    int someInt = 3498 * i;
+                    Console.WriteLine("Hello");
+                }
+
                 await foreach (var n in SimulateWorkStreamAsync())
                 {
                     await TheMethodAsync(async () => await SimulateWorkAsync(3000).ConfigureAwait(false)).ConfigureAwait(false);
@@ -72,6 +78,11 @@ namespace Test
                     Task<int> ReturnGenericTaskAsync(Func<Task<int>> funkyAsync)
                     {
                         return funkyAsync();
+                    }
+
+                    int NonAsyncMethod(int nonAsyncParam)
+                    {
+                        return 4;
                     }
                 }
 

@@ -11,6 +11,7 @@ namespace Test
             /// <summary>
             /// The summary
             /// </summary>
+            /// 
             /// <param name="param">The param</param>
             /// <param name="param2Async">The 2nd param</param>
             /// <param name="param3">The 3rd param</param>
@@ -30,6 +31,7 @@ namespace Test
                     await TheMethodAsync(async () => await Task.Delay(3000, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
                     await TheMethodAsync(async () => await Task.Delay(3001, cancellationToken)).ConfigureAwait(false);
                     await TheMethodAsync(async () => await Task.Delay(3002, cancellationToken));
+                    await TheMethodAsync(async () => await Task.Delay(3003));
 
                     await AnotherMethodAsync(SimulateWorkAsync).ConfigureAwait(false);
                     

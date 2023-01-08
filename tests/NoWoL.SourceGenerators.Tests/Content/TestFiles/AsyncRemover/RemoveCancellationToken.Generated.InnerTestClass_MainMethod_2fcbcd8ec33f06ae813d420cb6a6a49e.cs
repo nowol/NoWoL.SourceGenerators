@@ -11,6 +11,7 @@ namespace Test
             /// <summary>
             /// The summary
             /// </summary>
+            /// 
             /// <param name="param">The param</param>
             /// <param name="param2">The 2nd param</param>
             /// <param name="param3">The 3rd param</param>
@@ -28,6 +29,7 @@ namespace Test
                     TheMethod(() => System.Threading.Thread.Sleep(3000));
                     TheMethod(() => System.Threading.Thread.Sleep(3001));
                     TheMethod(() => System.Threading.Thread.Sleep(3002));
+                    TheMethod(() => System.Threading.Thread.Sleep(3003));
 
                     AnotherMethod(SimulateWork);
                     

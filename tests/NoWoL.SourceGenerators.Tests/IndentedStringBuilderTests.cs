@@ -289,13 +289,11 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public void AddWithoutNewLineShouldNotIndent()
+        public void AddingRawContentShouldIgnoreIdent()
         {
-            _sut.IncreaseIndent().Add("abc").Add("def");
+            _sut.IncreaseIndent().Add("abc").AddRaw("def");
             Assert.Equal("    abcdef",
                          _sut.ToString());
-
-            // todo fix ISB
         }
     }
 }

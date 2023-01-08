@@ -20,6 +20,12 @@ namespace Test
             {
                 string str = param2(1, "");
 
+                for (int i = 0; i < 24; i++)
+                {
+                    int someInt = 3498 * i;
+                    Console.WriteLine("Hello");
+                }
+
                 foreach (var n in SimulateWorkStream())
                 {
                     TheMethod(() => SimulateWork(3000));
@@ -72,6 +78,11 @@ namespace Test
                     int ReturnGenericTask(System.Func<int> funky)
                     {
                         return funky();
+                    }
+
+                    int NonAsyncMethod(int nonAsyncParam)
+                    {
+                        return 4;
                     }
                 }
 
