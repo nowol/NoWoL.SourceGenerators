@@ -67,6 +67,7 @@ This generator uses simple rules to convert async code to their sync version:
 * The name of the method must end with `Async`. The generator does not validate if a non-async version of the method exists.
 * The generated method will have the same access modifiers as the original method.
 * Awaitable local functions must end with `Async`. The generator does not validate if a non-async version of the location function exists.
+* Identifiers (e.g.: variable name) ending with `Async` will have `Async` removed from their name.
 * Assumes that a `Func<>` returning a `Task` will be awaited. In this case the `Func<>` will be converted to an `Action<>` which will not be awaited.
 * ConfigureAwait / ConfigureAwaitWithCulture will be removed.
 * `Task.Delay` is converted to `Thread.Sleep`.
@@ -80,6 +81,7 @@ This generator uses simple rules to convert async code to their sync version:
   * `Func<int, Task<double>>` is converted to `Func<int, double>`
 * Async streams will be converted to sync by dropping their `await` keyword and removing `Async` from the name of their method.
 * Attributes and XML documentation will be copied to the new method.
+  * The cancellation token parameter should be named `cancellationToken` otherwise it will not be removed from XML documentation.
 
 Not yet supported:
 

@@ -285,5 +285,17 @@ namespace NoWoL.SourceGenerators.Tests
             Assert.Equal("def",
                          _sut.ToString());
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void AddWithoutNewLineShouldNotIndent()
+        {
+            _sut.IncreaseIndent().Add("abc").Add("def");
+            Assert.Equal("    abcdef",
+                         _sut.ToString());
+
+            // todo fix ISB
+        }
     }
 }

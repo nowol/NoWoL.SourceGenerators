@@ -340,5 +340,13 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task RemoveCancellationToken()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
     }
 }

@@ -453,6 +453,12 @@ namespace NoWoL.SourceGenerators
                         var symbol4 = semanticModel.GetSymbolInfo(parameterSyntax.Type!).Symbol;
 
                         if (symbol4 != null
+                            && symbol4.Equals(analysis.GetTypeByMetadataName("System.Threading.CancellationToken"), SymbolEqualityComparer.Default))
+                        {
+                            wasModified = true;
+                            parameterWasConverted = true;
+                        }
+                        else if (symbol4 != null
                             && symbol4.ContainingNamespace != null 
                             && symbol4.ContainingNamespace.ToString() == "System"
                             && symbol4.Name == "Func")

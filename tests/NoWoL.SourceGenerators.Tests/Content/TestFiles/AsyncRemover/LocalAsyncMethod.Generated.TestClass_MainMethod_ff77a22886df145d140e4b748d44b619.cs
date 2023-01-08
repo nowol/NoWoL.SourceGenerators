@@ -10,15 +10,17 @@ namespace Test
         {
             TheMethod(() => SimulateWork(3000));
             TheMethod(() => SimulateWork(5000));
+
             AnotherMethod(SimulateWork);
-            void TheMethod(System.Action funkyAsync)
+
+            void TheMethod(System.Action funky)
             {
-                funkyAsync();
+                funky();
             }
 
-            void AnotherMethod(System.Action<int> funkyAsync)
+            void AnotherMethod(System.Action<int> funky)
             {
-                funkyAsync(3);
+                funky(3);
             }
 
             int SimulateWork(int value)
@@ -27,14 +29,14 @@ namespace Test
                 return 3;
             }
 
-            void TheMethodValue(System.Action funkyAsync)
+            void TheMethodValue(System.Action funky)
             {
-                funkyAsync();
+                funky();
             }
 
-            void AnotherMethodValue(System.Action<int> funkyAsync)
+            void AnotherMethodValue(System.Action<int> funky)
             {
-                funkyAsync(3);
+                funky(3);
             }
 
             int SimulateWorkValue(int value)
@@ -43,19 +45,19 @@ namespace Test
                 return 3;
             }
 
-            void ReturnNonGenericTask(System.Action funkyAsync)
+            void ReturnNonGenericTask(System.Action funky)
             {
-                funkyAsync();
+                funky();
             }
 
-            int ReturnGenericTask(System.Func<int> funkyZAsync)
+            int ReturnGenericTask(System.Func<int> funkyZ)
             {
-                return funkyZAsync();
+                return funkyZ();
             }
 
-            int ReturnGenericTaskWhereTheReturnShouldBeKept(System.Func<int> funkyAsync)
+            int ReturnGenericTaskWhereTheReturnShouldBeKept(System.Func<int> funky)
             {
-                return funkyAsync();
+                return funky();
             }
         }
     }
