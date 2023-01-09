@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Test
@@ -10,29 +11,28 @@ namespace Test
             /// <summary>
             /// The summary
             /// </summary>
+            /// 
             /// <param name="param">The param</param>
             /// <param name="param2">The 2nd param</param>
             /// <param name="param3">The 3rd param</param>
-            /// <param name="token">The cancel token</param>
+            /// 
             /// <returns>The return</returns>
             [System.CodeDom.Compiler.GeneratedCodeAttribute("AsyncToSyncConverterGenerator", "1.0.0.0")]
-            public string MainMethod(int param, Func<int, string, string> param2, System.Action<int, string> param3)
+            public string MainMethod(int param, System.Func<int, string, string> param2, System.Action<int, string> param3)
             {
                 string str = param2(1, "");
 
-                for (int i = 0; i < 24; i++)
-                {
-                    int someInt = 3498 * i;
-                    Console.WriteLine("Hello");
-                }
-
                 foreach (var n in SimulateWorkStream())
                 {
+
                     TheMethod(() => SimulateWork(3000));
                     TheMethod(() => System.Threading.Thread.Sleep(3000));
+                    TheMethod(() => System.Threading.Thread.Sleep(3001));
+                    TheMethod(() => System.Threading.Thread.Sleep(3002));
+                    TheMethod(() => System.Threading.Thread.Sleep(3003));
 
                     AnotherMethod(SimulateWork);
-
+                    
                     void AnotherMethod(System.Action<int> funky)
                     {
                         funky(3);
@@ -42,9 +42,9 @@ namespace Test
                 foreach (var n in new string[] { "hello" })
                 { }
 
-                void TheMethod(System.Action funky)
+                void TheMethod(System.Action funky9000)
                 {
-                    funky();
+                    funky9000();
                 }
 
                 int SimulateWork(int value)
@@ -52,7 +52,6 @@ namespace Test
                     System.Threading.Thread.Sleep(3000);
 
                     return 3;
-
                     void TheMethodValue(System.Action funky)
                     {
                         funky();
@@ -66,7 +65,6 @@ namespace Test
                     int SimulateWorkValue(int value)
                     {
                         System.Threading.Thread.Sleep(TimeSpan.FromSeconds(3));
-
                         return 3;
                     }
 
@@ -74,15 +72,16 @@ namespace Test
                     {
                         funky();
                     }
-
+                    
                     int ReturnGenericTask(System.Func<int> funky)
                     {
                         return funky();
                     }
 
-                    int NonAsyncMethod(int nonAsyncParam)
+                    void ReturnTaskWithNormalReturnStatement(System.Action funky)
                     {
-                        return 4;
+						funky();
+                        return;
                     }
                 }
 

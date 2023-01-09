@@ -8,7 +8,7 @@ namespace Test
         public void MainMethod()
         {
             TheMethod();
-        //await TheMethodAsync().ConfigureAwait(false);
+            //await TheMethodAsync().ConfigureAwait(false);
         }
     }
 }

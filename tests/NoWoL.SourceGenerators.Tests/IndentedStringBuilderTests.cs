@@ -285,5 +285,15 @@ namespace NoWoL.SourceGenerators.Tests
             Assert.Equal("def",
                          _sut.ToString());
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void AddingRawContentShouldIgnoreIdent()
+        {
+            _sut.IncreaseIndent().Add("abc").AddRaw("def");
+            Assert.Equal("    abcdef",
+                         _sut.ToString());
+        }
     }
 }

@@ -8,10 +8,10 @@ namespace Test
         public void MainMethod()
         {
             TheMethod(() =>
-            {
-                SimulateWork(3000);
-                System.Threading.Thread.Sleep(3);
-            });
+                                 {
+                                     SimulateWork(3000);
+                                     System.Threading.Thread.Sleep(3);
+                                 });
         }
     }
 }

@@ -1,14 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Test
 {
     public partial class TestClass
     {
-
         [System.CodeDom.Compiler.GeneratedCodeAttribute("AsyncToSyncConverterGenerator", "1.0.0.0")]
-        public void PublicMainMethod()
+        public int MainMethod(System.Func<string> param2)
         {
-            TheMethod();
+            string str = param2();
+
+            return 3;
         }
     }
 }

@@ -72,7 +72,7 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
-                                                                       DiagnosticResult.CompilerError("NWL0007").WithMessage("The [AsyncToSyncConverter] must be applied to a method return a task instead of type 'void'.").WithSpan(8, 16, 8, 20)
+                                                                       DiagnosticResult.CompilerError("NWL0007").WithMessage("The [AsyncToSyncConverter] must be applied to a method which returns a task (Task or ValueTask) instead of type 'void'.").WithSpan(8, 16, 8, 20)
                                                                    }).ConfigureAwait(false);
         }
 
@@ -251,6 +251,22 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public async Task AsyncWithoutParameters()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task AsyncWithParameters()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public async Task WithConfigureAwait()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
@@ -337,6 +353,14 @@ namespace NoWoL.SourceGenerators.Tests
         [Trait("Category",
                "Unit")]
         public async Task WorksWithInterfaceMethodsInNestedClasses()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task RemoveCancellationToken()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }

@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +16,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace NoWoL.SourceGenerators
 {
     [Generator]
-    public class AsyncToSyncConverterGenerator : IIncrementalGenerator
+    public partial class AsyncToSyncConverterGenerator : IIncrementalGenerator
     {
         // This class was inspired from NetEscapades.EnumGenerators
         // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
@@ -94,22 +99,15 @@ namespace NoWoL.SourceGenerators
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var node = methodDeclarationSyntax;
+            var sb = new IndentedStringBuilder();
+            var processor = new AsyncToSyncProcessor(compilation, context, methodDeclarationSyntax, sb);
 
-            var remover = new AsyncToSyncConverter();
+            var ancestorAnalysisResults = processor.AnalyzeAncestors(methodDeclarationSyntax);
 
-            var transformResult = remover.Transform(context,
-                                                    compilation,
-                                                    node);
-
-            if (!transformResult.Success)
+            if (!ancestorAnalysisResults.Result)
             {
                 return;
             }
-
-            node = transformResult.Node.NormalizeWhitespace();
-
-            var sb = new IndentedStringBuilder();
 
             var className = methodDeclarationSyntax.FirstAncestorOrSelf<TypeDeclarationSyntax>(x => x.IsKind(SyntaxKind.ClassDeclaration) || x.IsKind(SyntaxKind.InterfaceDeclaration))!.Identifier.ValueText;
             var syncMethodName = GenerationHelpers.RemoveLastWord(methodDeclarationSyntax.Identifier.ValueText, "Async");
@@ -117,20 +115,36 @@ namespace NoWoL.SourceGenerators
             var fileNamePrefix = className + "_" + syncMethodName;
 
             var result = GenericClassBuilder.GenerateClass(sb,
-                                                           transformResult.NameSpace!,
-                                                           transformResult.TypeDeclaration!,
+                                                           ancestorAnalysisResults.NameSpace!,
+                                                           ancestorAnalysisResults.TypeDeclaration!,
                                                            fileNamePrefix,
                                                            (isb) =>
                                                            {
                                                                isb.IncreaseIndent();
 
-                                                               isb.Add(GenerationHelpers.BuildTypeDefinition(transformResult.TypeDeclaration!), addNewLine: true);
+                                                               isb.Add(GenerationHelpers.BuildTypeDefinition(ancestorAnalysisResults.TypeDeclaration!), addNewLine: true);
                                                                isb.Add("{", addNewLine: true);
+                                                               //isb.IncreaseIndent();
+                                                               //isb.Add(node.ToFullString(),
+                                                               //        addNewLine: true);
+                                                               
+                                                               processor.ProcessNode(methodDeclarationSyntax);
 
-                                                               isb.IncreaseIndent();
-                                                               isb.Add(node.ToFullString(),
-                                                                       addNewLine: true);
-                                                               isb.DecreaseIndent();
+                                                               var indent = isb.Indent;
+
+                                                               //for (var i = 0; i < indent; i++)
+                                                               //{
+                                                               //    isb.DecreaseIndent();
+                                                               //}
+
+                                                               //isb.Add(processor.GetBuilderContent(), addNewLine: true);
+                                                               
+                                                               //for (var i = 0; i < indent; i++)
+                                                               //{
+                                                               //    isb.IncreaseIndent();
+                                                               //}
+
+                                                               //isb.DecreaseIndent();
 
                                                                isb.Add("}", addNewLine: true);
                                                                isb.DecreaseIndent();
@@ -157,11 +171,14 @@ namespace NoWoL.SourceGenerators
                                                                }
                                                            });
 
-            var content = sb.ToString();
+            if (!processor.ContainsDiagnosticErrors)
+            {
+                var content = sb.ToString();
 
-            context.AddSource(result.FileName!,
-                              SourceText.From(content,
-                                              Encoding.UTF8));
+                context.AddSource(result.FileName!,
+                                  SourceText.From(content,
+                                                  Encoding.UTF8));
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Test
@@ -10,49 +11,50 @@ namespace Test
             /// <summary>
             /// The summary
             /// </summary>
+            /// 
             /// <param name="param">The param</param>
             /// <param name="param2Async">The 2nd param</param>
             /// <param name="param3">The 3rd param</param>
-            /// <param name="token">The cancel token</param>
+            /// <param name="cancellationToken">The cancel token</param>
             /// <returns>The return</returns>
             [NoWoL.SourceGenerators.AsyncToSyncConverter()]
-            public async Task<string> MainMethodAsync(int param, Func<int, string, string> param2Async, Func<int, string, Task> param3, System.Threading.CancellationToken token)
+            public async Task<string> MainMethodAsync(int param, Func<int, string, Task<string>> param2Async, Func<int, string, Task> param3, System.Threading.CancellationToken cancellationToken)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 string str = await param2Async(1, "").ConfigureAwait(true);
-
-                for (int i = 0; i < 24; i++)
-                {
-                    int someInt = 3498 * i;
-                    Console.WriteLine("Hello");
-                }
 
                 await foreach (var n in SimulateWorkStreamAsync())
                 {
-                    await TheMethodAsync(async () => await SimulateWorkAsync(3000).ConfigureAwait(false)).ConfigureAwait(false);
-                    await TheMethodAsync(async () => await Task.Delay(3000, token).ConfigureAwait(false)).ConfigureAwait(false);
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    await TheMethodAsync(async () => await SimulateWorkAsync(3000, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
+                    await TheMethodAsync(async () => await Task.Delay(3000, cancellationToken).ConfigureAwait(false)).ConfigureAwait(false);
+                    await TheMethodAsync(async () => await Task.Delay(3001, cancellationToken)).ConfigureAwait(false);
+                    await TheMethodAsync(async () => await Task.Delay(3002, cancellationToken));
+                    await TheMethodAsync(async () => await Task.Delay(3003));
 
                     await AnotherMethodAsync(SimulateWorkAsync).ConfigureAwait(false);
-
-                    async Task AnotherMethodAsync(Func<int, Task> funkyAsync)
+                    
+                    async Task AnotherMethodAsync(Func<int, System.Threading.CancellationToken, Task> funkyAsync)
                     {
-                        await funkyAsync(3);
+                        await funkyAsync(3, System.Threading.CancellationToken.None);
                     }
                 }
 
                 foreach (var n in new string[] { "hello" })
                 { }
 
-                async Task TheMethodAsync(Func<Task> funkyAsync)
+                async Task TheMethodAsync(Func<Task> funky9000Async)
                 {
-                    await funkyAsync().ConfigureAwait(false);
+                    await funky9000Async().ConfigureAwait(false);
                 }
 
-                async Task<int> SimulateWorkAsync(int value)
+                async Task<int> SimulateWorkAsync(int value, System.Threading.CancellationToken anotherToken)
                 {
-                    await Task.Delay(3000, token).ConfigureAwait(false);
+                    anotherToken.ThrowIfCancellationRequested();
+                    await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
 
                     return 3;
-
                     ValueTask TheMethodValueAsync(Func<ValueTask> funkyAsync)
                     {
                         return funkyAsync();
@@ -65,8 +67,7 @@ namespace Test
 
                     async ValueTask<int> SimulateWorkValueAsync(int value)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(3), token).ConfigureAwait(false);
-
+                        await Task.Delay(TimeSpan.FromSeconds(3), anotherToken).ConfigureAwait(false);
                         return 3;
                     }
 
@@ -74,15 +75,16 @@ namespace Test
                     {
                         return funkyAsync();
                     }
-
+                    
                     Task<int> ReturnGenericTaskAsync(Func<Task<int>> funkyAsync)
                     {
                         return funkyAsync();
                     }
 
-                    int NonAsyncMethod(int nonAsyncParam)
+                    Task ReturnTaskWithNormalReturnStatementAsync(Func<Task> funkyAsync)
                     {
-                        return 4;
+						await funkyAsync();
+                        return;
                     }
                 }
 

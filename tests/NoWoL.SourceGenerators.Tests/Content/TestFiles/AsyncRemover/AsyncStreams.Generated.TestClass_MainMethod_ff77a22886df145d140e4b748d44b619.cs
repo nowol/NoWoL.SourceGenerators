@@ -11,7 +11,7 @@ namespace Test
             {
             }
 
-            foreach (var n in new string[]{"hello"})
+            foreach (var n in new string[] { "hello" })
             {
             }
         }

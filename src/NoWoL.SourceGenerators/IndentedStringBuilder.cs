@@ -158,6 +158,11 @@ namespace NoWoL.SourceGenerators
             }
         }
 
+        public void AddRaw(string? value)
+        {
+            _builder.Append(value);
+        }
+
         private void Append(ReadOnlySpan<char> value)
         {
             if (!value.IsEmpty)

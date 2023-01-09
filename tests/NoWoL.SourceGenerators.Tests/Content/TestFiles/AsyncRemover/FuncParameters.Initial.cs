@@ -7,26 +7,26 @@ namespace Test
     public partial class TestClass
     {
         [NoWoL.SourceGenerators.AsyncToSyncConverter()]
-        public async Task MainMethodAsync(int param, Func<int, string, string> param2Async, Func<int, string, Task> param3, Func<int, string, Task<TestClass>> param4, Func<string> param5, Func<Task> param6, System.Func<Task<TestClass>> param7)
+        public async Task MainMethodAsync(int param, Func<int, string, string> param2Async, Func<int, string, Task> param3Async, Func<int, string, Task<TestClass>> param4Async, Func<string> param5, Func<Task> param6Async, System.Func<Task<TestClass>> param7Async)
         {
             param2Async(1, "a");
-            await param3(1, "a");
-            await param4(1, "a").ConfigureAwait(false);
+            await param3Async(1, "a");
+            await param4Async(1, "a").ConfigureAwait(false);
             string s = param5();
-            await param6();
-            TestClass tc = await param7();
-            await TheMethodAsync(param2Async, param3, param4, param5, param6, param7).ConfigureAwait(false);
+            await param6Async();
+            TestClass tc = await param7Async();
+            await TheMethodAsync(param2Async, param3Async, param4Async, param5, param6Async, param7Async).ConfigureAwait(false);
 
-            async Task TheMethodAsync(Func<int, string, string> paramAAsync, Func<int, string, Task> paramB, System.Func<int, string, Task<TestClass>> paramC, Func<string> paramD, Func<Task> paramE, Func<Task<TestClass>> paramF)
+            async Task TheMethodAsync(Func<int, string, string> paramAAsync, Func<int, string, Task> paramBAsync, System.Func<int, string, Task<TestClass>> paramCAsync, Func<string> paramDAsync, Func<Task> paramEAsync, Func<Task<TestClass>> paramFAsync)
             {
                 await Task.Delay(3).ConfigureAwait(false);
 
                 paramAAsync(1, "a");
-                await paramB(1, "a");
-                await paramC(1, "a").ConfigureAwait(false);
-                string s2 = paramD();
-                await paramE();
-                TestClass tc2 = await paramF();
+                await paramBAsync(1, "a");
+                await paramCAsync(1, "a").ConfigureAwait(false);
+                string s2 = paramDAsync();
+                await paramEAsync();
+                TestClass tc2 = await paramFAsync();
             }
         }
 

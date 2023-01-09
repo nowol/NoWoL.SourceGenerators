@@ -6,8 +6,8 @@ namespace Test
     public partial class TestClass
     {
         [NoWoL.SourceGenerators.AsyncToSyncConverter()]
-		public async Task MainMethodAsync()
-		{
+        public async Task MainMethodAsync()
+        {
             await TheMethodAsync(async () => await SimulateWorkAsync(3000).ConfigureAwait(false)).ConfigureAwait(false);
             await TheMethodAsync(() => SimulateWorkAsync(5000)).ConfigureAwait(false);
 

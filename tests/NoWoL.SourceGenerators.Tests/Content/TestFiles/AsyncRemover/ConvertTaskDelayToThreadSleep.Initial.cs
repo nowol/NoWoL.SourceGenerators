@@ -7,7 +7,7 @@ namespace Test
     public partial class TestClass
     {
         [NoWoL.SourceGenerators.AsyncToSyncConverter()]
-		public async Task MainMethodAsync(CancellationToken ctToken)
+        public async Task MainMethodAsync(CancellationToken ctToken)
         {
             await Task.Delay(123);
             await Task.Delay(456).ConfigureAwait(true);
