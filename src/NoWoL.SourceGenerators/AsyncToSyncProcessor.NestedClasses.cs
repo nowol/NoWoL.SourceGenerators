@@ -8,7 +8,7 @@ namespace NoWoL.SourceGenerators
         {
             private readonly SemanticModel _sm;
             private readonly SyntaxNode _node;
-            private SymbolInfo? symbol = null;
+            private SymbolInfo? _symbol = null;
 
             public Symbolizer(SemanticModel sm, SyntaxNode node)
             {
@@ -20,7 +20,7 @@ namespace NoWoL.SourceGenerators
             {
                 get
                 {
-                    return symbol ??= _sm.GetSymbolInfo(_node);
+                    return _symbol ??= _sm.GetSymbolInfo(_node);
                 }
             }
         }

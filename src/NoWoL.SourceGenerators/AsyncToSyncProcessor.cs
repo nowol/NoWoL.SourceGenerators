@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static NoWoL.SourceGenerators.AsyncToSyncConverterGenerator;
+﻿using Microsoft.CodeAnalysis;
 
 namespace NoWoL.SourceGenerators
 {
@@ -27,16 +20,4 @@ namespace NoWoL.SourceGenerators
             return _analysisContext.Builder.ToString();
         }
     }
-
-    //internal partial class TransientAsyncToSyncProcessor
-    //{
-    //    private readonly IAsyncToSyncAnalysisContext _analysisContext;
-
-    //    public TransientAsyncToSyncProcessor(IAsyncToSyncAnalysisContext analysisContext)
-    //    {
-    //        _analysisContext = analysisContext;
-    //    }
-
-    //    public bool ContainsDiagnosticErrors => _analysisContext.ContainsDiagnosticErrors;
-    //}
 }

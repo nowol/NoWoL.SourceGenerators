@@ -259,6 +259,14 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public async Task AsyncWithParameters()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public async Task WithConfigureAwait()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);

@@ -18,6 +18,8 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncWithoutConfigureAwaitInsideAPredicateShouldEndWithAsync.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncWithoutParameters.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncWithoutParameters.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncWithParameters.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncWithParameters.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AttributeWithoutMethod.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\ConvertTaskDelayToThreadSleep.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\ConvertTaskDelayToThreadSleep.Initial.cs" />
@@ -157,6 +159,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithParameters.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithParameters.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithoutParameters.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithoutParameters.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\RemoveCancellationToken.Generated.InnerTestClass_MainMethod_2fcbcd8ec33f06ae813d420cb6a6a49e.cs" />

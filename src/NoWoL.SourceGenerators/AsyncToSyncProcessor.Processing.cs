@@ -170,11 +170,11 @@ namespace NoWoL.SourceGenerators
             {
                 processChildNodes = false;
             }
-            else if (node.IsKind(SyntaxKind.LocalFunctionStatement)
-                     && node is LocalFunctionStatementSyntax lfss)
-            {
+            //else if (node.IsKind(SyntaxKind.LocalFunctionStatement)
+            //         && node is LocalFunctionStatementSyntax lfss)
+            //{
                 
-            }
+            //}
             else if (node.IsKind(SyntaxKind.ForEachStatement)
                      && node is ForEachStatementSyntax forEachStatement
                      && forEachStatement.AwaitKeyword.IsKind(SyntaxKind.AwaitKeyword))
@@ -348,20 +348,6 @@ namespace NoWoL.SourceGenerators
                     AppendWithTrivia(newPls);
                 }
             }
-            //else if (node.IsKind(SyntaxKind.Parameter)
-            //         && node is ParameterSyntax ps
-            //         && ps.Type != null)
-            //{
-            //    AddLeadingTrivia(node);
-
-            //    var newPs = ProcessParameterSyntax(ps);
-
-            //    _analysisContext.Builder.AddRaw(newPs?.ToString());
-
-            //    AddTrailingTrivia(node);
-
-            //    processChildNodes = false;
-            //}
 
             if (processChildNodes)
             {
