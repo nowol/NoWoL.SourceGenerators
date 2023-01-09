@@ -20,7 +20,12 @@ namespace NoWoL.SourceGenerators
             {
                 get
                 {
-                    return _symbol ??= _sm.GetSymbolInfo(_node);
+                    if (_symbol == null)
+                    {
+                        _symbol = _sm.GetSymbolInfo(_node);
+                    }
+
+                    return _symbol.Value;
                 }
             }
         }
