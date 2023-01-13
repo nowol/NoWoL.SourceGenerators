@@ -64,7 +64,7 @@
 #pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         {
 #pragma warning disable CA1062 // Validate arguments of public methods
-            return new $"This is a number {nb} and this a string {str} and a transformed param {NoWoL.SourceGenerators.Tests.ValueToStringTransformer.ConvertToCsv(numbers)}";
+            return $"This is a number {nb} and this a string {str} and a transformed param {NoWoL.SourceGenerators.Tests.ValueToStringTransformer.ConvertToCsv(numbers)}";
 #pragma warning restore CA1062 // Validate arguments of public methods
         }
     }

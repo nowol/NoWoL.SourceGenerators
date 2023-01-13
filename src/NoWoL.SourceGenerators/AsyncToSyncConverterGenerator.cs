@@ -30,10 +30,10 @@ namespace NoWoL.SourceGenerators
                                                                                                                      EmbeddedResourceLoader.AsyncToSyncConverterAttributeFileName)!,
                                                                                           Encoding.UTF8)));
 
-            IncrementalValuesProvider<MethodDeclarationSyntax> methodDeclarations = context.SyntaxProvider
-                                                                                         .CreateSyntaxProvider(predicate: static (s, _) => IsSyntaxTargetForGeneration(s),
-                                                                                                               transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
-                                                                                         .Where(static m => m is not null)!;
+            IncrementalValuesProvider<MethodDeclarationSyntax> methodDeclarations = context.SyntaxProvider.ForAttributeWithMetadataName(AsyncToSyncConverterAttributeFqn,
+                                                                                                                                        static (s, token) => IsSyntaxTargetForGeneration(s, token),
+                                                                                                                                        static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
+                                                                                           .Where(static m => m is not null)!;
 
             IncrementalValuesProvider<(MethodDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses
                 = methodDeclarations.Combine(context.CompilationProvider);
@@ -42,17 +42,19 @@ namespace NoWoL.SourceGenerators
                                          static (spc, source) => Execute(source.Compilation, source.ClassDef, spc));
         }
 
-        private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
+        private static bool IsSyntaxTargetForGeneration(SyntaxNode node, CancellationToken cancellationToken)
         {
-            return node is MethodDeclarationSyntax mds
-                   && mds.AttributeLists.Count > 0
-                   && !String.Equals(mds.Identifier.ValueText, "AsyncToSyncConverterAttribute", StringComparison.Ordinal);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return node.IsKind(SyntaxKind.MethodDeclaration);
         }
 
-        private static MethodDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+        private static MethodDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // we know the node is a MethodDeclarationSyntax thanks to IsSyntaxTargetForGeneration
-            var methodDeclarationSyntax = (MethodDeclarationSyntax)context.Node;
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)context.TargetNode;
 
             // loop through all the attributes on the method
             foreach (AttributeListSyntax attributeListSyntax in methodDeclarationSyntax.AttributeLists)

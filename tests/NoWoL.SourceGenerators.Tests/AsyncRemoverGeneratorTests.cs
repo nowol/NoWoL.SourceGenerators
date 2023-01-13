@@ -333,8 +333,7 @@ namespace NoWoL.SourceGenerators.Tests
                "Unit")]
         public async Task MethodCannotBeDuplicated()
         {
-            await WithWithEmbeddedFiles(addGeneratedAttributeDefinitionFile: false,
-                                        expectedDiagnosticResults: new List<DiagnosticResult>
+            await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>
                                                                    {
                                                                        DiagnosticResult.CompilerWarning("CS8785")
                                                                                        .WithMessage("Generator 'AsyncToSyncConverterGenerator' failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type 'ArgumentException' with message 'The hintName 'TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.g.cs' of the added source file must be unique within a generator. (Parameter 'hintName')'")

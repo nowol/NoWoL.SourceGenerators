@@ -64,7 +64,7 @@
 #pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         {
 #pragma warning disable CA1062 // Validate arguments of public methods
-            return new $"The message";
+            return $"The message";
 #pragma warning restore CA1062 // Validate arguments of public methods
         }
 
@@ -91,7 +91,7 @@
 #pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         {
 #pragma warning disable CA1062 // Validate arguments of public methods
-            return new $"This is a number {nb} and this a string {str}";
+            return $"This is a number {nb} and this a string {str}";
 #pragma warning restore CA1062 // Validate arguments of public methods
         }
     }

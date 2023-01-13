@@ -40,32 +40,5 @@
             : base(info, context)
         {
         }
-
-        /// <summary>
-        /// Helper method to create the exception
-        /// </summary>
-        /// <param name="innerException">Optional inner exception</param>
-        /// <returns>An instance of the <see cref="TestClass"/> exception</returns>
-#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        public static TestClass Create(int nb, string str, System.Exception innerException = null)
-#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        {
-#pragma warning disable CA1062 // Validate arguments of public methods
-            return new TestClass($"This is a number {nb} and this a string {str}", innerException);
-#pragma warning restore CA1062 // Validate arguments of public methods
-        }
-
-        /// <summary>
-        /// Helper method to create the exception's message
-        /// </summary>
-        /// <returns>An string with the message of the <see cref="TestClass"/> exception</returns>
-#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        public static string CreateMessage(int nb, string str)
-#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        {
-#pragma warning disable CA1062 // Validate arguments of public methods
-            return $"This is a number {nb} and this a string {str}";
-#pragma warning restore CA1062 // Validate arguments of public methods
-        }
     }
 }
