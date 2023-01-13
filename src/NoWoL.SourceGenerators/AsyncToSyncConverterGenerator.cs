@@ -26,14 +26,14 @@ namespace NoWoL.SourceGenerators
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(ctx => ctx.AddSource("AsyncToSyncConverterAttributeFqn.g.cs",
-                                                                          SourceText.From(EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly, 
+                                                                          SourceText.From(EmbeddedResourceLoader.Get(typeof(EmbeddedResourceLoader).Assembly,
                                                                                                                      EmbeddedResourceLoader.AsyncToSyncConverterAttributeFileName)!,
                                                                                           Encoding.UTF8)));
 
-            IncrementalValuesProvider<MethodDeclarationSyntax> methodDeclarations = context.SyntaxProvider
-                                                                                         .CreateSyntaxProvider(predicate: static (s, _) => IsSyntaxTargetForGeneration(s),
-                                                                                                               transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
-                                                                                         .Where(static m => m is not null)!;
+            IncrementalValuesProvider<MethodDeclarationSyntax> methodDeclarations = context.SyntaxProvider.ForAttributeWithMetadataName(AsyncToSyncConverterAttributeFqn,
+                                                                                                                                        static (s, token) => IsSyntaxTargetForGeneration(s, token),
+                                                                                                                                        static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
+                                                                                           .Where(static m => m is not null)!;
 
             IncrementalValuesProvider<(MethodDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses
                 = methodDeclarations.Combine(context.CompilationProvider);
@@ -42,57 +42,19 @@ namespace NoWoL.SourceGenerators
                                          static (spc, source) => Execute(source.Compilation, source.ClassDef, spc));
         }
 
-        private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
+        private static bool IsSyntaxTargetForGeneration(SyntaxNode node, CancellationToken cancellationToken)
         {
-            return node is MethodDeclarationSyntax mds
-                   && mds.AttributeLists.Count > 0
-                   && !String.Equals(mds.Identifier.ValueText, "AsyncToSyncConverterAttribute", StringComparison.Ordinal);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return node.IsKind(SyntaxKind.MethodDeclaration);
         }
 
-        private static MethodDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+        private static MethodDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             // we know the node is a MethodDeclarationSyntax thanks to IsSyntaxTargetForGeneration
-            var methodDeclarationSyntax = (MethodDeclarationSyntax)context.Node;
-
-            // loop through all the attributes on the method
-            foreach (AttributeListSyntax attributeListSyntax in methodDeclarationSyntax.AttributeLists)
-            {
-                foreach (var (_, attributeSymbol) in FilterAttributes(attributeListSyntax))
-                {
-                    INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                    string fullName = attributeContainingTypeSymbol.ToDisplayString();
-
-                    // Is the attribute the [ExceptionGenerator] attribute?
-                    if (fullName == AsyncToSyncConverterAttributeFqn)
-                    {
-                        // return the method
-                        return methodDeclarationSyntax;
-                    }
-                }
-            }
-
-            // we didn't find the attribute we were looking for
-            return null;
-
-            // moving the non testable code (the continue) to its own method to ignore it
-            [ExcludeFromCodeCoverage]
-            List<(AttributeSyntax, IMethodSymbol)> FilterAttributes(AttributeListSyntax attributeListSyntax)
-            {
-                var results = new List<(AttributeSyntax, IMethodSymbol)>();
-
-                foreach (var attributeSyntax in attributeListSyntax.Attributes)
-                {
-                    if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-                    {
-                        // weird, we couldn't get the symbol, ignore it
-                        continue;
-                    }
-
-                    results.Add((attributeSyntax, attributeSymbol));
-                }
-
-                return results;
-            }
+            return (MethodDeclarationSyntax)context.TargetNode;
         }
 
         private static void Execute(Compilation compilation, MethodDeclarationSyntax methodDeclarationSyntax, SourceProductionContext context)
@@ -124,7 +86,7 @@ namespace NoWoL.SourceGenerators
 
                                                                isb.Add(GenerationHelpers.BuildTypeDefinition(ancestorAnalysisResults.TypeDeclaration!), addNewLine: true);
                                                                isb.Add("{", addNewLine: true);
-                                                               
+
                                                                processor.ProcessNode(methodDeclarationSyntax);
 
                                                                isb.Add("}", addNewLine: true);

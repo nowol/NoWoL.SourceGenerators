@@ -10,7 +10,6 @@
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.TestClass_3b5abaddc0344111a05bc707222d4f00.cs" />
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AsyncRemover\AnotherAttributeWithSameName.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncStreams.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncStreams.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncStreamsMethodMustEndWithAsync.Initial.cs" />
@@ -112,6 +111,7 @@
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassWithoutAttribute.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.00Generated.TestClass.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
@@ -125,7 +125,6 @@
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\Exception\GeneratorShouldIgnoreAttributeWithSameAttributeName.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
@@ -216,7 +215,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsValueTaskDirectly.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsValueTaskDirectly.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AttributeWithoutMethod.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AnotherAttributeWithSameName.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WithConfigureAwait.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
@@ -230,6 +228,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.00Generated.TestClass.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
@@ -252,7 +251,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\Exception\GeneratorShouldIgnoreAttributeWithSameAttributeName.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
@@ -270,17 +268,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="coverlet.collector" Version="3.1.2">
+		<PackageReference Include="coverlet.collector" Version="3.2.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit" Version="1.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.0.1" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
-		<PackageReference Include="Moq" Version="4.18.2" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.4.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+		<PackageReference Include="Moq" Version="4.18.4" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 		<PackageReference Include="xunit" Version="2.4.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
