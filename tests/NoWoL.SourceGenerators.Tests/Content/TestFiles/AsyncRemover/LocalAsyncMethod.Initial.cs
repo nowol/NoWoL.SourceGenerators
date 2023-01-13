@@ -60,5 +60,5 @@ namespace Test
                 return funkyAsync();
             }
         }
-	}
+    }
 }

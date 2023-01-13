@@ -54,5 +54,18 @@
             return new TestClass($"The message", innerException);
 #pragma warning restore CA1062 // Validate arguments of public methods
         }
+
+        /// <summary>
+        /// Helper method to create the exception's message
+        /// </summary>
+        /// <returns>An string with the message of the <see cref="TestClass"/> exception</returns>
+#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+        public static string CreateMessage()
+#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+        {
+#pragma warning disable CA1062 // Validate arguments of public methods
+            return new $"The message";
+#pragma warning restore CA1062 // Validate arguments of public methods
+        }
     }
 }

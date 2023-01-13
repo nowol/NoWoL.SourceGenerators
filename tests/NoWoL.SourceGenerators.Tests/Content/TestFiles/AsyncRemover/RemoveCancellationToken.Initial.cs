@@ -34,7 +34,7 @@ namespace Test
                     await TheMethodAsync(async () => await Task.Delay(3003));
 
                     await AnotherMethodAsync(SimulateWorkAsync).ConfigureAwait(false);
-                    
+
                     async Task AnotherMethodAsync(Func<int, System.Threading.CancellationToken, Task> funkyAsync)
                     {
                         await funkyAsync(3, System.Threading.CancellationToken.None);
@@ -75,7 +75,7 @@ namespace Test
                     {
                         return funkyAsync();
                     }
-                    
+
                     Task<int> ReturnGenericTaskAsync(Func<Task<int>> funkyAsync)
                     {
                         return funkyAsync();
@@ -83,7 +83,7 @@ namespace Test
 
                     Task ReturnTaskWithNormalReturnStatementAsync(Func<Task> funkyAsync)
                     {
-						await funkyAsync();
+                        await funkyAsync();
                         return;
                     }
                 }

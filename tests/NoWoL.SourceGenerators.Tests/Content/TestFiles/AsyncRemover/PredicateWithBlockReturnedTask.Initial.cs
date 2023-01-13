@@ -24,7 +24,7 @@ namespace Test
             await Task.Delay(3000).ConfigureAwait(false);
         }
 
-		public int TheMethod()
+        public int TheMethod()
         {
             return 3;
         }

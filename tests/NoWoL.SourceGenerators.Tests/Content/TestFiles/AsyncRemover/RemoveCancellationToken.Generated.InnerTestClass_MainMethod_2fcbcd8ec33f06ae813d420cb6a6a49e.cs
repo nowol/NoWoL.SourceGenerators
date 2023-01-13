@@ -32,7 +32,7 @@ namespace Test
                     TheMethod(() => System.Threading.Thread.Sleep(3003));
 
                     AnotherMethod(SimulateWork);
-                    
+
                     void AnotherMethod(System.Action<int> funky)
                     {
                         funky(3);
@@ -72,7 +72,7 @@ namespace Test
                     {
                         funky();
                     }
-                    
+
                     int ReturnGenericTask(System.Func<int> funky)
                     {
                         return funky();
@@ -80,7 +80,7 @@ namespace Test
 
                     void ReturnTaskWithNormalReturnStatement(System.Action funky)
                     {
-						funky();
+                        funky();
                         return;
                     }
                 }
