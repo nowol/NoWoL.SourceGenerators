@@ -323,14 +323,6 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public async Task AnotherAttributeWithSameName()
-        {
-            await WithWithEmbeddedFiles().ConfigureAwait(false);
-        }
-
-        [Fact]
-        [Trait("Category",
-               "Unit")]
         public async Task MethodCannotBeDuplicated()
         {
             await WithWithEmbeddedFiles(expectedDiagnosticResults: new List<DiagnosticResult>

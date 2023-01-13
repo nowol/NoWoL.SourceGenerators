@@ -50,47 +50,7 @@ namespace NoWoL.SourceGenerators
             cancellationToken.ThrowIfCancellationRequested();
 
             // we know the node is a ClassDeclarationSyntax thanks to IsSyntaxTargetForGeneration
-            var classDeclarationSyntax = (ClassDeclarationSyntax)context.TargetNode;
-
-            // loop through all the attributes on the method
-            foreach (AttributeListSyntax attributeListSyntax in classDeclarationSyntax.AttributeLists)
-            {
-                foreach (var (_, attributeSymbol) in FilterAttributes(attributeListSyntax))
-                {
-                    INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                    string fullName = attributeContainingTypeSymbol.ToDisplayString();
-
-                    // Is the attribute the [ExceptionGenerator] attribute?
-                    if (fullName == ExceptionGeneratorAttributeFqn)
-                    {
-                        // return the class
-                        return classDeclarationSyntax;
-                    }
-                }
-            }
-
-            // we didn't find the attribute we were looking for
-            return null;
-
-            // moving the non testable code (the continue) to its own method to ignore it
-            [ExcludeFromCodeCoverage]
-            List<(AttributeSyntax, IMethodSymbol)> FilterAttributes(AttributeListSyntax attributeListSyntax)
-            {
-                var results = new List<(AttributeSyntax, IMethodSymbol)>();
-
-                foreach (var attributeSyntax in attributeListSyntax.Attributes)
-                {
-                    if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-                    {
-                        // weird, we couldn't get the symbol, ignore it
-                        continue;
-                    }
-
-                    results.Add((attributeSyntax, attributeSymbol));
-                }
-
-                return results;
-            }
+            return (ClassDeclarationSyntax)context.TargetNode;
         }
 
         private static void Execute(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, SourceProductionContext context)

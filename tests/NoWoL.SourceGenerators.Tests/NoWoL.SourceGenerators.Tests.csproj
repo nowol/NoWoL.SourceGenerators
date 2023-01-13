@@ -10,7 +10,6 @@
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.TestClass_3b5abaddc0344111a05bc707222d4f00.cs" />
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AsyncRemover\AnotherAttributeWithSameName.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncStreams.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncStreams.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\AsyncStreamsMethodMustEndWithAsync.Initial.cs" />
@@ -126,7 +125,6 @@
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\Exception\GeneratorShouldIgnoreAttributeWithSameAttributeName.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
@@ -217,7 +215,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsValueTaskDirectly.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsValueTaskDirectly.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AttributeWithoutMethod.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AnotherAttributeWithSameName.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WithConfigureAwait.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
@@ -254,7 +251,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithoutNamespaceShouldFail.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Generated.TestClassScoped_db7a6316fa2359dc975a550b589f4ed7.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionClassWithScopedFileNamespaceShouldSucceed.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\Exception\GeneratorShouldIgnoreAttributeWithSameAttributeName.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />

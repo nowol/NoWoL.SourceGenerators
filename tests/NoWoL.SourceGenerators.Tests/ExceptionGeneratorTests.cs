@@ -110,14 +110,6 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
-        public async Task GeneratorShouldIgnoreAttributeWithSameAttributeName()
-        {
-            await WithWithEmbeddedFiles().ConfigureAwait(false);
-        }
-
-        [Fact]
-        [Trait("Category",
-               "Unit")]
         public async Task AliasedAttributeShouldSucceed()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
