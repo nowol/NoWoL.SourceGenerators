@@ -161,9 +161,13 @@ namespace NoWoL.SourceGenerators
                                              new MatchEvaluator(ReplaceParameterMatch));
                 var methodParameters = parameters.Count == 0 ?
                                            String.Empty :
-                                           String.Join(", ", parameters.Select(x => $"{x.type} {x.name}")) + ", ";
+                                           String.Join(", ", parameters.Select(x => $"{x.type} {x.name}"));
 
                 sb.Add(Create(template, methodParameters),
+                       removeLastNewLines: true,
+                       addNewLine: true);
+
+                sb.Add(CreateMessage(template, methodParameters),
                        removeLastNewLines: true,
                        addNewLine: true);
             }
@@ -178,11 +182,29 @@ namespace NoWoL.SourceGenerators
         /// <param name=""innerException"">Optional inner exception</param>
         /// <returns>An instance of the <see cref=""{className}""/> exception</returns>
 #pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        public static {className} Create({methodParameters}System.Exception innerException = null)
+        public static {className} Create({methodParameters}{(String.IsNullOrWhiteSpace(methodParameters) ? "" : ", ")}System.Exception innerException = null)
 #pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
         {{
 #pragma warning disable CA1062 // Validate arguments of public methods
             return new {className}($""{template}"", innerException);
+#pragma warning restore CA1062 // Validate arguments of public methods
+        }}";
+            }
+
+            string CreateMessage(string template, string methodParameters)
+            {
+                return $@"
+
+        /// <summary>
+        /// Helper method to create the exception's message
+        /// </summary>
+        /// <returns>An string with the message of the <see cref=""{className}""/> exception</returns>
+#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+        public static string CreateMessage({methodParameters})
+#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+        {{
+#pragma warning disable CA1062 // Validate arguments of public methods
+            return new $""{template}"";
 #pragma warning restore CA1062 // Validate arguments of public methods
         }}";
             }

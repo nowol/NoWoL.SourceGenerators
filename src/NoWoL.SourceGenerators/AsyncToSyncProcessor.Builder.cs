@@ -10,44 +10,45 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace NoWoL.SourceGenerators
 {
     internal partial class AsyncToSyncProcessor // Builder
-	{
-		public void AppendWithTrivia(SyntaxNode? n)
-		{
-			if (n != null)
-			{
+    {
+        public void AppendWithTrivia(SyntaxNode? n)
+        {
+            if (n != null)
+            {
                 _analysisContext.Builder.AddRaw(n.ToFullString());
-			}
-		}
+            }
+        }
 
-		public void AddLeadingTrivia(SyntaxNode n)
-		{
-			if (n!.HasLeadingTrivia)
-			{
-				var triviaList = n.GetLeadingTrivia();
+        public void AddLeadingTrivia(SyntaxNode n)
+        {
+            if (n!.HasLeadingTrivia)
+            {
+                var triviaList = n.GetLeadingTrivia();
 
-				foreach (var trivia in triviaList)
+                foreach (var trivia in triviaList)
                 {
                     var isProcessed = false;
-					if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
-					{
-						var structure = trivia.GetStructure();
+                    if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia)
+                        && trivia.HasStructure)
+                    {
+                        var structure = trivia.GetStructure();
 
-						if (structure != null)
+                        if (structure != null)
                         {
                             ProcessTriviaStructure(structure);
                             isProcessed = true;
                         }
-					}
-					//else if (trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
-					//{ }
+                    }
+                    //else if (trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia))
+                    //{ }
 
                     if (!isProcessed)
                     {
                         _analysisContext.Builder.AddRaw(trivia.ToFullString());
                     }
-				}
-			}
-		}
+                }
+            }
+        }
 
         private void ProcessTriviaStructure(SyntaxNode structure)
         {
@@ -95,28 +96,28 @@ namespace NoWoL.SourceGenerators
         }
 
         public void AddTrailingTrivia(SyntaxNode n)
-		{
-			if (n.HasTrailingTrivia)
-			{
+        {
+            if (n.HasTrailingTrivia)
+            {
                 _analysisContext.Builder.AddRaw(n.GetTrailingTrivia().ToFullString());
-			}
-		}
+            }
+        }
 
-		public void AddLeadingTrivia(SyntaxToken token)
-		{
-			if (token.HasLeadingTrivia)
-			{
+        public void AddLeadingTrivia(SyntaxToken token)
+        {
+            if (token.HasLeadingTrivia)
+            {
                 _analysisContext.Builder.AddRaw(token.LeadingTrivia.ToFullString());
-			}
-		}
+            }
+        }
 
-		[ExcludeFromCodeCoverage]
-		public void AddTrailingTrivia(SyntaxToken token)
-		{
-			if (token.HasTrailingTrivia)
-			{
-				_analysisContext.Builder.AddRaw(token.TrailingTrivia.ToFullString());
-			}
-		}
-	}
+        [ExcludeFromCodeCoverage]
+        public void AddTrailingTrivia(SyntaxToken token)
+        {
+            if (token.HasTrailingTrivia)
+            {
+                _analysisContext.Builder.AddRaw(token.TrailingTrivia.ToFullString());
+            }
+        }
+    }
 }

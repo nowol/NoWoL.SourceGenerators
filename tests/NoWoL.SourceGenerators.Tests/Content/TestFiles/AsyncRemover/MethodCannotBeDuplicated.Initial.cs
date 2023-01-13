@@ -6,8 +6,8 @@ namespace Test
     public partial class TestClass
     {
         [NoWoL.SourceGenerators.AsyncToSyncConverter()]
-		public async Task MainMethodAsync()
-		{
+        public async Task MainMethodAsync()
+        {
             await TheMethodAsync(async () => await SimulateWorkAsync(3000).ConfigureAwait(false)).ConfigureAwait(false);
             
             async Task<int> SimulateWorkAsync(int value)
@@ -18,8 +18,8 @@ namespace Test
         }
 
         [NoWoL.SourceGenerators.AsyncToSyncConverter()]
-		public async Task MainMethodAsync()
-		{
+        public async Task MainMethodAsync()
+        {
             await TheMethodAsync(async () => await SimulateWorkAsync(3000).ConfigureAwait(false)).ConfigureAwait(false);
             
             async Task<int> SimulateWorkAsync(int value)
@@ -28,5 +28,5 @@ namespace Test
                 return 3;
             }
         }
-	}
+    }
 }

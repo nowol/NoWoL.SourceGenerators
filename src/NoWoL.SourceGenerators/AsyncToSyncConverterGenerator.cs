@@ -124,27 +124,8 @@ namespace NoWoL.SourceGenerators
 
                                                                isb.Add(GenerationHelpers.BuildTypeDefinition(ancestorAnalysisResults.TypeDeclaration!), addNewLine: true);
                                                                isb.Add("{", addNewLine: true);
-                                                               //isb.IncreaseIndent();
-                                                               //isb.Add(node.ToFullString(),
-                                                               //        addNewLine: true);
                                                                
                                                                processor.ProcessNode(methodDeclarationSyntax);
-
-                                                               var indent = isb.Indent;
-
-                                                               //for (var i = 0; i < indent; i++)
-                                                               //{
-                                                               //    isb.DecreaseIndent();
-                                                               //}
-
-                                                               //isb.Add(processor.GetBuilderContent(), addNewLine: true);
-                                                               
-                                                               //for (var i = 0; i < indent; i++)
-                                                               //{
-                                                               //    isb.IncreaseIndent();
-                                                               //}
-
-                                                               //isb.DecreaseIndent();
 
                                                                isb.Add("}", addNewLine: true);
                                                                isb.DecreaseIndent();
