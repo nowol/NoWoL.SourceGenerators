@@ -92,7 +92,7 @@ namespace NoWoL.SourceGenerators
                                                                isb.Add("}", addNewLine: true);
                                                                isb.DecreaseIndent();
                                                            },
-                                                           preAction: isb =>
+                                                           addUsings: isb =>
                                                            {
                                                                var cuSyntaxes = methodDeclarationSyntax.Ancestors().Where(x => x.IsKind(SyntaxKind.CompilationUnit));
                                                                var hasUsings = false;
