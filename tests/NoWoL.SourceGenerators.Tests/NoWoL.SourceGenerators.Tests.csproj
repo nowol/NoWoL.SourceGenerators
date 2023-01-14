@@ -111,7 +111,6 @@
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Generated.TestClassPublic_8ac28b09dc2dc04896bf6fc0e1c8b8b0.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassModifiersShouldBePreserved.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ClassWithoutAttribute.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.00Generated.TestClass.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\ExceptionClassWithAttributeWithMessageShouldSucceed.Initial.cs" />
@@ -228,7 +227,6 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.00Generated.TestClass.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
