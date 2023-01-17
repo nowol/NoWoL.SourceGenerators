@@ -10,6 +10,7 @@
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.TestClass_3b5abaddc0344111a05bc707222d4f00.cs" />
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AliasedAttributeShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\AddingTheAttributeToAPropertyShouldDoNothing.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\CannotBeInAStruct.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\CannotDeclareMoreThanOneFieldAtTheSameTime.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\ClassMustBeInNamespace.Initial.cs" />
@@ -205,6 +206,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithMultipleFields.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithMultipleFields.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\CannotDeclareMoreThanOneFieldAtTheSameTime.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\AddingTheAttributeToAPropertyShouldDoNothing.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldWithXmlDoc.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldWithXmlDoc.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneInitializedField.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />

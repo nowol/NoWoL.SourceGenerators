@@ -118,8 +118,8 @@ namespace NoWoL.SourceGenerators
         {
             token.ThrowIfCancellationRequested();
 
-            return syntaxNode.IsKind(SyntaxKind.VariableDeclarator)
-                   && syntaxNode.Parent is VariableDeclarationSyntax { Parent: FieldDeclarationSyntax };
+            return syntaxNode.Parent is VariableDeclarationSyntax { Parent: FieldDeclarationSyntax }
+                    && syntaxNode.IsKind(SyntaxKind.VariableDeclarator); // validating the parent first to help with code coverage
         }
 
         private static (FieldDeclarationSyntax? FieldSyntax, DiagnosticDescriptor? Diagnostic) GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext ctx, CancellationToken token)
@@ -223,7 +223,7 @@ namespace NoWoL.SourceGenerators
 
             var members = typeSymbol.Type!.GetMembers(".ctor");
 
-            if (!members.Any(x => x is IMethodSymbol ms && ms.Parameters.IsEmpty))
+            if (!members.OfType<IMethodSymbol>().Any(x => x.Parameters.IsEmpty))
             {
                 diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustHaveParameterlessConstructor;
 

@@ -224,8 +224,6 @@ namespace NoWoL.SourceGenerators
                 }
                 else
                 {
-                    // todo: add test with 0 param, with 2 async params, with 2 async param and 1 non async, with async inside async
-
                     if (unfoldedExpr is InvocationExpressionSyntax ies7
                         && ies7.Expression is IdentifierNameSyntax ins7)
                     {

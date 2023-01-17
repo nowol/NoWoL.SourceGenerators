@@ -299,5 +299,13 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task AddingTheAttributeToAPropertyShouldDoNothing()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
     }
 }
