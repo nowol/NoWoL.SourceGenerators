@@ -1,6 +1,6 @@
 ﻿namespace NoWoL.SourceGenerators
 {
-    internal class ExceptionClassBuilderResult
+    internal class GenericClassBuilderResult
     {
         public string? FileName { get; set; }
     }

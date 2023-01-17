@@ -49,6 +49,14 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public void ConvertErrorCodeShouldThrowForInvalidValue_AlwaysInitializedPropertyGenerator()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => SourceGenerators.GenerationHelpers.ConvertErrorCode((AlwaysInitializedPropertyGeneratorErrorCode)66666));
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public void IsOperationCanceledExceptionReturnsTrueForCanceledException()
         {
             var result = SourceGenerators.GenerationHelpers.IsOperationCanceledException(new OperationCanceledException());

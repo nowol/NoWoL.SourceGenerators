@@ -175,6 +175,26 @@ namespace NoWoL.SourceGenerators
                    };
         }
 
+        public static string ConvertErrorCode(AlwaysInitializedPropertyGeneratorErrorCode errorCode)
+        {
+            return errorCode switch
+                   {
+                       AlwaysInitializedPropertyGeneratorErrorCode.MustBeInParentPartialClass => "NWL1101",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldMustBePrivate => "NWL1102",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldCannotBeStatic => "NWL1103",
+                       AlwaysInitializedPropertyGeneratorErrorCode.ClassMustBeInNamespace => "NWL1104",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldCannotBeReadOnly => "NWL1105",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldMustBeInClass => "NWL1106",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldTypeMustBeAReferenceType => "NWL1107",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldTypeMustHaveParameterlessConstructor => "NWL1108",
+                       AlwaysInitializedPropertyGeneratorErrorCode.FieldTypeMustExist => "NWL1109",
+                       AlwaysInitializedPropertyGeneratorErrorCode.OnlyOneFieldCanBeDeclared => "NWL1110",
+                       _ => throw new ArgumentOutOfRangeException(nameof(errorCode),
+                                                                  errorCode,
+                                                                  null)
+                   };
+        }
+
         public static bool IsOperationCanceledException(Exception ex)
         {
             return ex is OperationCanceledException;

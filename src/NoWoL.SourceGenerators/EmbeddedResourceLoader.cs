@@ -10,6 +10,7 @@ namespace NoWoL.SourceGenerators
     {
         public const string ExceptionGeneratorAttributeFileName = "NoWoL.SourceGenerators.Content.ExceptionGeneratorAttribute.cs";
         public const string AsyncToSyncConverterAttributeFileName = "NoWoL.SourceGenerators.Content.AsyncToSyncConverterAttribute.cs";
+        public const string AlwaysInitializedPropertyAttributeFileName = "NoWoL.SourceGenerators.Content.AlwaysInitializedPropertyAttribute.cs";
 
         public static string? Get(Assembly assembly, string resourceName)
         {

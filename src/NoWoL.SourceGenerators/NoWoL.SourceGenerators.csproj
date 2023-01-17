@@ -19,6 +19,8 @@
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
 		<PackageIcon>logo.png</PackageIcon>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -32,12 +34,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Content\AlwaysInitializedPropertyAttribute.cs" />
 	  <Compile Remove="Content\AsyncToSyncConverterAttribute.cs" />
 	  <Compile Remove="Content\ExceptionGeneratorAttribute.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <EmbeddedResource Include="Content\AsyncToSyncConverterAttribute.cs" />
+	  <EmbeddedResource Include="Content\AlwaysInitializedPropertyAttribute.cs" />
 	  <EmbeddedResource Include="Content\ExceptionGeneratorAttribute.cs" />
 	</ItemGroup>
 

@@ -60,6 +60,39 @@ public void Main()
 }
 ```
 
+## AlwaysInitializedProperty Usage
+
+Define a partial class with one or more fields decorated with the `[AlwaysInitializedProperty]` attribute to generate the boilerplate code to create a property which initialize its backing field when the field is null. This ensure that the property will never return null.
+
+```csharp
+public partial class TestClass
+{
+    [AlwaysInitializedProperty]
+    private List<int> _field1;
+}
+```
+
+This will generate this code:
+
+```csharp
+public partial class TestClass
+{
+    public List<int> Field1
+    {
+        get
+        {
+            if (_field1 == default)
+            {
+                _field1 = new List<int>();
+            }
+
+            return _field1;
+        }
+        set { _field1 = value; }
+    }
+}
+```
+
 ## AsyncToSyncConverterGenerator Usage
 
 This generator uses simple rules to convert async code to their sync version:
@@ -178,4 +211,3 @@ Useful information for creating source generators:
 * Great collection of analyzers to help figure out how syntax trees work: https://github.com/JosefPihrt/Roslynator
 * Tool to see a syntax tree: https://sharplab.io
 * Tool to generate Roslyn API calls: https://roslynquoter.azurewebsites.net/
-

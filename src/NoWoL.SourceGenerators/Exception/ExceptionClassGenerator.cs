@@ -72,10 +72,9 @@ namespace NoWoL.SourceGenerators
 
             var exceptionAttributes = classSymbol.GetAttributes().Where(x => exceptionAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default)).ToList();
 
-            var classToGenerate = new ClassToGenerate(classDeclarationSyntax,
-                                                      classSymbol,
-                                                      exceptionAttributes,
-                                                      ns);
+            var classToGenerate = new ExceptionClassToGenerate(classDeclarationSyntax,
+                                                               exceptionAttributes,
+                                                               ns);
 
             var sb = new IndentedStringBuilder();
             var classBuilder = new ExceptionClassBuilder();
