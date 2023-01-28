@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using NoWoL.SourceGenerators.Comparers;
 
 namespace NoWoL.SourceGenerators
 {
@@ -36,7 +37,8 @@ namespace NoWoL.SourceGenerators
                                                                                            .Where(static m => m is not null)!;
 
             IncrementalValuesProvider<(MethodDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses
-                = methodDeclarations.Combine(context.CompilationProvider);
+                = methodDeclarations.Combine(context.CompilationProvider)
+                                    .WithComparer(new MethodDeclarationSyntaxIsEquivalentToComparer());
 
             context.RegisterSourceOutput(compilationAndClasses,
                                          static (spc, source) => Execute(source.Compilation, source.ClassDef, spc));
