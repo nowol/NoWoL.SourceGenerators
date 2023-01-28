@@ -89,6 +89,16 @@ namespace NoWoL.SourceGenerators
             return modifier + " ";
         }
 
+        public static string BuildClassDefinition(string? className, string? modifier)
+        {
+            if (String.IsNullOrWhiteSpace(modifier))
+            {
+                return "class " + className;
+            }
+
+            return modifier + " class " + className;
+        }
+
         public static string BuildTypeDefinition(TypeDeclarationSyntax typeDef)
         {
             return BuildTypeDefinition(typeDef,

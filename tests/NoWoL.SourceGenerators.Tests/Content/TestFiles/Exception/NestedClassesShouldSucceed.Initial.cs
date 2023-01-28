@@ -4,9 +4,12 @@
     {
         private partial class Level2
         {
-            [NoWoL.SourceGenerators.ExceptionGenerator()]
-            public partial class TestClass
+            private partial class Level3
             {
+                [NoWoL.SourceGenerators.ExceptionGenerator()]
+                public partial class TestClass
+                {
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -9,6 +10,65 @@ namespace NoWoL.SourceGenerators
 {
     internal class GenericClassBuilder
     {
+        public static string GenerateFilename(string fileNamePrefix, ClassDefinition classDefinition, string ns, List<ClassDefinition>? parentClasses)
+        {
+            var filenameStringBuilder = new StringBuilder();
+            filenameStringBuilder.Append(ns).Append(classDefinition.Name);
+
+            if (parentClasses != null)
+            {
+                foreach (var parentClass in parentClasses)
+                {
+                    var buildClassDefinition = GenerationHelpers.BuildClassDefinition(parentClass.Name, parentClass.Modifier);
+                    filenameStringBuilder.Append(buildClassDefinition);
+                }
+            }
+
+            return GenerateFileName(filenameStringBuilder,
+                                    fileNamePrefix);
+        }
+
+        public static void WriteClassStart(IndentedStringBuilder sb, ClassDefinition classDefinition, string ns, List<ClassDefinition>? parentClasses)
+        {
+            sb.Add($@"namespace {ns}
+{{", addNewLine: true);
+
+            //var parentClasses = typeDeclaration.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Reverse();
+
+            if (parentClasses != null)
+            {
+                foreach (var parentClass in parentClasses)
+                {
+                    var buildClassDefinition = GenerationHelpers.BuildClassDefinition(parentClass.Name, parentClass.Modifier);
+                    //filenameStringBuilder.Append(buildClassDefinition);
+
+                    sb.IncreaseIndent();
+
+                    sb.Add(buildClassDefinition,
+                           addNewLine: true);
+                    sb.Add("{",
+                           addNewLine: true);
+                }
+            }
+        }
+
+        public static void WriteClassEnd(IndentedStringBuilder sb)
+        {
+            if (sb.Indent > 0)
+            {
+                while (sb.Indent > 1)
+                {
+                    sb.Add("}", addNewLine: true);
+                    sb.DecreaseIndent();
+                }
+
+                sb.Add("}", addNewLine: true);
+                sb.DecreaseIndent();
+            }
+
+            sb.Add("}");
+        }
+
         internal static GenericClassBuilderResult GenerateClass(IndentedStringBuilder sb, 
                                                                 string nameSpace, 
                                                                 TypeDeclarationSyntax typeDeclaration,

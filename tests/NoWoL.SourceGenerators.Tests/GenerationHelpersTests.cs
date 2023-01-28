@@ -224,6 +224,33 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public void BuildClassDefinitionWithStringReturnsClassWithoutModifierEmpty()
+        {
+            var result = SourceGenerators.GenerationHelpers.BuildClassDefinition("classy", "");
+            Assert.Equal("class classy", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void BuildClassDefinitionWithStringReturnsClassWithoutModifierNull()
+        {
+            var result = SourceGenerators.GenerationHelpers.BuildClassDefinition("classy", null);
+            Assert.Equal("class classy", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void BuildClassDefinitionWithStringReturnsClassWithModifier()
+        {
+            var result = SourceGenerators.GenerationHelpers.BuildClassDefinition("classy", "public");
+            Assert.Equal("public class classy", result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public void RemoveLastWordReturnsInitialStringWhenWordIsNotFound()
         {
             var result = SourceGenerators.GenerationHelpers.RemoveLastWord("hello there", "sometext");
@@ -422,6 +449,33 @@ namespace NoWoL.SourceGenerators.Tests
 
             var result = SourceGenerators.GenerationHelpers.GetNamespace(clsNode1);
             Assert.Equal("ns1", result);
+        }
+
+        [Theory]
+        [Trait("Category",
+               "Unit")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.MustBeInParentPartialClass, "NWL1101")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldMustBePrivate, "NWL1102")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldCannotBeStatic, "NWL1103")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.ClassMustBeInNamespace, "NWL1104")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldCannotBeReadOnly, "NWL1105")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldMustBeInClass, "NWL1106")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldTypeMustBeAReferenceType, "NWL1107")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldTypeMustHaveParameterlessConstructor, "NWL1108")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.FieldTypeMustExist, "NWL1109")]
+        [InlineData(AlwaysInitializedPropertyGeneratorErrorCode.OnlyOneFieldCanBeDeclared, "NWL1110")]
+        public void AlwaysInitializedPropertyGeneratorErrorCodeConvertErrorCodeMapping(object code, string expected)
+        {
+            var result = SourceGenerators.GenerationHelpers.ConvertErrorCode((AlwaysInitializedPropertyGeneratorErrorCode)code);
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void ConvertAlwaysInitializedPropertyGeneratorErrorCodeThrowsForOutOfRangeValue()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => SourceGenerators.GenerationHelpers.ConvertErrorCode((AlwaysInitializedPropertyGeneratorErrorCode)666));
         }
     }
 }
