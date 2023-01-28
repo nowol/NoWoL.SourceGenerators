@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NoWoL.SourceGenerators
 {
-    public struct ExceptionClassDefinition : IEquatable<ExceptionClassDefinition>
+    internal struct ExceptionClassDefinition : IEquatable<ExceptionClassDefinition>
     {
         public string? Namespace { get; set; }
 
@@ -20,8 +20,8 @@ namespace NoWoL.SourceGenerators
             var result = Namespace == other.Namespace
                          && ClassDef.Equals(other.ClassDef)
                          && DiagnosticDef.Equals(other.DiagnosticDef)
-                         && ComparisonHelpers.AreCollectionEquals<ClassDefinition>(ParentClasses, other.ParentClasses)
-                         && ComparisonHelpers.AreCollectionEquals<string>(Messages, other.Messages);
+                         && ComparisonHelpers.AreCollectionEquals(ParentClasses, other.ParentClasses)
+                         && ComparisonHelpers.AreCollectionEquals(Messages, other.Messages);
 
             // Uncomment for diagnostic
             //System.Diagnostics.Trace.WriteLine($"[nwl]----- {result}");

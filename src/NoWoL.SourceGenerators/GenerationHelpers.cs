@@ -219,5 +219,15 @@ namespace NoWoL.SourceGenerators
 
             return false;
         }
+
+        public static string GetFieldIdentifierText(FieldDeclarationSyntax syntax)
+        {
+            return syntax.Declaration.Variables.FirstOrDefault()?.Identifier.Text ?? String.Empty;
+        }
+
+        public static Location? GetFieldIdentifierLocation(FieldDeclarationSyntax syntax)
+        {
+            return syntax.Declaration.Variables.FirstOrDefault()?.GetLocation();
+        }
     }
 }

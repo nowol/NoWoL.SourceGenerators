@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace NoWoL.SourceGenerators.Comparers
 {
     [ExcludeFromCodeCoverage]
-    public class MethodDeclarationSyntaxIsEquivalentToComparer
+    internal class MethodDeclarationSyntaxIsEquivalentToComparer
         : IEqualityComparer<(MethodDeclarationSyntax Node, Compilation compilation)>
     {
         public bool Equals((MethodDeclarationSyntax Node, Compilation compilation) x,

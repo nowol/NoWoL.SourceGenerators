@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace NoWoL.SourceGenerators
 {
-    public static class ComparisonHelpers
+    internal static class ComparisonHelpers
     {
         public static bool AreEquatable<T>(IEquatable<T>? item, IEquatable<T>? other)
         {
@@ -47,6 +48,20 @@ namespace NoWoL.SourceGenerators
             }
 
             return isNull == isOtherNull;
+        }
+
+        public static bool AreImmutableArrayEquals<T>(ImmutableArray<T> col, ImmutableArray<T> colOther)
+        {
+            var isEmpty = col.IsDefaultOrEmpty;
+            var isOtherEmpty = colOther.IsDefaultOrEmpty;
+
+            if (!isEmpty
+                && !isOtherEmpty)
+            {
+                return col!.SequenceEqual(colOther!);
+            }
+
+            return isEmpty == isOtherEmpty;
         }
     }
 }

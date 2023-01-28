@@ -32,7 +32,7 @@
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithMultipleFields.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneField.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneField.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass_bb0f0e5f6ff86b2810a82b6605eed0a0.cs" />
+	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass3_d7ea8fe71373ab67b838a04b235408e2.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Initial.cs" />
@@ -214,7 +214,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldWithXmlDoc.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneInitializedField.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneInitializedField.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass_bb0f0e5f6ff86b2810a82b6605eed0a0.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass3_d7ea8fe71373ab67b838a04b235408e2.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Initial.cs" />

@@ -24,6 +24,7 @@ namespace Test
             set { _field1 = value; }
         }
 
+
         /// <summary>
         /// Some documentation
         /// </summary>
@@ -53,6 +54,20 @@ namespace Test
                 return _field4;
             }
             set { _field4 = value; }
+        }
+
+        public List<int> Field5
+        {
+            get
+            {
+                if (_field5 == default)
+                {
+                    _field5 = new List<int>();
+                }
+
+                return _field5;
+            }
+            set { _field5 = value; }
         }
     }
 }

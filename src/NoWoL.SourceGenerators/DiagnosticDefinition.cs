@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace NoWoL.SourceGenerators
 {
-    public struct DiagnosticDefinition : IEquatable<DiagnosticDefinition>
+    internal struct DiagnosticDefinition : IEquatable<DiagnosticDefinition>
     {
         public DiagnosticDescriptor? Diagnostic { get; set; }
         public Location? Location { get; set; }

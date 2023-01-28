@@ -8,6 +8,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
+using NoWoL.SourceGenerators.Comparers;
+using NoWoL.SourceGenerators.AlwaysInitializedProperty;
 
 namespace NoWoL.SourceGenerators
 {
@@ -23,96 +25,194 @@ namespace NoWoL.SourceGenerators
                                                                                                                      EmbeddedResourceLoader.AlwaysInitializedPropertyAttributeFileName)!,
                                                                                           Encoding.UTF8)));
 
-            // Gather info for all annotated fields
-            IncrementalValuesProvider<(FieldDeclarationSyntax FieldSyntax, DiagnosticDescriptor? Diagnostic)> fieldsWithError
-                = context.SyntaxProvider.ForAttributeWithMetadataName(AlwaysInitializedPropertyAttributeFqn,
-                                                                      static (s, token) => IsSyntaxTargetForGeneration(s, token),
-                                                                      static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
-                         .Where(static m => m.FieldSyntax is not null)!;
+            IncrementalValuesProvider<AlwaysInitializedPropertyFieldDefinition> allFields = context.SyntaxProvider.ForAttributeWithMetadataName(AlwaysInitializedPropertyAttributeFqn,
+                                                                                                                                                 static (s, token) => IsSyntaxTargetForGeneration(s, token),
+                                                                                                                                                 static (ctx, token) => GetSemanticTargetForGeneration(ctx, token));
 
-            // Output the diagnostics
-            context.RegisterSourceOutput(fieldsWithError.Where(x => x.Diagnostic is not null),
-                                         static (context, fwd) =>
-                                         {
-                                             var firstVariable = fwd.FieldSyntax.Declaration.Variables.First();
-                                             var error = Diagnostic.Create(fwd.Diagnostic!,
-                                                                           firstVariable.GetLocation(),
-                                                                           firstVariable.Identifier.Text);
+            IncrementalValuesProvider<AlwaysInitializedPropertyFieldDefinition> withErrors = allFields.Where(static m => m.DiagnosticDef.Initialized);
+            IncrementalValuesProvider<AlwaysInitializedPropertyFieldDefinition> withoutErrors = allFields.Where(static m => !m.DiagnosticDef.Initialized);
 
-                                             context.ReportDiagnostic(error);
+            context.RegisterSourceOutput(withErrors,
+                                         (productionContext, definition) => {
+
+                                             var error = Diagnostic.Create(definition.DiagnosticDef.Diagnostic!,
+                                                                           definition.DiagnosticDef.Location,
+                                                                           definition.DiagnosticDef.Parameter);
+
+                                             productionContext.ReportDiagnostic(error);
                                          });
+            
+            IncrementalValuesProvider<AlwaysInitializedPropertyClassDefinition> groupedFields
+                = withoutErrors.Collect().SelectMany((item, token) =>
+                                                     {
+                                                         // adapted from https://github.com/CommunityToolkit/dotnet/blob/e8969781afe537ea41a964a15b4ccfee32e095df/src/CommunityToolkit.Mvvm.SourceGenerators/ComponentModel/ObservablePropertyGenerator.cs
+                                                         Dictionary<ClassWithParentAndNamespaceDefinition, ImmutableArray<AlwaysInitializedPropertyFieldDefinition>.Builder> map = new();
 
-            // Get the filtered sequence to enable caching
-            IncrementalValuesProvider<(ClassDeclarationSyntax Parent, FieldDeclarationSyntax FieldSyntax)> classWithField 
-                = fieldsWithError.Where(static item => item.Diagnostic is null).Select((x, _) => ((ClassDeclarationSyntax)x.FieldSyntax.Parent!, x.FieldSyntax));
+                                                         foreach (var field in item)
+                                                         {
+                                                             ClassWithParentAndNamespaceDefinition key = new ClassWithParentAndNamespaceDefinition
+                                                                                                         {
+                                                                                                             ClassDef = field.ClassDef,
+                                                                                                             Namespace = field.Namespace,
+                                                                                                             ParentClasses = field.ParentClasses,
+                                                                                                             UsingStatements = field.UsingStatements
+                                                                                                         };
 
-            IncrementalValuesProvider<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)> groupedFields
-                = classWithField.Collect().SelectMany((item, token) =>
-                                                  {
-                                                      Dictionary<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> map = new();
+                                                             if (!map.TryGetValue(key,
+                                                                                  out ImmutableArray<AlwaysInitializedPropertyFieldDefinition>.Builder builder))
+                                                             {
+                                                                 builder = ImmutableArray.CreateBuilder<AlwaysInitializedPropertyFieldDefinition>();
 
-                                                      foreach ((ClassDeclarationSyntax, FieldDeclarationSyntax) pair in item)
-                                                      {
-                                                          ClassDeclarationSyntax key = pair.Item1;
-                                                          FieldDeclarationSyntax element = pair.Item2;
+                                                                 map.Add(key,
+                                                                         builder);
+                                                             }
 
-                                                          if (!map.TryGetValue(key,
-                                                                               out ImmutableArray<FieldDeclarationSyntax>.Builder builder))
-                                                          {
-                                                              builder = ImmutableArray.CreateBuilder<FieldDeclarationSyntax>();
+                                                             builder.Add(field);
+                                                         }
 
-                                                              map.Add(key,
-                                                                      builder);
-                                                          }
+                                                         token.ThrowIfCancellationRequested();
 
-                                                          builder.Add(element);
-                                                      }
+                                                         ImmutableArray<AlwaysInitializedPropertyClassDefinition>.Builder result = ImmutableArray.CreateBuilder<AlwaysInitializedPropertyClassDefinition>();
 
-                                                      token.ThrowIfCancellationRequested();
+                                                         foreach (KeyValuePair<ClassWithParentAndNamespaceDefinition, ImmutableArray<AlwaysInitializedPropertyFieldDefinition>.Builder> entry in map)
+                                                         {
+                                                             AlwaysInitializedPropertyClassDefinition newEntry = new AlwaysInitializedPropertyClassDefinition();
+                                                             newEntry.AdvClassDef = entry.Key;
+                                                             newEntry.Fields = entry.Value.ToImmutable();
 
-                                                      ImmutableArray<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)>.Builder result =
-                                                          ImmutableArray.CreateBuilder<(ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>)>();
+                                                             result.Add(newEntry);
+                                                         }
 
-                                                      foreach (KeyValuePair<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> entry in map)
-                                                      {
-                                                          result.Add((entry.Key, entry.Value.ToImmutable()));
-                                                      }
+                                                         //ImmutableArray<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)>.Builder result =
+                                                         //    ImmutableArray.CreateBuilder<(ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>)>();
 
-                                                      return result;
-                                                  });
+                                                         //foreach (KeyValuePair<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> entry in map)
+                                                         //{
+                                                         //    result.Add((entry.Key, entry.Value.ToImmutable()));
+                                                         //}
 
-            // Generate the requested properties and methods
-            context.RegisterSourceOutput(groupedFields, static (context, item) =>
-                                                        {
-                                                            var result = GeneratePartialClass(context,
-                                                                                              item.Key,
-                                                                                              item.Fields);
+                                                         return result;
+                                                     });
 
-                                                            context.AddSource(result.FileName,
-                                                                              result.Content);
-                                                        });
+            context.RegisterSourceOutput(groupedFields,
+                                         static (spc, source) => Execute(source, spc));
+
+            ///////////////////
+
+            //// Gather info for all annotated fields
+            //IncrementalValuesProvider<(FieldDeclarationSyntax FieldSyntax, DiagnosticDescriptor? Diagnostic)> fieldsWithError
+            //    = context.SyntaxProvider.ForAttributeWithMetadataName(AlwaysInitializedPropertyAttributeFqn,
+            //                                                          static (s, token) => IsSyntaxTargetForGeneration(s, token),
+            //                                                          static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
+            //             .Where(static m => m.FieldSyntax is not null)!;
+
+            //// Output the diagnostics
+            //context.RegisterSourceOutput(fieldsWithError.Where(x => x.Diagnostic is not null),
+            //                             static (context, fwd) =>
+            //                             {
+            //                                 var firstVariable = fwd.FieldSyntax.Declaration.Variables.First();
+            //                                 var error = Diagnostic.Create(fwd.Diagnostic!,
+            //                                                               firstVariable.GetLocation(),
+            //                                                               firstVariable.Identifier.Text);
+
+            //                                 context.ReportDiagnostic(error);
+            //                             });
+
+            //// Get the filtered sequence to enable caching
+            //IncrementalValuesProvider<(ClassDeclarationSyntax Parent, FieldDeclarationSyntax FieldSyntax)> classWithField 
+            //    = fieldsWithError.Where(static item => item.Diagnostic is null).Select((x, _) => ((ClassDeclarationSyntax)x.FieldSyntax.Parent!, x.FieldSyntax))
+            //                     //.WithComparer(new ClassAndFieldDeclarationSyntaxIsEquivalentToComparer())
+            //                     ;
+
+            //IncrementalValuesProvider<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)> groupedFields
+            //    = classWithField.Collect().SelectMany((item, token) =>
+            //                                      {
+            //                                          // adapted from https://github.com/CommunityToolkit/dotnet/blob/e8969781afe537ea41a964a15b4ccfee32e095df/src/CommunityToolkit.Mvvm.SourceGenerators/ComponentModel/ObservablePropertyGenerator.cs
+            //                                          Dictionary<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> map = new();
+
+            //                                          foreach ((ClassDeclarationSyntax, FieldDeclarationSyntax) pair in item)
+            //                                          {
+            //                                              ClassDeclarationSyntax key = pair.Item1;
+            //                                              FieldDeclarationSyntax element = pair.Item2;
+
+            //                                              if (!map.TryGetValue(key,
+            //                                                                   out ImmutableArray<FieldDeclarationSyntax>.Builder builder))
+            //                                              {
+            //                                                  builder = ImmutableArray.CreateBuilder<FieldDeclarationSyntax>();
+
+            //                                                  map.Add(key,
+            //                                                          builder);
+            //                                              }
+
+            //                                              builder.Add(element);
+            //                                          }
+
+            //                                          token.ThrowIfCancellationRequested();
+
+            //                                          ImmutableArray<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)>.Builder result =
+            //                                              ImmutableArray.CreateBuilder<(ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>)>();
+
+            //                                          foreach (KeyValuePair<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> entry in map)
+            //                                          {
+            //                                              result.Add((entry.Key, entry.Value.ToImmutable()));
+            //                                          }
+
+            //                                          return result;
+            //                                      })
+            //                    .WithComparer(new ClassDeclarationSyntaxWithFieldsIsEquivalentToComparer())
+            //                    ;
+
+            //// Generate the requested properties and methods
+            //context.RegisterSourceOutput(groupedFields, static (context, item) =>
+            //                                            {
+            //                                                var result = GeneratePartialClass(context,
+            //                                                                                  item.Key,
+            //                                                                                  item.Fields);
+
+            //                                                context.AddSource(result.FileName,
+            //                                                                  result.Content);
+            //                                            });
         }
 
-        private static (string FileName, SourceText Content) GeneratePartialClass(SourceProductionContext context, 
-                                                                                  ClassDeclarationSyntax classDeclarationSyntax, 
-                                                                                  ImmutableArray<FieldDeclarationSyntax> fields)
+        private static void Execute(AlwaysInitializedPropertyClassDefinition groupedFields, SourceProductionContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
-
-            var classToGenerate = new AlwaysInitializedPropertyClassToGenerate(classDeclarationSyntax,
-                                                                               fields,
-                                                                               ns);
-
             var sb = new IndentedStringBuilder();
             var classBuilder = new AlwaysInitializedPropertyClassBuilder();
-            var result = classBuilder.Generate(sb, classToGenerate);
+            classBuilder.Generate(sb, ref groupedFields);
 
-            return (result.FileName!,
-                    SourceText.From(sb.ToString(),
-                                    Encoding.UTF8));
+            var filename = GenericClassBuilder.GenerateFilename(groupedFields.AdvClassDef.ClassDef.Name,
+                                                                groupedFields.AdvClassDef.ClassDef,
+                                                                groupedFields.AdvClassDef.Namespace!,
+                                                                groupedFields.AdvClassDef.ParentClasses);
+
+            context.AddSource(filename,
+                              SourceText.From(sb.ToString(),
+                                              Encoding.UTF8));
+
         }
+
+        //private static (string FileName, SourceText Content) GeneratePartialClass(SourceProductionContext context, 
+        //                                                                          ClassDeclarationSyntax classDeclarationSyntax, 
+        //                                                                          ImmutableArray<FieldDeclarationSyntax> fields)
+        //{
+        //    context.CancellationToken.ThrowIfCancellationRequested();
+
+        //    var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
+
+        //    var classToGenerate = new AlwaysInitializedPropertyClassToGenerate(classDeclarationSyntax,
+        //                                                                       fields,
+        //                                                                       ns);
+
+        //    var sb = new IndentedStringBuilder();
+        //    var classBuilder = new AlwaysInitializedPropertyClassBuilder();
+        //    var result = classBuilder.Generate(sb, classToGenerate);
+
+        //    return (result.FileName!,
+        //            SourceText.From(sb.ToString(),
+        //                            Encoding.UTF8));
+        //}
 
         private static bool IsSyntaxTargetForGeneration(SyntaxNode syntaxNode, CancellationToken token)
         {
@@ -122,81 +222,182 @@ namespace NoWoL.SourceGenerators
                     && syntaxNode.IsKind(SyntaxKind.VariableDeclarator); // validating the parent first to help with code coverage
         }
 
-        private static (FieldDeclarationSyntax? FieldSyntax, DiagnosticDescriptor? Diagnostic) GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext ctx, CancellationToken token)
+        private static AlwaysInitializedPropertyFieldDefinition GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext ctx, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
             var fieldSyntax = (FieldDeclarationSyntax)ctx.TargetNode.Parent!.Parent!;
 
-            if (!TryValidateTarget(ctx,
-                                   fieldSyntax,
-                                   out var diag,
-                                   out var ns))
-            {
-                return (fieldSyntax, diag);
-            }
+            var def = new AlwaysInitializedPropertyFieldDefinition();
 
-            return (fieldSyntax, null);
+            PopulateTarget(ctx,
+                           fieldSyntax,
+                           ref def);
+
+            return def;
+
+            //if (!TryValidateTarget(ctx,
+            //                       fieldSyntax,
+            //                       out var diag,
+            //                       out var ns))
+            //{
+            //    return (fieldSyntax, diag);
+            //}
+
+            //return (fieldSyntax, null);
         }
+        
+        //private static (FieldDeclarationSyntax? FieldSyntax, DiagnosticDescriptor? Diagnostic) GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext ctx, CancellationToken token)
+        //{
+        //    token.ThrowIfCancellationRequested();
 
-        internal static bool TryValidateTarget(GeneratorAttributeSyntaxContext context, FieldDeclarationSyntax target, out DiagnosticDescriptor? diagnosticToReport, out string? ns)
+        //    var fieldSyntax = (FieldDeclarationSyntax)ctx.TargetNode.Parent!.Parent!;
+
+        //    if (!TryValidateTarget(ctx,
+        //                           fieldSyntax,
+        //                           out var diag,
+        //                           out var ns))
+        //    {
+        //        return (fieldSyntax, diag);
+        //    }
+
+        //    return (fieldSyntax, null);
+        //}
+
+        internal static bool PopulateTarget(GeneratorAttributeSyntaxContext context, 
+                                            FieldDeclarationSyntax target, 
+                                            ref AlwaysInitializedPropertyFieldDefinition def)
         {
+            var cls = (target.Parent as ClassDeclarationSyntax)!;
+
+            def.Name = GenerationHelpers.GetFieldIdentifierText(target);
+            def.Type = target.Declaration.Type.ToString();
+            def.LeadingTrivia = target.HasLeadingTrivia ? target.GetLeadingTrivia().ToString() : null;
+
             if (target.Parent is not ClassDeclarationSyntax)
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldMustBeInClass;
-                ns = null;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldMustBeInClass,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
-            var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
-            if (parentClasses.Any(x => !GenerationHelpers.IsPartialType(x)))
+            def.ClassDef = new ClassDefinition
+                           {
+                               Name = cls.Identifier.ValueText,
+                               Modifier = String.Join(" ", cls.Modifiers.Select(x => x.ValueText))
+                           };
+
+            if (!GenerationHelpers.IsPartialType(cls))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.MustBeInParentPartialClass;
-                ns = null;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.MustBeInParentPartialClass,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
+            }
+
+            var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Skip(1).Reverse();
+
+            foreach (var parentClass in parentClasses)
+            {
+                if (!GenerationHelpers.IsPartialType(parentClass))
+                {
+                    def.SetDiagnostic(new DiagnosticDefinition
+                                      {
+                                          Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.MustBeInParentPartialClass,
+                                          Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                          Parameter = def.Name,
+                                          Initialized = true
+                                      });
+
+                    return false;
+                }
+
+                def.ParentClasses ??= new List<ClassDefinition>();
+
+                def.ParentClasses.Add(new ClassDefinition
+                                      {
+                                          Name = parentClass.Identifier.ValueText,
+                                          Modifier = String.Join(" ",
+                                                                 parentClass.Modifiers.Select(x => x.ValueText))
+                                      });
             }
 
             if (!target.Modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldMustBePrivate;
-                ns = null;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldMustBePrivate,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
             if (target.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword)))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldCannotBeStatic;
-                ns = null;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldCannotBeStatic,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
             if (target.Modifiers.Any(m => m.IsKind(SyntaxKind.ReadOnlyKeyword)))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldCannotBeReadOnly;
-                ns = null;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldCannotBeReadOnly,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
             if (target.Declaration.Variables.Count != 1)
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.OnlyOneFieldCanBeDeclared;
-                ns = null;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.OnlyOneFieldCanBeDeclared,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
-            var parentClass = (ClassDeclarationSyntax)target.Parent;
+            var parentClassSyntax = (ClassDeclarationSyntax)target.Parent;
 
-            ns = GenerationHelpers.GetNamespace(parentClass);
+            def.Namespace = GenerationHelpers.GetNamespace(parentClassSyntax);
 
-            if (String.IsNullOrWhiteSpace(ns))
+            if (String.IsNullOrWhiteSpace(def.Namespace))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldMustBeInNamespace;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldMustBeInNamespace,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
@@ -206,7 +407,13 @@ namespace NoWoL.SourceGenerators
 
             if (typeSymbol.Type is IErrorTypeSymbol)
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustExist;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustExist,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
@@ -216,21 +423,50 @@ namespace NoWoL.SourceGenerators
             if (typeSymbol.Type is { IsValueType: true }
                 || typeSymbol.Type!.Equals(stringSymbol, SymbolEqualityComparer.Default))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustBeAReferenceType;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustBeAReferenceType,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
             var members = typeSymbol.Type!.GetMembers(".ctor");
 
-            if (!members.OfType<IMethodSymbol>().Any(x => x.Parameters.IsEmpty))
+            if (!members.OfType<IMethodSymbol>().Any(x => x.Parameters.IsDefaultOrEmpty))
             {
-                diagnosticToReport = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustHaveParameterlessConstructor;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = AlwaysInitializedPropertyGeneratorDescriptors.FieldTypeMustHaveParameterlessConstructor,
+                                      Location = GenerationHelpers.GetFieldIdentifierLocation(target),
+                                      Parameter = def.Name,
+                                      Initialized = true
+                                  });
 
                 return false;
             }
 
-            diagnosticToReport = null;
+            var usingStatements = cls.Ancestors().Where(x => x.IsKind(SyntaxKind.CompilationUnit)).OfType<CompilationUnitSyntax>();
+            var hasUsigns = false;
+            ImmutableArray<string>.Builder usingBuilder = ImmutableArray.CreateBuilder<string>();
+            
+            foreach (var usingStatement in usingStatements)
+            {
+                foreach (var usingDirectiveSyntax in usingStatement.Usings)
+                {
+                    hasUsigns = true;
+
+                    usingBuilder.Add(usingDirectiveSyntax.Name.ToString());
+                }
+            }
+
+            if (hasUsigns)
+            {
+                def.UsingStatements = usingBuilder.ToImmutable();
+            }
 
             return true;
         }

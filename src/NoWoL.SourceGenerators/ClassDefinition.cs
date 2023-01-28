@@ -2,7 +2,7 @@
 
 namespace NoWoL.SourceGenerators
 {
-    public struct ClassDefinition : IEquatable<ClassDefinition>
+    internal struct ClassDefinition : IEquatable<ClassDefinition>
     {
         public string Name { get; set; }
 

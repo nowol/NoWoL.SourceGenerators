@@ -22,14 +22,11 @@ namespace NoWoL.SourceGenerators
                                                                                                                      EmbeddedResourceLoader.ExceptionGeneratorAttributeFileName)!,
                                                                                           Encoding.UTF8)));
 
-            IncrementalValuesProvider<ExceptionClassDefinition> withErrors = context.SyntaxProvider.ForAttributeWithMetadataName(ExceptionGeneratorAttributeFqn,
+            IncrementalValuesProvider<ExceptionClassDefinition> allClasses = context.SyntaxProvider.ForAttributeWithMetadataName(ExceptionGeneratorAttributeFqn,
                                                                                                                                  static (s, token) => IsSyntaxTargetForGeneration(s, token),
-                                                                                                                                 static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
-                                                                                    .Where(static m => m.DiagnosticDef.Initialized);
-            IncrementalValuesProvider<ExceptionClassDefinition> withoutErrors = context.SyntaxProvider.ForAttributeWithMetadataName(ExceptionGeneratorAttributeFqn,
-                                                                                                                                    static (s, token) => IsSyntaxTargetForGeneration(s, token),
-                                                                                                                                    static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
-                                                                                       .Where(static m => !m.DiagnosticDef.Initialized);
+                                                                                                                                 static (ctx, token) => GetSemanticTargetForGeneration(ctx, token));
+            IncrementalValuesProvider<ExceptionClassDefinition> withErrors = allClasses.Where(static m => m.DiagnosticDef.Initialized);
+            IncrementalValuesProvider<ExceptionClassDefinition> withoutErrors = allClasses.Where(static m => !m.DiagnosticDef.Initialized);
 
             context.RegisterSourceOutput(withErrors,
                                          (productionContext, definition) => {
