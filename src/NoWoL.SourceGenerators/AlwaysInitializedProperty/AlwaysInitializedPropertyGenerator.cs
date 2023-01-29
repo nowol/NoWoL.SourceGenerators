@@ -83,95 +83,11 @@ namespace NoWoL.SourceGenerators
                                                              result.Add(newEntry);
                                                          }
 
-                                                         //ImmutableArray<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)>.Builder result =
-                                                         //    ImmutableArray.CreateBuilder<(ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>)>();
-
-                                                         //foreach (KeyValuePair<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> entry in map)
-                                                         //{
-                                                         //    result.Add((entry.Key, entry.Value.ToImmutable()));
-                                                         //}
-
                                                          return result;
                                                      });
 
             context.RegisterSourceOutput(groupedFields,
                                          static (spc, source) => Execute(source, spc));
-
-            ///////////////////
-
-            //// Gather info for all annotated fields
-            //IncrementalValuesProvider<(FieldDeclarationSyntax FieldSyntax, DiagnosticDescriptor? Diagnostic)> fieldsWithError
-            //    = context.SyntaxProvider.ForAttributeWithMetadataName(AlwaysInitializedPropertyAttributeFqn,
-            //                                                          static (s, token) => IsSyntaxTargetForGeneration(s, token),
-            //                                                          static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
-            //             .Where(static m => m.FieldSyntax is not null)!;
-
-            //// Output the diagnostics
-            //context.RegisterSourceOutput(fieldsWithError.Where(x => x.Diagnostic is not null),
-            //                             static (context, fwd) =>
-            //                             {
-            //                                 var firstVariable = fwd.FieldSyntax.Declaration.Variables.First();
-            //                                 var error = Diagnostic.Create(fwd.Diagnostic!,
-            //                                                               firstVariable.GetLocation(),
-            //                                                               firstVariable.Identifier.Text);
-
-            //                                 context.ReportDiagnostic(error);
-            //                             });
-
-            //// Get the filtered sequence to enable caching
-            //IncrementalValuesProvider<(ClassDeclarationSyntax Parent, FieldDeclarationSyntax FieldSyntax)> classWithField 
-            //    = fieldsWithError.Where(static item => item.Diagnostic is null).Select((x, _) => ((ClassDeclarationSyntax)x.FieldSyntax.Parent!, x.FieldSyntax))
-            //                     //.WithComparer(new ClassAndFieldDeclarationSyntaxIsEquivalentToComparer())
-            //                     ;
-
-            //IncrementalValuesProvider<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)> groupedFields
-            //    = classWithField.Collect().SelectMany((item, token) =>
-            //                                      {
-            //                                          // adapted from https://github.com/CommunityToolkit/dotnet/blob/e8969781afe537ea41a964a15b4ccfee32e095df/src/CommunityToolkit.Mvvm.SourceGenerators/ComponentModel/ObservablePropertyGenerator.cs
-            //                                          Dictionary<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> map = new();
-
-            //                                          foreach ((ClassDeclarationSyntax, FieldDeclarationSyntax) pair in item)
-            //                                          {
-            //                                              ClassDeclarationSyntax key = pair.Item1;
-            //                                              FieldDeclarationSyntax element = pair.Item2;
-
-            //                                              if (!map.TryGetValue(key,
-            //                                                                   out ImmutableArray<FieldDeclarationSyntax>.Builder builder))
-            //                                              {
-            //                                                  builder = ImmutableArray.CreateBuilder<FieldDeclarationSyntax>();
-
-            //                                                  map.Add(key,
-            //                                                          builder);
-            //                                              }
-
-            //                                              builder.Add(element);
-            //                                          }
-
-            //                                          token.ThrowIfCancellationRequested();
-
-            //                                          ImmutableArray<(ClassDeclarationSyntax Key, ImmutableArray<FieldDeclarationSyntax> Fields)>.Builder result =
-            //                                              ImmutableArray.CreateBuilder<(ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>)>();
-
-            //                                          foreach (KeyValuePair<ClassDeclarationSyntax, ImmutableArray<FieldDeclarationSyntax>.Builder> entry in map)
-            //                                          {
-            //                                              result.Add((entry.Key, entry.Value.ToImmutable()));
-            //                                          }
-
-            //                                          return result;
-            //                                      })
-            //                    .WithComparer(new ClassDeclarationSyntaxWithFieldsIsEquivalentToComparer())
-            //                    ;
-
-            //// Generate the requested properties and methods
-            //context.RegisterSourceOutput(groupedFields, static (context, item) =>
-            //                                            {
-            //                                                var result = GeneratePartialClass(context,
-            //                                                                                  item.Key,
-            //                                                                                  item.Fields);
-
-            //                                                context.AddSource(result.FileName,
-            //                                                                  result.Content);
-            //                                            });
         }
 
         private static void Execute(AlwaysInitializedPropertyClassDefinition groupedFields, SourceProductionContext context)
@@ -192,27 +108,6 @@ namespace NoWoL.SourceGenerators
                                               Encoding.UTF8));
 
         }
-
-        //private static (string FileName, SourceText Content) GeneratePartialClass(SourceProductionContext context, 
-        //                                                                          ClassDeclarationSyntax classDeclarationSyntax, 
-        //                                                                          ImmutableArray<FieldDeclarationSyntax> fields)
-        //{
-        //    context.CancellationToken.ThrowIfCancellationRequested();
-
-        //    var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
-
-        //    var classToGenerate = new AlwaysInitializedPropertyClassToGenerate(classDeclarationSyntax,
-        //                                                                       fields,
-        //                                                                       ns);
-
-        //    var sb = new IndentedStringBuilder();
-        //    var classBuilder = new AlwaysInitializedPropertyClassBuilder();
-        //    var result = classBuilder.Generate(sb, classToGenerate);
-
-        //    return (result.FileName!,
-        //            SourceText.From(sb.ToString(),
-        //                            Encoding.UTF8));
-        //}
 
         private static bool IsSyntaxTargetForGeneration(SyntaxNode syntaxNode, CancellationToken token)
         {
@@ -235,34 +130,7 @@ namespace NoWoL.SourceGenerators
                            ref def);
 
             return def;
-
-            //if (!TryValidateTarget(ctx,
-            //                       fieldSyntax,
-            //                       out var diag,
-            //                       out var ns))
-            //{
-            //    return (fieldSyntax, diag);
-            //}
-
-            //return (fieldSyntax, null);
         }
-        
-        //private static (FieldDeclarationSyntax? FieldSyntax, DiagnosticDescriptor? Diagnostic) GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext ctx, CancellationToken token)
-        //{
-        //    token.ThrowIfCancellationRequested();
-
-        //    var fieldSyntax = (FieldDeclarationSyntax)ctx.TargetNode.Parent!.Parent!;
-
-        //    if (!TryValidateTarget(ctx,
-        //                           fieldSyntax,
-        //                           out var diag,
-        //                           out var ns))
-        //    {
-        //        return (fieldSyntax, diag);
-        //    }
-
-        //    return (fieldSyntax, null);
-        //}
 
         internal static bool PopulateTarget(GeneratorAttributeSyntaxContext context, 
                                             FieldDeclarationSyntax target, 
@@ -272,7 +140,7 @@ namespace NoWoL.SourceGenerators
 
             def.Name = GenerationHelpers.GetFieldIdentifierText(target);
             def.Type = target.Declaration.Type.ToString();
-            def.LeadingTrivia = target.HasLeadingTrivia ? target.GetLeadingTrivia().ToString() : null;
+            def.LeadingTrivia = target.GetLeadingTrivia().ToString();
 
             if (target.Parent is not ClassDeclarationSyntax)
             {

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Text;
 using Moq;
 using Xunit;
 
@@ -476,6 +477,58 @@ namespace NoWoL.SourceGenerators.Tests
         public void ConvertAlwaysInitializedPropertyGeneratorErrorCodeThrowsForOutOfRangeValue()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => SourceGenerators.GenerationHelpers.ConvertErrorCode((AlwaysInitializedPropertyGeneratorErrorCode)666));
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetFieldIdentifierTextReturnsTextOfFirstVariable()
+        {
+            var field = SyntaxFactory.FieldDeclaration(SyntaxFactory.VariableDeclaration(SyntaxFactory.ParseTypeName("System.String"),
+                                                                                         SyntaxFactory.SeparatedList(new [] { SyntaxFactory.VariableDeclarator("Texto") })));
+            var value = SourceGenerators.GenerationHelpers.GetFieldIdentifierText(field);
+
+            Assert.Equal("Texto",
+                         value);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetFieldIdentifierTextReturnsDefaultValue()
+        {
+            var field = SyntaxFactory.FieldDeclaration(SyntaxFactory.VariableDeclaration(SyntaxFactory.ParseTypeName("System.String"),
+                                                                                         SyntaxFactory.SeparatedList(Array.Empty<VariableDeclaratorSyntax>())));
+            var value = SourceGenerators.GenerationHelpers.GetFieldIdentifierText(field);
+
+            Assert.Equal("",
+                         value);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetFieldIdentifierLocationReturnsLocationOfFirstVariable()
+        {
+            var field = SyntaxFactory.FieldDeclaration(SyntaxFactory.VariableDeclaration(SyntaxFactory.ParseTypeName("System.String"),
+                                                                                         SyntaxFactory.SeparatedList(new [] { SyntaxFactory.VariableDeclarator("Texto") })));
+
+            var fieldLocation = SourceGenerators.GenerationHelpers.GetFieldIdentifierLocation(field);
+
+            Assert.Equal(TextSpan.FromBounds(13, 18),
+                         fieldLocation!.SourceSpan);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public void GetFieldIdentifierLocationReturnsDefaultValue()
+        {
+            var field = SyntaxFactory.FieldDeclaration(SyntaxFactory.VariableDeclaration(SyntaxFactory.ParseTypeName("System.String"),
+                                                                                         SyntaxFactory.SeparatedList(Array.Empty<VariableDeclaratorSyntax>())));
+            var value = SourceGenerators.GenerationHelpers.GetFieldIdentifierLocation(field);
+
+            Assert.Null(value);
         }
     }
 }
