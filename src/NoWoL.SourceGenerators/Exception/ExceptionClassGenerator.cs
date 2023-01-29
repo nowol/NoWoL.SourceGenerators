@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,9 +13,6 @@ namespace NoWoL.SourceGenerators
     [Generator]
     public class ExceptionClassGenerator : IIncrementalGenerator
     {
-        // This class was inspired from NetEscapades.EnumGenerators
-        // https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
-
         private const string ExceptionGeneratorAttributeFqn = "NoWoL.SourceGenerators.ExceptionGeneratorAttribute";
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -26,16 +22,43 @@ namespace NoWoL.SourceGenerators
                                                                                                                      EmbeddedResourceLoader.ExceptionGeneratorAttributeFileName)!,
                                                                                           Encoding.UTF8)));
 
-            IncrementalValuesProvider<ClassDeclarationSyntax> classDeclarations = context.SyntaxProvider.ForAttributeWithMetadataName(ExceptionGeneratorAttributeFqn,
-                                                                                                                                      static (s, token) => IsSyntaxTargetForGeneration(s, token),
-                                                                                                                                      static (ctx, token) => GetSemanticTargetForGeneration(ctx, token))
-                                                                                         .Where(static m => m is not null)!;
+            IncrementalValuesProvider<ExceptionClassDefinition> allClasses = context.SyntaxProvider.ForAttributeWithMetadataName(ExceptionGeneratorAttributeFqn,
+                                                                                                                                 static (s, token) => IsSyntaxTargetForGeneration(s, token),
+                                                                                                                                 static (ctx, token) => GetSemanticTargetForGeneration(ctx, token));
+            IncrementalValuesProvider<ExceptionClassDefinition> withErrors = allClasses.Where(static m => m.DiagnosticDef.Initialized);
+            IncrementalValuesProvider<ExceptionClassDefinition> withoutErrors = allClasses.Where(static m => !m.DiagnosticDef.Initialized);
 
-            IncrementalValuesProvider<(ClassDeclarationSyntax ClassDef, Compilation Compilation)> compilationAndClasses
-                = classDeclarations.Combine(context.CompilationProvider);
+            context.RegisterSourceOutput(withErrors,
+                                         (productionContext, definition) => {
 
-            context.RegisterSourceOutput(compilationAndClasses,
-                                         static (spc, source) => Execute(source.Compilation, source.ClassDef, spc));
+                                             var error = Diagnostic.Create(definition.DiagnosticDef.Diagnostic!,
+                                                                           definition.DiagnosticDef.Location,
+                                                                           definition.DiagnosticDef.Parameter);
+
+                                             productionContext.ReportDiagnostic(error);
+                                         });
+
+            context.RegisterSourceOutput(withoutErrors,
+                                         static (spc, source) => Execute(source, spc));
+        }
+
+        private static void Execute(ExceptionClassDefinition classDefinition, SourceProductionContext context)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var sb = new IndentedStringBuilder();
+            var classBuilder = new ExceptionClassBuilder();
+            classBuilder.GenerateException(sb, ref classDefinition);
+
+            var filename = GenericClassBuilder.GenerateFilename(classDefinition.ClassDef.Name,
+                                                                classDefinition.ClassDef,
+                                                                classDefinition.Namespace!,
+                                                                classDefinition.ParentClasses);
+
+            context.AddSource(filename,
+                              SourceText.From(sb.ToString(),
+                                              Encoding.UTF8));
+
         }
 
         private static bool IsSyntaxTargetForGeneration(SyntaxNode node, CancellationToken cancellationToken)
@@ -45,120 +68,91 @@ namespace NoWoL.SourceGenerators
             return node.IsKind(SyntaxKind.ClassDeclaration);
         }
 
-        private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
+        private static ExceptionClassDefinition GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            // we know the node is a ClassDeclarationSyntax thanks to IsSyntaxTargetForGeneration
-            return (ClassDeclarationSyntax)context.TargetNode;
-        }
+            var cls = (ClassDeclarationSyntax)context.TargetNode;
 
-        private static void Execute(Compilation compilation, ClassDeclarationSyntax classDeclarationSyntax, SourceProductionContext context)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
+            var def = new ExceptionClassDefinition();
 
-            var executionValidationResult = CanExecute(compilation,
-                                                       classDeclarationSyntax,
-                                                       context);
+            var ns = GenerationHelpers.GetNamespace(cls);
 
-            if (!executionValidationResult.IsSuccess())
+            def.ClassDef = new ClassDefinition {
+                                                   Name = cls.Identifier.ValueText,
+                                                   Modifier = String.Join(" ", cls.Modifiers.Select(x => x.ValueText))
+                                               };
+            def.Namespace = ns;
+
+            if (!GenerationHelpers.IsPartialType(cls))
             {
-                return;
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = ExceptionGeneratorDescriptors.MethodMustBePartial,
+                                      Location = cls.Identifier.GetLocation(),
+                                      Parameter = cls.Identifier.Text,
+                                      Initialized = true
+                                  });
             }
 
-            var exceptionAttribute = executionValidationResult.ExceptionAttribute!;
-            var classSymbol = executionValidationResult.ClassSymbol!;
-            var ns = executionValidationResult.Ns!;
-
-            var exceptionAttributes = classSymbol.GetAttributes().Where(x => exceptionAttribute.Equals(x.AttributeClass, SymbolEqualityComparer.Default)).ToList();
-
-            var classToGenerate = new ExceptionClassToGenerate(classDeclarationSyntax,
-                                                               exceptionAttributes,
-                                                               ns);
-
-            var sb = new IndentedStringBuilder();
-            var classBuilder = new ExceptionClassBuilder();
-            var result = classBuilder.GenerateException(sb, classToGenerate);
-            context.AddSource(result.FileName!,
-                              SourceText.From(sb.ToString(),
-                                              Encoding.UTF8));
-        }
-
-        private static CanExecuteValidationResult CanExecute(Compilation compilation,
-                                                             ClassDeclarationSyntax classDeclarationSyntax,
-                                                             SourceProductionContext context)
-        {
-            var ns = GenerationHelpers.GetNamespace(classDeclarationSyntax);
-
-            if (!TryValidateTarget(classDeclarationSyntax, ns, out var diagnosticToReport))
+            if (String.IsNullOrWhiteSpace(def.Namespace))
             {
-                var error = Diagnostic.Create(diagnosticToReport!,
-                                              classDeclarationSyntax.Identifier.GetLocation(),
-                                              classDeclarationSyntax.Identifier.Text);
-                context.ReportDiagnostic(error);
-
-                return new CanExecuteValidationResult(null, null, ns);
+                def.SetDiagnostic(new DiagnosticDefinition
+                                  {
+                                      Diagnostic = ExceptionGeneratorDescriptors.MethodClassMustBeInNamespace,
+                                      Location = cls.Identifier.GetLocation(),
+                                      Parameter = cls.Identifier.Text,
+                                      Initialized = true
+                                  });
             }
 
-            var exceptionAttribute = compilation.GetTypeByMetadataName(ExceptionGeneratorAttributeFqn);
+            var parentClasses = cls.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>().Reverse();
 
-            SemanticModel semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-            var classSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax,
-                                                              context.CancellationToken);
-
-            return new CanExecuteValidationResult(exceptionAttribute, classSymbol, ns);
-        }
-
-        internal static bool TryValidateTarget(ClassDeclarationSyntax target, string? ns, out DiagnosticDescriptor? diagnosticToReport)
-        {
-            if (!GenerationHelpers.IsPartialType(target))
+            foreach (var parentClass in parentClasses)
             {
-                diagnosticToReport = ExceptionGeneratorDescriptors.MethodMustBePartial;
+                if (!GenerationHelpers.IsPartialType(parentClass))
+                {
+                    def.SetDiagnostic(new DiagnosticDefinition
+                                      {
+                                          Diagnostic = ExceptionGeneratorDescriptors.MustBeInParentPartialClass,
+                                          Location = cls.Identifier.GetLocation(),
+                                          Parameter = cls.Identifier.Text,
+                                          Initialized = true
+                                      });
+                }
 
-                return false;
+                def.ParentClasses ??= new List<ClassDefinition>();
+
+                def.ParentClasses.Add(new ClassDefinition
+                                      {
+                                          Name = parentClass.Identifier.ValueText,
+                                          Modifier = String.Join(" ",
+                                                                 parentClass.Modifiers.Select(x => x.ValueText))
+                                      });
             }
 
-            if (String.IsNullOrWhiteSpace(ns))
+            var exceptionAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(ExceptionGeneratorAttributeFqn);
+
+            var classSymbol = context.SemanticModel.GetDeclaredSymbol(cls,
+                                                                      cancellationToken)!;
+            var exceptionAttributes = classSymbol.GetAttributes().Where(x => exceptionAttribute!.Equals(x.AttributeClass, SymbolEqualityComparer.Default));
+
+            foreach (var exceptionAttr in exceptionAttributes)
             {
-                diagnosticToReport = ExceptionGeneratorDescriptors.MethodClassMustBeInNamespace;
+                if (exceptionAttr.ConstructorArguments.Length == 1)
+                {
+                    var msg = exceptionAttr.ConstructorArguments[0].Value as string;
 
-                return false;
+                    if (!String.IsNullOrWhiteSpace(msg))
+                    {
+                        def.Messages ??= new List<string>();
+
+                        def.Messages.Add(msg!);
+                    }
+                }
             }
-
-            var parentClasses = target.Ancestors().Where(x => x.IsKind(SyntaxKind.ClassDeclaration)).OfType<ClassDeclarationSyntax>();
-            if (parentClasses.Any(x => !GenerationHelpers.IsPartialType(x)))
-            {
-                diagnosticToReport = ExceptionGeneratorDescriptors.MustBeInParentPartialClass;
-
-                return false;
-            }
-
-            diagnosticToReport = null;
-
-            return true;
-        }
-
-        private readonly struct CanExecuteValidationResult
-        {
-            public INamedTypeSymbol? ExceptionAttribute { get; }
-
-            public INamedTypeSymbol? ClassSymbol { get; }
-
-            public string? Ns { get; }
-
-            public CanExecuteValidationResult(INamedTypeSymbol? exceptionAttribute, INamedTypeSymbol? classSymbol, string? ns)
-            {
-                ExceptionAttribute = exceptionAttribute;
-                ClassSymbol = classSymbol;
-                Ns = ns;
-            }
-
-            public bool IsSuccess()
-            {
-                return ExceptionAttribute != null
-                       && ClassSymbol != null
-                       && Ns != null;
-            }
+            
+            return def;
         }
     }
 }

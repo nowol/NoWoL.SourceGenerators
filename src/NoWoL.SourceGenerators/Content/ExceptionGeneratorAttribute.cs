@@ -5,7 +5,7 @@
     /// </summary>
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("NoWoL.SourceGenerators", null)]
-    public class ExceptionGeneratorAttribute : System.Attribute
+    internal class ExceptionGeneratorAttribute : System.Attribute
     {
         /// <summary>
         /// Message of the exception

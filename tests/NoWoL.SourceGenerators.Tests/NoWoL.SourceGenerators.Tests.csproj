@@ -32,7 +32,7 @@
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithMultipleFields.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneField.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneField.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass_bb0f0e5f6ff86b2810a82b6605eed0a0.cs" />
+	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass3_d7ea8fe71373ab67b838a04b235408e2.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Initial.cs" />
@@ -102,13 +102,16 @@
 	  <Compile Remove="Content\TestFiles\AsyncRemover\ReturnsValueTaskDirectly.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\TwoAsyncMethodsToConvert.Generated.TestClass_MainMethod1_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\TwoAsyncMethodsToConvert.Generated.TestClass_MainMethod2_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\TwoAsyncMethodsToConvert.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwait.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwait.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WithConfigureAwaitWithCulture.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Generated.ITestInterface_MainMethod_65650ea3493880c7af62d03af2c85929.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Initial.cs" />
-	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Generated.ITestInterface_MainMethod_6c79eb6cee7b6c23fd70ff35fe391162.cs" />
+	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Generated.ITestInterface_MainMethod_c12ed62c3e7d81b306b8fee0644799b7.cs" />
 	  <Compile Remove="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassInternalAbstract_beff2dfef43d1fe0d9ecb4ea7fb4d6eb.cs" />
 	  <Compile Remove="Content\TestFiles\ClassModifiersShouldBePreserved.Generated.TestClassInternal_d2b3daa975bdb1a40870e041ade49f89.cs" />
@@ -158,7 +161,7 @@
 	  <Compile Remove="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
-	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_3f09774f3ea0ded540bc58382252aeca.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_d929c8f74755a926010ad94bb623242a.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\TestedNamespaceShouldSucceed.Generated.TestClass_a383433eba2b14850b3edf28962b30d7.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\TestedNamespaceShouldSucceed.Initial.cs" />
@@ -211,7 +214,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldWithXmlDoc.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneInitializedField.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneInitializedField.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass_bb0f0e5f6ff86b2810a82b6605eed0a0.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Generated.TestClass3_d7ea8fe71373ab67b838a04b235408e2.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNestedNamespace.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AlwaysInitializedProperty\GenerateClassWithOneFieldNewNamespaceSyntax.Initial.cs" />
@@ -221,9 +224,12 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithParameters.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithoutParameters.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\AsyncWithoutParameters.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TwoAsyncMethodsToConvert.Generated.TestClass_MainMethod2_ff77a22886df145d140e4b748d44b619.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TwoAsyncMethodsToConvert.Generated.TestClass_MainMethod1_ff77a22886df145d140e4b748d44b619.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TwoAsyncMethodsToConvert.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\RemoveCancellationToken.Generated.InnerTestClass_MainMethod_2fcbcd8ec33f06ae813d420cb6a6a49e.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\RemoveCancellationToken.Initial.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Generated.ITestInterface_MainMethod_6c79eb6cee7b6c23fd70ff35fe391162.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Generated.ITestInterface_MainMethod_c12ed62c3e7d81b306b8fee0644799b7.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethodsInNestedClasses.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Generated.ITestInterface_MainMethod_65650ea3493880c7af62d03af2c85929.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\WorksWithInterfaceMethods.Initial.cs" />
@@ -312,7 +318,7 @@
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldMustBePartial.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\ExceptionCannotBeDuplicated.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
-	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_3f09774f3ea0ded540bc58382252aeca.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_d929c8f74755a926010ad94bb623242a.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\NestedClassesShouldSucceed.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\TestedNamespaceShouldSucceed.Generated.TestClass_a383433eba2b14850b3edf28962b30d7.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\TestedNamespaceShouldSucceed.Initial.cs" />

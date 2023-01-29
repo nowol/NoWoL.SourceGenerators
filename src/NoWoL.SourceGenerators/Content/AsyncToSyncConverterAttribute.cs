@@ -5,7 +5,7 @@
     /// </summary>
     [System.AttributeUsage(System.AttributeTargets.Method, Inherited = false)]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("NoWoL.SourceGenerators", null)]
-    public class AsyncToSyncConverterAttribute : System.Attribute
+    internal class AsyncToSyncConverterAttribute : System.Attribute
     {
     }
 }

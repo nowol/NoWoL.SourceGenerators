@@ -17,5 +17,8 @@ namespace Test
 
         [NoWoL.SourceGenerators.AlwaysInitializedProperty]
         private List<int> _field4;
+
+        [NoWoL.SourceGenerators.AlwaysInitializedProperty]
+        private List<int> _field5;
     }
 }

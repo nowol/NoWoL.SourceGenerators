@@ -355,5 +355,13 @@ namespace NoWoL.SourceGenerators.Tests
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);
         }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
+        public async Task TwoAsyncMethodsToConvert()
+        {
+            await WithWithEmbeddedFiles().ConfigureAwait(false);
+        }
     }
 }

@@ -95,8 +95,9 @@ public partial class TestClass
 
 ## AsyncToSyncConverterGenerator Usage
 
-This generator uses simple rules to convert async code to their sync version:
+Experimental generator uses simple rules to convert async code to their sync version:
 
+* Caching of the generated code, used by Visual Studio, can be a bit wonky.
 * The name of the method must end with `Async`. The generator does not validate if a non-async version of the method exists.
 * The generated method will have the same access modifiers as the original method.
 * Awaitable local functions must end with `Async`. The generator does not validate if a non-async version of the location function exists.
@@ -205,6 +206,7 @@ Useful information for creating source generators:
 
 * Presentation by Andrey Dyatlov: https://youtu.be/052xutD86uI
 * List of existing source generators: https://github.com/amis92/csharp-source-generators
+* https://www.thinktecture.com/en/net/roslyn-source-generators-performance/
 * https://andrewlock.net/creating-a-source-generator-part-1-creating-an-incremental-source-generator/
 * https://andrewlock.net/exploring-dotnet-6-part-9-source-generator-updates-incremental-generators/
 * https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md
