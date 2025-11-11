@@ -26,6 +26,7 @@ namespace NoWoL.SourceGenerators.Tests
         protected async Task WithWithEmbeddedFiles(List<DiagnosticResult>? expectedDiagnosticResults = null,
                                                    List<string>? additionalSourceFiles = null,
                                                    bool addGeneratedAttributeDefinitionFile = true,
+                                                   bool enableNullable = true,
                                                    [CallerMemberName] string callerMemberName = "")
         {
             if (string.IsNullOrWhiteSpace(callerMemberName))
@@ -59,7 +60,8 @@ namespace NoWoL.SourceGenerators.Tests
                            TestState =
                            {
                                Sources = { initialCode }
-                           }
+                           },
+                           NullableContextOptions = enableNullable ? NullableContextOptions.Enable : NullableContextOptions.Disable,
                        };
 
             if (addGeneratedAttributeDefinitionFile)

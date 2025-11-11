@@ -4,6 +4,7 @@
 NoWoL.SourceGenerators will contain C# (.NET 6/VS2022) source generators used to improve a developer's life. So far it includes:
 
 * a way to generate the boilerplate for an exception: `ExceptionGenerator`
+* a way to create a property that is always initialized using its defeault constructor: `AlwaysInitializedPropertyGenerator`
 * an simple async to sync code generator: `AsyncToSyncConverterGenerator`
 
 ## Installation

@@ -24,8 +24,12 @@ namespace Microsoft.CodeAnalysis.CSharp.Testing
             {
                 var compilationOptions = base.CreateCompilationOptions();
 
+                compilationOptions = (compilationOptions as CSharpCompilationOptions)!.WithNullableContextOptions(NullableContextOptions);
+
                 return compilationOptions.WithSpecificDiagnosticOptions(compilationOptions.SpecificDiagnosticOptions.SetItems(GetNullableWarningsFromCompiler()));
             }
+
+            public NullableContextOptions NullableContextOptions { get; set; } = NullableContextOptions.Enable;
 
             public LanguageVersion LanguageVersion { get; set; } = LanguageVersion.Default;
 

@@ -163,6 +163,8 @@
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClassStatic_6f4f0d6acbd258f3dca1daf7d1617dfa.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Generated.TestClass_d929c8f74755a926010ad94bb623242a.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\NestedClassesShouldSucceed.Initial.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\ShouldNotIncludeNullablePragma.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
+	  <Compile Remove="Content\TestFiles\Exception\ShouldNotIncludeNullablePragma.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\TestedNamespaceShouldSucceed.Generated.TestClass_a383433eba2b14850b3edf28962b30d7.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\TestedNamespaceShouldSucceed.Initial.cs" />
 	  <Compile Remove="Content\TestFiles\Exception\TwoExceptionClassesWithAttributeWithoutMessageShouldSucceed.Generated.AnotherTestClass_b331070b72c92651e7adfb4752fa9bfd.cs" />
@@ -293,6 +295,8 @@
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\ReturnsNonAwaitedValueGenericTask.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Generated.TestClass_MainMethod_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\AsyncRemover\TaskToVoidWithOneStatement.Initial.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\ShouldNotIncludeNullablePragma.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
+	  <EmbeddedResource Include="Content\TestFiles\Exception\ShouldNotIncludeNullablePragma.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\MultipleCreationMessages.Initial.cs" />
 	  <EmbeddedResource Include="Content\TestFiles\Exception\AliasedAttributeShouldSucceed.Generated.TestClass_ff77a22886df145d140e4b748d44b619.cs" />

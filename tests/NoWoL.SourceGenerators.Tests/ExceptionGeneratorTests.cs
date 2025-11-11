@@ -118,6 +118,14 @@ namespace NoWoL.SourceGenerators.Tests
         [Fact]
         [Trait("Category",
                "Unit")]
+        public async Task ShouldNotIncludeNullablePragma()
+        {
+            await WithWithEmbeddedFiles(enableNullable:false).ConfigureAwait(false);
+        }
+
+        [Fact]
+        [Trait("Category",
+               "Unit")]
         public async Task NestedClassesShouldSucceed()
         {
             await WithWithEmbeddedFiles().ConfigureAwait(false);

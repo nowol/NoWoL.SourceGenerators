@@ -28,6 +28,15 @@ namespace NoWoL.SourceGenerators
             IncrementalValuesProvider<ExceptionClassDefinition> withErrors = allClasses.Where(static m => m.DiagnosticDef.Initialized);
             IncrementalValuesProvider<ExceptionClassDefinition> withoutErrors = allClasses.Where(static m => !m.DiagnosticDef.Initialized);
 
+            var nullableContextInfo = context.CompilationProvider.Select(
+                (compilation, cancellationToken) =>
+                {
+                    // We only need the NullableContextOptions for this specific purpose
+                    return compilation.Options.NullableContextOptions;
+                });
+
+            var combined = withoutErrors.Combine(nullableContextInfo);
+
             context.RegisterSourceOutput(withErrors,
                                          (productionContext, definition) => {
 
@@ -38,17 +47,19 @@ namespace NoWoL.SourceGenerators
                                              productionContext.ReportDiagnostic(error);
                                          });
 
-            context.RegisterSourceOutput(withoutErrors,
-                                         static (spc, source) => Execute(source, spc));
+            context.RegisterSourceOutput(combined,
+                                         static (spc, source) => Execute(source.Left, source.Right, spc));
         }
 
-        private static void Execute(ExceptionClassDefinition classDefinition, SourceProductionContext context)
+        private static void Execute(ExceptionClassDefinition classDefinition, 
+                                    NullableContextOptions nullableContextOptions,
+                                    SourceProductionContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
             var sb = new IndentedStringBuilder();
             var classBuilder = new ExceptionClassBuilder();
-            classBuilder.GenerateException(sb, ref classDefinition);
+            classBuilder.GenerateException(sb, nullableContextOptions == NullableContextOptions.Enable, ref classDefinition);
 
             var filename = GenericClassBuilder.GenerateFilename(classDefinition.ClassDef.Name,
                                                                 classDefinition.ClassDef,
