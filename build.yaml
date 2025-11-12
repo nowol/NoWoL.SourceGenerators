@@ -36,34 +36,41 @@ stages:
           custom: 'tool'
           arguments: 'install -g dotnet-reportgenerator-globaltool'
 
-      - task: DotNetCoreCLI@2
-        displayName: 'Install Sonar Scanner'
-        inputs:
-          command: 'custom'
-          custom: 'tool'
-          arguments: 'install -g dotnet-sonarscanner'
-
       - task: gitversion/execute@0
         displayName: 'Execute GitVersion'
         inputs:
           additionalArguments: '/updateprojectfiles'
 
-      - task: SonarCloudPrepare@1
-        displayName: 'Install Sonar Scanner'
-        env:
-            SONAR_TOKEN: $(SonarCloudProjectToken)
+      - task: SonarCloudPrepare@3
+        displayName: 'Prepare Sonar Scanner'
         inputs:
           SonarCloud: 'SonarCloud'
           organization: 'nowol'
-          scannerMode: 'CLI'
-          configMode: 'manual'
-          cliProjectKey: '$(SonarCloudProjectKey)'
-          cliSources: '.'
+          scannerMode: 'dotnet'
+          projectKey: '$(SonarCloudProjectKey)'
+          projectName: 'SourceGenerators'
           extraProperties: |
-              sonar.cs.vstest.reportsPaths=artifacts\TestResults\*.trx
-              sonar.cs.vscoveragexml.reportsPaths=artifacts\TestResults\**\*.coveragexml
-              sonar.cs.opencover.reportsPaths=artifacts\TestResults\**\coverage.opencover.xml
-              sonar.verbose=true
+            sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)\TestResults\**
+            sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)\TestResults\**
+            sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)\TestResults\**\coverage.opencover.xml
+            sonar.verbose=true
+
+      # - task: SonarCloudPrepare@1
+      #   displayName: 'Install Sonar Scanner'
+      #   env:
+      #       SONAR_TOKEN: $(SonarCloudProjectToken)
+      #   inputs:
+      #     SonarCloud: 'SonarCloud'
+      #     organization: 'nowol'
+      #     scannerMode: 'CLI'
+      #     configMode: 'manual'
+      #     cliProjectKey: '$(SonarCloudProjectKey)'
+      #     cliSources: '.'
+      #     extraProperties: |
+      #         sonar.cs.vstest.reportsPaths=artifacts\TestResults\*.trx
+      #         sonar.cs.vscoveragexml.reportsPaths=artifacts\TestResults\**\*.coveragexml
+      #         sonar.cs.opencover.reportsPaths=artifacts\TestResults\**\coverage.opencover.xml
+      #         sonar.verbose=true
 
       - task: DotNetCoreCLI@2
         displayName: 'Execute Build In $(buildConfiguration) Mode'
@@ -116,10 +123,11 @@ stages:
           mergeTestResults: true
           failTaskOnFailedTests: true
 
-      - task: SonarCloudAnalyze@1
+      - task: SonarCloudAnalyze@3
         displayName: 'Run Sonar Scanner'
 
-      - task: SonarCloudPublish@1
+      - task: SonarCloudPublish@3
+        continueOnError: true
         inputs:
           pollingTimeoutSec: '300'
 
