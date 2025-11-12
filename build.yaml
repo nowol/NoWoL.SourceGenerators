@@ -43,10 +43,8 @@ stages:
 
       - task: SonarCloudPrepare@3
         displayName: 'Prepare Sonar Scanner'
-        env:
-          SONAR_TOKEN: $(SonarCloudProjectToken)
         inputs:
-          SonarCloud: 'SonarCloud'
+          SonarCloud: 'SonarCloud' # service connection
           organization: 'nowol'
           scannerMode: 'dotnet'
           projectKey: '$(SonarCloudProjectKey)'
@@ -56,23 +54,6 @@ stages:
             sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)\TestResults\**
             sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)\TestResults\**\coverage.opencover.xml
             sonar.verbose=true
-
-      # - task: SonarCloudPrepare@1
-      #   displayName: 'Install Sonar Scanner'
-      #   env:
-      #       SONAR_TOKEN: $(SonarCloudProjectToken)
-      #   inputs:
-      #     SonarCloud: 'SonarCloud'
-      #     organization: 'nowol'
-      #     scannerMode: 'CLI'
-      #     configMode: 'manual'
-      #     cliProjectKey: '$(SonarCloudProjectKey)'
-      #     cliSources: '.'
-      #     extraProperties: |
-      #         sonar.cs.vstest.reportsPaths=artifacts\TestResults\*.trx
-      #         sonar.cs.vscoveragexml.reportsPaths=artifacts\TestResults\**\*.coveragexml
-      #         sonar.cs.opencover.reportsPaths=artifacts\TestResults\**\coverage.opencover.xml
-      #         sonar.verbose=true
 
       - task: DotNetCoreCLI@2
         displayName: 'Execute Build In $(buildConfiguration) Mode'
