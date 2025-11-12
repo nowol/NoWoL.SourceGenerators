@@ -43,6 +43,8 @@ stages:
 
       - task: SonarCloudPrepare@3
         displayName: 'Prepare Sonar Scanner'
+        env:
+          SONAR_TOKEN: $(SonarCloudProjectToken)
         inputs:
           SonarCloud: 'SonarCloud'
           organization: 'nowol'
